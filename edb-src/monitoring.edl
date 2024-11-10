@@ -1,0 +1,131 @@
+
+TABLE monitoring_cluster {
+    cluster_name TEXT PRIMARY KEY,
+    namespace REF nomad_namespace DEFAULT epl,
+    region REF region DETACHED DEFAULT,
+    is_region_default BOOL DEFAULT false,
+
+    workload_architecture TEXT DEFAULT x86_64,
+    docker_image_prometheus REF docker_image_pin DETACHED DEFAULT,
+    docker_image_alertmanager REF docker_image_pin DETACHED DEFAULT,
+    docker_image_victoriametrics REF docker_image_pin DETACHED DEFAULT,
+
+    prometheus_memory_mb INT DEFAULT 768,
+    victoriametrics_memory_mb INT DEFAULT 256,
+    alertmanager_memory_mb INT DEFAULT 64,
+
+    prometheus_port INT DEFAULT 9090,
+    victoriametrics_port INT GENERATED AS { prometheus_port + 1 },
+    alertmanager_port INT GENERATED AS { victoriametrics_port + 1 },
+    alertmanager_p2p_port INT GENERATED AS { alertmanager_port + 1 },
+
+    CHECK { isKebabCase(cluster_name) },
+    CHECK { isValidPort(prometheus_port) and isValidPort(alertmanager_p2p_port) },
+    CHECK {
+        -- all ports must go in a row
+        areNumbersInSequence(prometheus_port, victoriametrics_port, alertmanager_port, alertmanager_p2p_port)
+    },
+}
+
+// these metrics will be evaluated and stored in compile
+// time database to make decisions based on metrics in compile time
+TABLE monitoring_cluster_scraped_metric {
+    metric_name TEXT PRIMARY KEY CHILD OF monitoring_cluster,
+    expression TEXT,
+
+    CHECK { isSnakeCase(metric_name) },
+    CHECK { checkValidScrapedMetricsNames(metric_name) },
+}
+
+// we need this to know instantly in the Makefile if we need to
+// unseal region, otherwise unsealing is slow for user
+// TODO: we want this per every region, how to do this?
+// maybe lua hook that processes after user defined all his data, and we can
+// create this per region?
+//DATA STRUCT monitoring_cluster_scraped_metric {
+//    metric_name: 'vault_sealed_clusters',
+//    expression: 'max_over_time( sum by (cluster) (vault_core_unsealed)[7d:] ) - sum by (cluster) (vault_core_unsealed)',
+//}
+
+TABLE monitoring_cluster_alert_group {
+    alert_group_name REF alert_group PRIMARY KEY CHILD OF monitoring_cluster,
+    telegram_channel REF telegram_channel,
+    telegram_bot REF telegram_bot,
+}
+
+// Single instance includes:
+// - prometheus
+// - victoria metrics
+TABLE monitoring_instance {
+    instance_id INT PRIMARY KEY CHILD OF monitoring_cluster,
+    monitoring_server REF FOREIGN CHILD server_volume,
+
+    UNIQUE(monitoring_server, cluster_name),
+
+    CHECK { instance_id > 0 },
+}
+
+// Single instance includes:
+// - alert manager
+TABLE alertmanager_instance {
+    instance_id INT PRIMARY KEY CHILD OF monitoring_cluster,
+    alertmanager_server REF FOREIGN CHILD server_volume,
+
+    UNIQUE(alertmanager_server, cluster_name),
+
+    CHECK { instance_id > 0 },
+}
+
+TABLE grafana {
+    deployment_name TEXT PRIMARY KEY,
+    namespace REF nomad_namespace DEFAULT epl,
+    region REF region DETACHED DEFAULT,
+    placement TEXT DEFAULT '',
+    workload_architecture TEXT DEFAULT x86_64,
+    docker_image_grafana REF docker_image_pin DETACHED DEFAULT,
+    docker_image_promxy REF docker_image_pin DETACHED DEFAULT,
+    loki_cluster TEXT DEFAULT region_default,
+    monitoring_cluster TEXT DEFAULT region_default,
+    port INT DEFAULT 3000,
+    promxy_port INT GENERATED AS { port + 1 },
+    instance_count INT DEFAULT 2,
+    database REF FOREIGN CHILD pg_deployment_unmanaged_db,
+    memory_mb INT DEFAULT 256,
+    promxy_memory_mb INT DEFAULT 128,
+
+    CHECK { instance_count >= 2 }, // at least two for HA, possibly more for scaling
+    CHECK { isValidPort(port) and isValidPort(promxy_port) },
+    CHECK { areNumbersInSequence( port, promxy_port ) },
+    CHECK { isKebabCase( deployment_name ) },
+}
+
+// filled with files
+TABLE grafana_dashboard {
+    filename TEXT PRIMARY KEY,
+    contents TEXT,
+}
+
+TABLE alert_group {
+    alert_group_name TEXT PRIMARY KEY,
+    CHECK { isPascalCase(alert_group_name) },
+}
+
+TABLE alert {
+    alert_name TEXT PRIMARY KEY CHILD OF alert_group,
+    expr TEXT,
+    description TEXT,
+    for_time TEXT DEFAULT '5m',
+    severity INT DEFAULT 50, // from 1 to 100
+    CHECK { severity >= 1 and severity <= 100 },
+    CHECK { isPascalCase(alert_name) },
+
+    UNIQUE(alert_name), // alert names are globally unique
+}
+
+TABLE alert_trigger_test {
+    expected_message TEXT PRIMARY KEY CHILD OF alert,
+    expected_labels TEXT DEFAULT '', // inferred if not specified
+    eval_time TEXT,
+    interval TEXT DEFAULT '1m',
+    input_series TEXT,
+}

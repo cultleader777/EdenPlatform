@@ -1,0 +1,1 @@
+/tank/projects/p1/test-envs/envs/gcloud-single-dc/servers/gcloud-image/nixos-image-23.05.2441.b7cde1c47b73-x86_64-linux.raw.tar.gz

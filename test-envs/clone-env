@@ -1,0 +1,58 @@
+#!/bin/sh
+
+# Use this script to clone environment from source environment quickly
+
+SOURCE_ENV=$1
+NEW_ENV=$2
+
+set -e
+
+if [ -z "$SOURCE_ENV" ];
+then
+	echo \$SOURCE_ENV is undefined
+	echo Usage: ./clone-env SOURCE_ENV NEW_ENV
+	exit 7
+fi
+
+if [ -z "$NEW_ENV" ];
+then
+	echo \$NEW_ENV is undefined
+	echo Usage: ./clone-env SOURCE_ENV NEW_ENV
+	exit 7
+fi
+
+if [ ! -d "envs/$SOURCE_ENV" ];
+then
+	echo envs/$SOURCE_ENV source test environment doesnt exist
+	exit 7
+fi
+
+if [[ ! "$NEW_ENV" =~ ^[a-z-]+$ ]];
+then
+	echo \"$NEW_ENV\" new environment name is not kebab case
+	exit 7
+fi
+
+if [ "$SOURCE_ENV" == "$NEW_ENV" ];
+then
+	echo Source environment and new environment are the same \"$SOURCE_ENV\" == \"$NEW_ENV\"
+	exit 7
+fi
+
+if [ -d "envs/$NEW_ENV" ];
+then
+	echo envs/$NEW_ENV new environment already exists
+	exit 7
+fi
+
+mkdir -p envs/$NEW_ENV
+
+echo Cloning environment $SOURCE_ENV to $NEW_ENV
+cp -rv envs/$SOURCE_ENV/data envs/$NEW_ENV/
+cp -rv envs/$SOURCE_ENV/apps envs/$NEW_ENV/
+cp -rv envs/$SOURCE_ENV/comp-envs envs/$NEW_ENV/
+cp -v envs/$SOURCE_ENV/Makefile envs/$NEW_ENV/
+mkdir envs/$NEW_ENV/integration-tests
+cp -v envs/$SOURCE_ENV/integration-tests/Cargo.toml envs/$NEW_ENV/integration-tests/
+cp -v envs/$SOURCE_ENV/integration-tests/Cargo.lock envs/$NEW_ENV/integration-tests/
+echo Done

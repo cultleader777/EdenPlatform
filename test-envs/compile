@@ -1,0 +1,41 @@
+#!/bin/sh
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+if [ "$PWD" != "$SCRIPT_DIR" ]
+then
+  echo This script must be called from its own directory
+  exit 7
+fi
+
+
+if [ -z "$EPL_SHELL" ]
+then
+  echo This script must be run inside eden platform shell.nix shell
+  exit 7
+fi
+
+export EPL_PROJECT="${EPL_PROJECT:-single-dc}"
+export EPL_ROOT_DIR="$(cd ..; pwd)"
+export EPL_EXECUTABLE=$EPL_ROOT_DIR/target/debug/epl
+
+if [ ! -d "envs/$EPL_PROJECT" ]
+then
+  echo "Project envs/$EPL_PROJECT doesn't exist."
+  exit 7
+fi
+
+export EPL_PROJECT_DIR="$(cd envs/$EPL_PROJECT; pwd)"
+export EPL_LIB_EVALUATED=true
+
+set -e
+
+# must run from root because we rely
+# on eden platform epl source files
+pushd $EPL_ROOT_DIR
+cargo build
+$EPL_ROOT_DIR/target/debug/epl \
+	compile \
+	--output-directory $EPL_PROJECT_DIR \
+	$EPL_PROJECT_DIR/data/main.edl
+popd

@@ -1,0 +1,4619 @@
+[
+  {
+    "instance_type": "a1.2xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 16384,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "a1.4xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 32768,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "a1.large",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "a1.medium",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 2048,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "a1.metal",
+    "arch": "arm64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 16,
+    "memory_mb": 32768,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "a1.xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 8192,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c4.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 15360,
+    "maximum_iops": 8000
+  },
+  {
+    "instance_type": "c4.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 30720,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "c4.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 36,
+    "memory_mb": 61440,
+    "maximum_iops": 32000
+  },
+  {
+    "instance_type": "c4.large",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 3840,
+    "maximum_iops": 4000
+  },
+  {
+    "instance_type": "c4.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 7680,
+    "maximum_iops": 6000
+  },
+  {
+    "instance_type": "c5.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 98304,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c5.18xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 72,
+    "memory_mb": 147456,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c5.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 196608,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c5.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 16384,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c5.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 32768,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c5.9xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 36,
+    "memory_mb": 73728,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c5.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c5.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 96,
+    "memory_mb": 196608,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c5.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 8192,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c5a.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 98304,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c5a.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 131072,
+    "maximum_iops": 26700
+  },
+  {
+    "instance_type": "c5a.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 196608,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c5a.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 16384,
+    "maximum_iops": 13300
+  },
+  {
+    "instance_type": "c5a.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 32768,
+    "maximum_iops": 13300
+  },
+  {
+    "instance_type": "c5a.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 65536,
+    "maximum_iops": 13300
+  },
+  {
+    "instance_type": "c5a.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": 13300
+  },
+  {
+    "instance_type": "c5a.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 8192,
+    "maximum_iops": 13300
+  },
+  {
+    "instance_type": "c5d.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 98304,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c5d.18xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 72,
+    "memory_mb": 147456,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c5d.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 196608,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c5d.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 16384,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c5d.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 32768,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c5d.9xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 36,
+    "memory_mb": 73728,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c5d.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c5d.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 96,
+    "memory_mb": 196608,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c5d.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 8192,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c5n.18xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 72,
+    "memory_mb": 196608,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c5n.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 21504,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c5n.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 43008,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c5n.9xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 36,
+    "memory_mb": 98304,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c5n.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 5376,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c5n.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 72,
+    "memory_mb": 196608,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c5n.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 10752,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c6a.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 98304,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "c6a.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 131072,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c6a.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 196608,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "c6a.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6a.32xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 128,
+    "memory_mb": 262144,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "c6a.48xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 192,
+    "memory_mb": 393216,
+    "maximum_iops": 240000
+  },
+  {
+    "instance_type": "c6a.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6a.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6a.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6a.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 192,
+    "memory_mb": 393216,
+    "maximum_iops": 240000
+  },
+  {
+    "instance_type": "c6a.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 8192,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6g.12xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 98304,
+    "maximum_iops": 50000
+  },
+  {
+    "instance_type": "c6g.16xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 131072,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c6g.2xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 16384,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c6g.4xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 32768,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c6g.8xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6g.large",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c6g.medium",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 2048,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c6g.metal",
+    "arch": "arm64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 64,
+    "memory_mb": 131072,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c6g.xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 8192,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c6gd.12xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 98304,
+    "maximum_iops": 50000
+  },
+  {
+    "instance_type": "c6gd.16xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 131072,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c6gd.2xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 16384,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c6gd.4xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 32768,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c6gd.8xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6gd.large",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c6gd.medium",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 2048,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c6gd.metal",
+    "arch": "arm64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 64,
+    "memory_mb": 131072,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c6gd.xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 8192,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "c6gn.12xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 98304,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "c6gn.16xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 131072,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "c6gn.2xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6gn.4xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6gn.8xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 65536,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c6gn.large",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6gn.medium",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 2048,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6gn.xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 8192,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6i.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 98304,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "c6i.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 131072,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c6i.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 196608,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "c6i.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6i.32xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 128,
+    "memory_mb": 262144,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "c6i.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6i.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6i.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6i.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 128,
+    "memory_mb": 262144,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "c6i.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 8192,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c6in.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 98304,
+    "maximum_iops": 150000
+  },
+  {
+    "instance_type": "c6in.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 131072,
+    "maximum_iops": 200000
+  },
+  {
+    "instance_type": "c6in.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 196608,
+    "maximum_iops": 300000
+  },
+  {
+    "instance_type": "c6in.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 16384,
+    "maximum_iops": 100000
+  },
+  {
+    "instance_type": "c6in.32xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 128,
+    "memory_mb": 262144,
+    "maximum_iops": 400000
+  },
+  {
+    "instance_type": "c6in.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 32768,
+    "maximum_iops": 100000
+  },
+  {
+    "instance_type": "c6in.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 65536,
+    "maximum_iops": 100000
+  },
+  {
+    "instance_type": "c6in.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": 100000
+  },
+  {
+    "instance_type": "c6in.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 128,
+    "memory_mb": 262144,
+    "maximum_iops": 400000
+  },
+  {
+    "instance_type": "c6in.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 8192,
+    "maximum_iops": 100000
+  },
+  {
+    "instance_type": "c7g.12xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 98304,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "c7g.16xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 131072,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c7g.2xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c7g.4xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c7g.8xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c7g.large",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c7g.medium",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 2048,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c7g.metal",
+    "arch": "arm64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 64,
+    "memory_mb": 131072,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c7g.xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 8192,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c7gd.12xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 98304,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "c7gd.16xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 131072,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c7gd.2xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c7gd.4xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c7gd.8xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c7gd.large",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c7gd.medium",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 2048,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c7gd.metal",
+    "arch": "arm64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 64,
+    "memory_mb": 131072,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c7gd.xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 8192,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c7i.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 98304,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "c7i.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 131072,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "c7i.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 196608,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "c7i.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c7i.48xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 192,
+    "memory_mb": 393216,
+    "maximum_iops": 240000
+  },
+  {
+    "instance_type": "c7i.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c7i.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c7i.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "c7i.metal-24xl",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 96,
+    "memory_mb": 196608,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "c7i.metal-48xl",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 192,
+    "memory_mb": 393216,
+    "maximum_iops": 240000
+  },
+  {
+    "instance_type": "c7i.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 8192,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "d2.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 62464,
+    "maximum_iops": 8000
+  },
+  {
+    "instance_type": "d2.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 124928,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "d2.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 36,
+    "memory_mb": 249856,
+    "maximum_iops": 32000
+  },
+  {
+    "instance_type": "d2.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 31232,
+    "maximum_iops": 6000
+  },
+  {
+    "instance_type": "d3.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 15000
+  },
+  {
+    "instance_type": "d3.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 131072,
+    "maximum_iops": 15000
+  },
+  {
+    "instance_type": "d3.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 262144,
+    "maximum_iops": 30000
+  },
+  {
+    "instance_type": "d3.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 15000
+  },
+  {
+    "instance_type": "g4dn.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 196608,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "g4dn.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "g4dn.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "g4dn.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 65536,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "g4dn.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "g4dn.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 96,
+    "memory_mb": 393216,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "g4dn.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "g5.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 196608,
+    "maximum_iops": 65000
+  },
+  {
+    "instance_type": "g5.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 65000
+  },
+  {
+    "instance_type": "g5.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 393216,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "g5.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 15000
+  },
+  {
+    "instance_type": "g5.48xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 192,
+    "memory_mb": 786432,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "g5.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 65536,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "g5.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 131072,
+    "maximum_iops": 65000
+  },
+  {
+    "instance_type": "g5.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 15000
+  },
+  {
+    "instance_type": "i2.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 62464,
+    "maximum_iops": 8000
+  },
+  {
+    "instance_type": "i2.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 124928,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "i2.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 249856,
+    "maximum_iops": null
+  },
+  {
+    "instance_type": "i2.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 31232,
+    "maximum_iops": 4000
+  },
+  {
+    "instance_type": "i3.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 499712,
+    "maximum_iops": 65000
+  },
+  {
+    "instance_type": "i3.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 62464,
+    "maximum_iops": 12000
+  },
+  {
+    "instance_type": "i3.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 124928,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "i3.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 249856,
+    "maximum_iops": 32500
+  },
+  {
+    "instance_type": "i3.large",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 15616,
+    "maximum_iops": 3000
+  },
+  {
+    "instance_type": "i3.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 72,
+    "memory_mb": 524288,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "i3.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 31232,
+    "maximum_iops": 6000
+  },
+  {
+    "instance_type": "i3en.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "i3en.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 786432,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "i3en.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "i3en.3xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 12,
+    "memory_mb": 98304,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "i3en.6xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 24,
+    "memory_mb": 196608,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "i3en.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 16384,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "i3en.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 96,
+    "memory_mb": 786432,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "i3en.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "i4i.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "i4i.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "i4i.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 786432,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "i4i.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "i4i.32xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 128,
+    "memory_mb": 1048576,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "i4i.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "i4i.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 262144,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "i4i.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "i4i.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 128,
+    "memory_mb": 1048576,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "i4i.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "inf1.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 196608,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "inf1.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 16384,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "inf1.6xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 24,
+    "memory_mb": 49152,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "inf1.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 8192,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "inf2.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 393216,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "inf2.48xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 192,
+    "memory_mb": 786432,
+    "maximum_iops": 240000
+  },
+  {
+    "instance_type": "inf2.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "inf2.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "is4gen.2xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 49152,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "is4gen.4xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 98304,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "is4gen.8xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 196608,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "is4gen.large",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 12288,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "is4gen.medium",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 6144,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "is4gen.xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 24576,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m4.10xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 40,
+    "memory_mb": 163840,
+    "maximum_iops": 32000
+  },
+  {
+    "instance_type": "m4.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 65000
+  },
+  {
+    "instance_type": "m4.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 8000
+  },
+  {
+    "instance_type": "m4.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 65536,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "m4.large",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 3600
+  },
+  {
+    "instance_type": "m4.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 6000
+  },
+  {
+    "instance_type": "m5.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 196608,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m5.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "m5.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 393216,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "m5.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "m5.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 65536,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "m5.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 131072,
+    "maximum_iops": 30000
+  },
+  {
+    "instance_type": "m5.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "m5.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 96,
+    "memory_mb": 393216,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "m5.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "m5a.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 196608,
+    "maximum_iops": 30000
+  },
+  {
+    "instance_type": "m5a.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m5a.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 393216,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "m5a.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "m5a.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 65536,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "m5a.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 131072,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "m5a.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "m5a.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "m5ad.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 196608,
+    "maximum_iops": 30000
+  },
+  {
+    "instance_type": "m5ad.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m5ad.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 393216,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "m5ad.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "m5ad.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 65536,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "m5ad.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 131072,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "m5ad.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "m5ad.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "m5d.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 196608,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m5d.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "m5d.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 393216,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "m5d.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "m5d.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 65536,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "m5d.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 131072,
+    "maximum_iops": 30000
+  },
+  {
+    "instance_type": "m5d.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "m5d.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 96,
+    "memory_mb": 393216,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "m5d.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "m6a.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 196608,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "m6a.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "m6a.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 393216,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "m6a.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m6a.32xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 128,
+    "memory_mb": 524288,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "m6a.48xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 192,
+    "memory_mb": 786432,
+    "maximum_iops": 240000
+  },
+  {
+    "instance_type": "m6a.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m6a.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m6a.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m6a.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 192,
+    "memory_mb": 786432,
+    "maximum_iops": 240000
+  },
+  {
+    "instance_type": "m6a.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m6g.12xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 196608,
+    "maximum_iops": 50000
+  },
+  {
+    "instance_type": "m6g.16xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "m6g.2xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "m6g.4xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 65536,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "m6g.8xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m6g.large",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "m6g.medium",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 4096,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "m6g.metal",
+    "arch": "arm64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "m6g.xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "m6gd.12xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 196608,
+    "maximum_iops": 50000
+  },
+  {
+    "instance_type": "m6gd.16xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "m6gd.2xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "m6gd.4xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 65536,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "m6gd.8xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m6gd.large",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "m6gd.medium",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 4096,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "m6gd.metal",
+    "arch": "arm64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "m6gd.xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "m6i.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 196608,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "m6i.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "m6i.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 393216,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "m6i.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m6i.32xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 128,
+    "memory_mb": 524288,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "m6i.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m6i.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m6i.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m6i.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 128,
+    "memory_mb": 524288,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "m6i.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m6id.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 196608,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "m6id.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "m6id.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 393216,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "m6id.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m6id.32xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 128,
+    "memory_mb": 524288,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "m6id.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m6id.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m6id.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m6id.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 128,
+    "memory_mb": 524288,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "m6id.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7g.12xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 196608,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "m7g.16xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "m7g.2xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7g.4xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7g.8xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7g.large",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7g.medium",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 4096,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7g.metal",
+    "arch": "arm64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "m7g.xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7gd.12xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 196608,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "m7gd.16xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "m7gd.2xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7gd.4xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7gd.8xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7gd.large",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7gd.medium",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 4096,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7gd.metal",
+    "arch": "arm64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "m7gd.xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7i-flex.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7i-flex.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7i-flex.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7i-flex.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7i-flex.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7i.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 196608,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "m7i.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 262144,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "m7i.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 393216,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "m7i.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7i.48xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 192,
+    "memory_mb": 786432,
+    "maximum_iops": 240000
+  },
+  {
+    "instance_type": "m7i.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7i.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7i.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "m7i.metal-24xl",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 96,
+    "memory_mb": 393216,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "m7i.metal-48xl",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 192,
+    "memory_mb": 786432,
+    "maximum_iops": 240000
+  },
+  {
+    "instance_type": "m7i.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "mac1.metal",
+    "arch": "x86_64_mac",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 12,
+    "memory_mb": 32768,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "p2.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 749568,
+    "maximum_iops": 65000
+  },
+  {
+    "instance_type": "p2.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 499712,
+    "maximum_iops": 32500
+  },
+  {
+    "instance_type": "p2.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 62464,
+    "maximum_iops": 6000
+  },
+  {
+    "instance_type": "r3.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 62464,
+    "maximum_iops": 8000
+  },
+  {
+    "instance_type": "r3.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 124928,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "r3.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 249856,
+    "maximum_iops": null
+  },
+  {
+    "instance_type": "r3.large",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 15360,
+    "maximum_iops": null
+  },
+  {
+    "instance_type": "r3.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 31232,
+    "maximum_iops": 4000
+  },
+  {
+    "instance_type": "r4.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 499712,
+    "maximum_iops": 75000
+  },
+  {
+    "instance_type": "r4.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 62464,
+    "maximum_iops": 12000
+  },
+  {
+    "instance_type": "r4.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 124928,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "r4.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 249856,
+    "maximum_iops": 37500
+  },
+  {
+    "instance_type": "r4.large",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 15616,
+    "maximum_iops": 3000
+  },
+  {
+    "instance_type": "r4.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 31232,
+    "maximum_iops": 6000
+  },
+  {
+    "instance_type": "r5.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r5.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "r5.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 786432,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r5.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "r5.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 131072,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "r5.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 262144,
+    "maximum_iops": 30000
+  },
+  {
+    "instance_type": "r5.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 16384,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "r5.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 96,
+    "memory_mb": 786432,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r5.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "r5a.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 30000
+  },
+  {
+    "instance_type": "r5a.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r5a.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 786432,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "r5a.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "r5a.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 131072,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "r5a.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 262144,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "r5a.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 16384,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "r5a.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "r5ad.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 30000
+  },
+  {
+    "instance_type": "r5ad.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r5ad.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 786432,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "r5ad.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "r5ad.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 131072,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "r5ad.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 262144,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "r5ad.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 16384,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "r5ad.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 16000
+  },
+  {
+    "instance_type": "r5d.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r5d.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "r5d.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 786432,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r5d.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "r5d.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 131072,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "r5d.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 262144,
+    "maximum_iops": 30000
+  },
+  {
+    "instance_type": "r5d.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 16384,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "r5d.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 96,
+    "memory_mb": 786432,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r5d.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "r5n.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r5n.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "r5n.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 786432,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r5n.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "r5n.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 131072,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "r5n.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 262144,
+    "maximum_iops": 30000
+  },
+  {
+    "instance_type": "r5n.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 16384,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "r5n.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 96,
+    "memory_mb": 786432,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r5n.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 18750
+  },
+  {
+    "instance_type": "r6a.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "r6a.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r6a.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 786432,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "r6a.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r6a.32xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 128,
+    "memory_mb": 1048576,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "r6a.48xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 192,
+    "memory_mb": 1572864,
+    "maximum_iops": 240000
+  },
+  {
+    "instance_type": "r6a.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r6a.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 262144,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r6a.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r6a.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 192,
+    "memory_mb": 1572864,
+    "maximum_iops": 240000
+  },
+  {
+    "instance_type": "r6a.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r6g.12xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 50000
+  },
+  {
+    "instance_type": "r6g.16xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r6g.2xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "r6g.4xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 131072,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "r6g.8xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 262144,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r6g.large",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 16384,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "r6g.medium",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 8192,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "r6g.metal",
+    "arch": "arm64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r6g.xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "r6gd.12xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 50000
+  },
+  {
+    "instance_type": "r6gd.16xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r6gd.2xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "r6gd.4xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 131072,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "r6gd.8xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 262144,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r6gd.large",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 16384,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "r6gd.medium",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 8192,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "r6gd.metal",
+    "arch": "arm64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r6gd.xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "r6i.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "r6i.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r6i.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 786432,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "r6i.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r6i.32xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 128,
+    "memory_mb": 1048576,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "r6i.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r6i.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 262144,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r6i.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r6i.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 128,
+    "memory_mb": 1048576,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "r6i.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r6id.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "r6id.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r6id.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 786432,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "r6id.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r6id.32xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 128,
+    "memory_mb": 1048576,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "r6id.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r6id.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 262144,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r6id.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r6id.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 128,
+    "memory_mb": 1048576,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "r6id.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7g.12xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "r7g.16xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r7g.2xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7g.4xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7g.8xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 262144,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7g.large",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7g.medium",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 8192,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7g.metal",
+    "arch": "arm64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r7g.xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7gd.12xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "r7gd.16xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r7gd.2xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7gd.4xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7gd.8xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 262144,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7gd.large",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7gd.medium",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 8192,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7gd.metal",
+    "arch": "arm64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r7gd.xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7i.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 60000
+  },
+  {
+    "instance_type": "r7i.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 524288,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "r7i.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 786432,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "r7i.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7i.48xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 192,
+    "memory_mb": 1572864,
+    "maximum_iops": 240000
+  },
+  {
+    "instance_type": "r7i.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 131072,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7i.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 262144,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7i.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 16384,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "r7i.metal-24xl",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 96,
+    "memory_mb": 786432,
+    "maximum_iops": 120000
+  },
+  {
+    "instance_type": "r7i.metal-48xl",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 192,
+    "memory_mb": 1572864,
+    "maximum_iops": 240000
+  },
+  {
+    "instance_type": "r7i.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "t2.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": null
+  },
+  {
+    "instance_type": "t2.large",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": null
+  },
+  {
+    "instance_type": "t2.medium",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": null
+  },
+  {
+    "instance_type": "t2.micro",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 1024,
+    "maximum_iops": null
+  },
+  {
+    "instance_type": "t2.nano",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 512,
+    "maximum_iops": null
+  },
+  {
+    "instance_type": "t2.small",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 1,
+    "memory_mb": 2048,
+    "maximum_iops": null
+  },
+  {
+    "instance_type": "t2.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": null
+  },
+  {
+    "instance_type": "t3.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 15700
+  },
+  {
+    "instance_type": "t3.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 15700
+  },
+  {
+    "instance_type": "t3.medium",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": 11800
+  },
+  {
+    "instance_type": "t3.micro",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 1024,
+    "maximum_iops": 11800
+  },
+  {
+    "instance_type": "t3.nano",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 512,
+    "maximum_iops": 11800
+  },
+  {
+    "instance_type": "t3.small",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 2048,
+    "maximum_iops": 11800
+  },
+  {
+    "instance_type": "t3.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 15700
+  },
+  {
+    "instance_type": "t3a.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 15700
+  },
+  {
+    "instance_type": "t3a.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 15700
+  },
+  {
+    "instance_type": "t3a.medium",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": 11800
+  },
+  {
+    "instance_type": "t3a.micro",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 1024,
+    "maximum_iops": 11800
+  },
+  {
+    "instance_type": "t3a.nano",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 512,
+    "maximum_iops": 11800
+  },
+  {
+    "instance_type": "t3a.small",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 2048,
+    "maximum_iops": 11800
+  },
+  {
+    "instance_type": "t3a.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 15700
+  },
+  {
+    "instance_type": "t4g.2xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 32768,
+    "maximum_iops": 15700
+  },
+  {
+    "instance_type": "t4g.large",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 8192,
+    "maximum_iops": 15700
+  },
+  {
+    "instance_type": "t4g.medium",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 4096,
+    "maximum_iops": 11800
+  },
+  {
+    "instance_type": "t4g.micro",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 1024,
+    "maximum_iops": 11800
+  },
+  {
+    "instance_type": "t4g.nano",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 512,
+    "maximum_iops": 11800
+  },
+  {
+    "instance_type": "t4g.small",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 2048,
+    "maximum_iops": 11800
+  },
+  {
+    "instance_type": "t4g.xlarge",
+    "arch": "arm64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 16384,
+    "maximum_iops": 15700
+  },
+  {
+    "instance_type": "u-12tb1.112xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 448,
+    "memory_mb": 12582912,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "u-6tb1.112xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 448,
+    "memory_mb": 6291456,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "u-6tb1.56xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 224,
+    "memory_mb": 6291456,
+    "maximum_iops": 160000
+  },
+  {
+    "instance_type": "x1.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 999424,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "x1.32xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 128,
+    "memory_mb": 1998848,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "x1e.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 1998848,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "x1e.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 249856,
+    "maximum_iops": 7400
+  },
+  {
+    "instance_type": "x1e.32xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 128,
+    "memory_mb": 3997696,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "x1e.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 499712,
+    "maximum_iops": 10000
+  },
+  {
+    "instance_type": "x1e.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 999424,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "x1e.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "xen",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 124928,
+    "maximum_iops": 3700
+  },
+  {
+    "instance_type": "x2idn.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 1048576,
+    "maximum_iops": 173333
+  },
+  {
+    "instance_type": "x2idn.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 1572864,
+    "maximum_iops": 260000
+  },
+  {
+    "instance_type": "x2idn.32xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 128,
+    "memory_mb": 2097152,
+    "maximum_iops": 260000
+  },
+  {
+    "instance_type": "x2idn.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 128,
+    "memory_mb": 2097152,
+    "maximum_iops": 260000
+  },
+  {
+    "instance_type": "x2iedn.16xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 64,
+    "memory_mb": 2097152,
+    "maximum_iops": 130000
+  },
+  {
+    "instance_type": "x2iedn.24xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 96,
+    "memory_mb": 3145728,
+    "maximum_iops": 195000
+  },
+  {
+    "instance_type": "x2iedn.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 262144,
+    "maximum_iops": 65000
+  },
+  {
+    "instance_type": "x2iedn.32xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 128,
+    "memory_mb": 4194304,
+    "maximum_iops": 260000
+  },
+  {
+    "instance_type": "x2iedn.4xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 16,
+    "memory_mb": 524288,
+    "maximum_iops": 65000
+  },
+  {
+    "instance_type": "x2iedn.8xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 32,
+    "memory_mb": 1048576,
+    "maximum_iops": 65000
+  },
+  {
+    "instance_type": "x2iedn.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 128,
+    "memory_mb": 4194304,
+    "maximum_iops": 260000
+  },
+  {
+    "instance_type": "x2iedn.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 131072,
+    "maximum_iops": 65000
+  },
+  {
+    "instance_type": "z1d.12xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "z1d.2xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 8,
+    "memory_mb": 65536,
+    "maximum_iops": 13333
+  },
+  {
+    "instance_type": "z1d.3xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 12,
+    "memory_mb": 98304,
+    "maximum_iops": 20000
+  },
+  {
+    "instance_type": "z1d.6xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 24,
+    "memory_mb": 196608,
+    "maximum_iops": 40000
+  },
+  {
+    "instance_type": "z1d.large",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 2,
+    "memory_mb": 16384,
+    "maximum_iops": 13333
+  },
+  {
+    "instance_type": "z1d.metal",
+    "arch": "x86_64",
+    "hypervisor": null,
+    "bare_metal": true,
+    "cores": 48,
+    "memory_mb": 393216,
+    "maximum_iops": 80000
+  },
+  {
+    "instance_type": "z1d.xlarge",
+    "arch": "x86_64",
+    "hypervisor": "nitro",
+    "bare_metal": false,
+    "cores": 4,
+    "memory_mb": 32768,
+    "maximum_iops": 13333
+  }
+]

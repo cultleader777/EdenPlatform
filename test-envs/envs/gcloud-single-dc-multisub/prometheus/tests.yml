@@ -1,0 +1,22 @@
+
+rule_files:
+- alert_rules.yml
+
+tests:
+- interval: 1m
+  input_series:
+    - series: 'node_filesystem_free_bytes{device="/mookie",instance="some-server:9090",fstype="zfs"}'
+      values: '1 1 1 1 1 1 1 1 1 1'
+    - series: 'node_filesystem_size_bytes{device="/mookie",instance="some-server:9090",fstype="zfs"}'
+      values: '10 10 10 10 10 10 10 10 10 10'
+  alert_rule_test:
+    - eval_time: 10m
+      alertname: FilesystemSpaceLow
+      exp_alerts:
+        - exp_labels:
+            severity: 50
+            device: "/mookie"
+            fstype: "zfs"
+            instance: "some-server:9090"
+          exp_annotations:
+            description: "Filesystem /mookie at some-server:9090 has less than 20% disk space remaining"

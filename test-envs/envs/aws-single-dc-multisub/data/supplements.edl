@@ -1,0 +1,3 @@
+DATA aws_gateway_interfaces {
+  10.17.0.7, eni-0b26458b8a02718d8;
+}

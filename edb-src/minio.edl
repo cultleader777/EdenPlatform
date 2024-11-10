@@ -1,0 +1,47 @@
+
+TABLE minio_cluster {
+    cluster_name TEXT PRIMARY KEY,
+    namespace REF nomad_namespace DEFAULT epl,
+    region REF region DETACHED DEFAULT,
+    workload_architecture TEXT DEFAULT x86_64,
+    docker_image_minio REF docker_image_pin DETACHED DEFAULT,
+    docker_image_minio_mc REF docker_image_pin DETACHED DEFAULT,
+    docker_image_nginx REF docker_image_pin DETACHED DEFAULT,
+    api_port INT DEFAULT 9000,
+    console_port INT DEFAULT 9001,
+    lb_port INT DEFAULT 9002,
+    loki_cluster TEXT DEFAULT region_default,
+    monitoring_cluster TEXT DEFAULT region_default,
+    expected_zfs_recordsize TEXT DEFAULT 1M,
+    distribute_over_dcs BOOL DEFAULT true,
+
+    instance_memory_mb INT DEFAULT 1024,
+    lb_memory_mb INT DEFAULT 64,
+
+    consul_service_name TEXT GENERATED AS { "epl-minio-" .. cluster_name },
+
+    CHECK { isKebabCase(cluster_name) },
+    CHECK { isValidPort(api_port) },
+    CHECK { isValidPort(console_port) },
+    CHECK { isValidPort(lb_port) },
+    CHECK { areNumbersInSequence(api_port, console_port, lb_port) },
+    CHECK { instance_memory_mb > 16 },
+    CHECK { lb_memory_mb > 16 },
+}
+
+TABLE minio_instance {
+    instance_id INT PRIMARY KEY CHILD OF minio_cluster,
+    instance_volume REF FOREIGN CHILD server_volume,
+
+    CHECK { instance_id > 0 },
+}
+
+TABLE minio_bucket {
+    bucket_name TEXT PRIMARY KEY CHILD OF minio_cluster,
+    locking_enabled BOOL DEFAULT true,
+
+    // s3 bucket naming convention
+    CHECK { isKebabCase(bucket_name) },
+    // s3 bucket naming character limit
+    CHECK { string.len(bucket_name) >= 3 and string.len(bucket_name) <= 63 },
+}

@@ -1,0 +1,173 @@
+TABLE ch_deployment {
+    deployment_name TEXT PRIMARY KEY,
+    namespace REF nomad_namespace DEFAULT epl,
+    region REF region DETACHED DEFAULT,
+    loki_cluster TEXT DEFAULT region_default,
+    monitoring_cluster TEXT DEFAULT region_default,
+    docker_image REF docker_image_pin DETACHED DEFAULT,
+    workload_architecture TEXT DEFAULT x86_64,
+    keeper REF ch_keeper_deployment,
+    // extra memory to reserve besides tuning settings
+    extra_memory_mb INT DEFAULT 32,
+    // default values are for running clickhouse with minimum requirements
+    mark_cache_size_mb INT DEFAULT 128,
+    index_mark_cache_size_mb INT DEFAULT 16,
+    uncompressed_cache_size_mb INT DEFAULT 256,
+    compiled_expression_cache_size_mb INT DEFAULT 8,
+    query_cache_size_mb INT DEFAULT 8,
+    max_thread_pool_size INT DEFAULT 10000,
+    max_concurrent_queries INT DEFAULT 100,
+    merge_max_block_size INT DEFAULT 1024,
+    max_bytes_to_merge_at_max_space_in_pool_mb INT DEFAULT 1024,
+    max_query_execution_time_seconds INT DEFAULT 10,
+    queue_max_wait_ms INT DEFAULT 1000,
+    distribute_over_dcs BOOL DEFAULT true,
+
+    native_port INT DEFAULT 8120,
+    http_port INT GENERATED AS { native_port + 1 },
+    replication_port INT GENERATED AS { http_port + 1 },
+    prometheus_port INT GENERATED AS { replication_port + 1 },
+
+    // first and last ports
+    CHECK { isValidPort(native_port) and isValidPort(prometheus_port) },
+    CHECK {
+        -- all ports must go in a row
+        local res = areNumbersInSequence(
+            native_port,
+            http_port,
+            replication_port,
+            prometheus_port
+        )
+        res -- TODO: return
+    },
+    // is in consul dns name
+    CHECK { isKebabCase(deployment_name) },
+    CHECK { isValidArchitecture(workload_architecture) },
+    CHECK { mark_cache_size_mb >= 16 },
+    CHECK { index_mark_cache_size_mb >= 16 },
+    CHECK { uncompressed_cache_size_mb >= 16 },
+    CHECK { compiled_expression_cache_size_mb >= 8 },
+    CHECK { max_thread_pool_size >= 1000 },
+    CHECK { query_cache_size_mb >= 8 },
+    CHECK { extra_memory_mb >= 32 },
+    CHECK { max_concurrent_queries >= 8 },
+    CHECK { isValidMergeMaxBlockSize(merge_max_block_size) },
+    CHECK { max_query_execution_time_seconds >= 1 },
+    CHECK { queue_max_wait_ms >= 1000 },
+}
+
+TABLE ch_deployment_instance {
+    instance_id INT PRIMARY KEY CHILD OF ch_deployment,
+    ch_server REF FOREIGN CHILD server_volume,
+    UNIQUE(ch_server, deployment_name),
+    UNIQUE(instance_id, deployment_name),
+
+    CHECK { instance_id > 0 },
+}
+
+TABLE ch_keeper_deployment {
+    deployment_name TEXT PRIMARY KEY,
+    namespace REF nomad_namespace DEFAULT epl,
+    region REF region DETACHED DEFAULT,
+    loki_cluster TEXT DEFAULT region_default,
+    monitoring_cluster TEXT DEFAULT region_default,
+    docker_image REF docker_image_pin DETACHED DEFAULT,
+    workload_architecture TEXT DEFAULT x86_64,
+    distribute_over_dcs BOOL DEFAULT true,
+    memory_mb INT DEFAULT 128,
+
+    keeper_port INT DEFAULT 9181,
+    raft_port INT GENERATED AS { keeper_port + 1 },
+    prometheus_port INT GENERATED AS { raft_port + 1 },
+
+    // first and last ports
+    CHECK { isValidPort(keeper_port) and isValidPort(raft_port) },
+    CHECK {
+        -- all ports must go in a row
+        local res = areNumbersInSequence(
+            keeper_port,
+            raft_port
+        )
+        res -- TODO: return
+    },
+    // is in consul dns name
+    CHECK { isKebabCase(deployment_name) },
+    CHECK { isValidArchitecture(workload_architecture) },
+    // keeper should never use more than GB by blog post?
+    CHECK { memory_mb >= 32 and memory_mb <= 1024 },
+}
+
+TABLE ch_keeper_deployment_instance {
+    instance_id INT PRIMARY KEY CHILD OF ch_keeper_deployment,
+    keeper_server REF FOREIGN CHILD server_volume,
+    //keeper_server REF FOREIGN CHILD server_volume,
+    UNIQUE(keeper_server, deployment_name),
+    UNIQUE(instance_id, deployment_name),
+
+    CHECK { instance_id > 0 },
+}
+
+TABLE ch_schema {
+    schema_name TEXT PRIMARY KEY,
+
+    CHECK { isSnakeCase(schema_name) },
+}
+
+TABLE ch_migration {
+    time INT PRIMARY KEY CHILD OF ch_schema,
+    upgrade TEXT,
+    downgrade TEXT,
+    needs_admin BOOL DEFAULT false,
+    CHECK { time >= 0 },
+    CHECK { noEOF(upgrade) },
+    CHECK { noEOF(downgrade) },
+}
+
+TABLE ch_query {
+    query_name TEXT PRIMARY KEY CHILD OF ch_schema,
+    query_expression TEXT,
+    opt_fields TEXT DEFAULT '',
+    CHECK { isSnakeCase(query_name) },
+}
+
+TABLE ch_query_test {
+    arguments TEXT PRIMARY KEY CHILD OF ch_query,
+    outputs TEXT,
+    test_dataset REF ch_test_dataset,
+}
+
+TABLE ch_mutator {
+    mutator_name TEXT PRIMARY KEY CHILD OF ch_schema,
+    mutator_expression TEXT,
+    CHECK { isSnakeCase(mutator_name) },
+}
+
+TABLE ch_mutator_test {
+    arguments TEXT PRIMARY KEY CHILD OF ch_mutator,
+    test_dataset REF ch_test_dataset,
+    // resulting data for checking mutator did what we expect
+    resulting_data TEXT,
+}
+
+TABLE ch_test_dataset {
+    dataset_name TEXT PRIMARY KEY CHILD OF ch_schema,
+    dataset_contents TEXT,
+    min_time INT DEFAULT 0,
+}
+
+TABLE ch_deployment_schemas {
+    db_name TEXT PRIMARY KEY CHILD OF ch_deployment,
+    ch_schema REF ch_schema,
+
+    CHECK { isSnakeCase(db_name) },
+    CHECK { not isInSet(CH_FORBIDDEN_DB_NAMES, db_name) },
+}
+
+TABLE ch_nats_stream_import {
+    consumer_name TEXT PRIMARY KEY CHILD OF ch_deployment_schemas,
+    into_table TEXT,
+    stream REF FOREIGN CHILD nats_jetstream_stream,
+    UNIQUE(consumer_name), // unique across all epl environment
+    CHECK { isSnakeCase(consumer_name) },
+    CHECK { isSnakeCase(into_table) },
+}

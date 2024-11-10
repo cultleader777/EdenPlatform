@@ -1,0 +1,5 @@
+set -e
+wait
+
+wait
+

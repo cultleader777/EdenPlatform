@@ -1,0 +1,33 @@
+
+DATA STRUCT minio_cluster {
+  cluster_name: global,
+  WITH minio_instance [
+    {
+      instance_id: 1,
+      instance_volume: server-a=>minio-docker-a,
+    },
+    {
+      instance_id: 2,
+      instance_volume: server-b=>minio-docker-b,
+    },
+    {
+      instance_id: 3,
+      instance_volume: server-c=>minio-docker-c,
+    },
+    {
+      instance_id: 4,
+      instance_volume: server-e=>minio-docker-e,
+    },
+  ]
+  WITH minio_bucket [
+    {
+      bucket_name: docker,
+    },
+    {
+      bucket_name: loki,
+    },
+    {
+      bucket_name: tempo,
+    },
+  ]
+}

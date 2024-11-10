@@ -1,0 +1,4 @@
+INCLUDE "cloud_specific/aws.edl"
+INCLUDE "cloud_specific/aws_disks.edl"
+INCLUDE "cloud_specific/gcloud.edl"
+INCLUDE "cloud_specific/gcloud_disks.edl"

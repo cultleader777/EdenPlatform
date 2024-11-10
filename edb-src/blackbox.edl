@@ -1,0 +1,76 @@
+
+TABLE blackbox_deployment {
+    deployment_name TEXT PRIMARY KEY,
+    namespace REF nomad_namespace DEFAULT epl,
+    region REF region DETACHED DEFAULT,
+    loki_cluster TEXT DEFAULT region_default,
+    monitoring_cluster TEXT DEFAULT region_default,
+
+    CHECK { isKebabCase(deployment_name) },
+}
+
+TABLE blackbox_deployment_group {
+    group_name TEXT PRIMARY KEY CHILD OF blackbox_deployment,
+    count INT DEFAULT 1,
+    workload_architecture TEXT DEFAULT x86_64,
+    placement TEXT DEFAULT '',
+
+    CHECK { count >= 1 },
+}
+
+TABLE blackbox_deployment_port {
+    port INT PRIMARY KEY CHILD OF blackbox_deployment_group,
+    port_description TEXT,
+    protocol TEXT blackbox_deployment_port,
+    http_healthcheck_path TEXT,
+
+    CHECK { isValidPort(port) },
+    CHECK { isValidBlackboxPortProtocol(protocol) },
+}
+
+TABLE blackbox_deployment_task {
+    task_name TEXT PRIMARY KEY CHILD OF blackbox_deployment_group,
+    docker_image REF docker_image_pin,
+    docker_image_set REF docker_image_set,
+    memory_mb INT,
+    memory_oversubscription_mb INT DEFAULT 128,
+    entrypoint TEXT DEFAULT '',
+    args TEXT DEFAULT '',
+    CHECK { memory_mb >= 32 },
+    CHECK { memory_oversubscription_mb >= 0 and memory_oversubscription_mb <= 10240 },
+}
+
+TABLE blackbox_deployment_task_mount {
+    target_path TEXT PRIMARY KEY CHILD OF blackbox_deployment_task,
+    server_volume REF FOREIGN CHILD server_volume,
+}
+
+TABLE blackbox_deployment_vault_secret {
+    secret_name TEXT PRIMARY KEY CHILD OF blackbox_deployment_task,
+    target_file_name TEXT DEFAULT '',
+    target_env_var_name TEXT DEFAULT '',
+}
+
+TABLE blackbox_deployment_local_file {
+    local_file_name TEXT PRIMARY KEY CHILD OF blackbox_deployment_task,
+    local_file_contents TEXT,
+    mode TEXT DEFAULT 644,
+    CHECK { mode == '644' or mode == '755' },
+}
+
+TABLE blackbox_deployment_service_registration {
+    service_name TEXT PRIMARY KEY CHILD OF blackbox_deployment,
+    scrape_prometheus_metrics BOOL DEFAULT false,
+    prometheus_metrics_path TEXT DEFAULT '/metrics',
+    // by default strive for high availability
+    min_instances INT DEFAULT 2,
+
+    CHECK { min_instances >= 1 },
+    CHECK { isKebabCase(service_name) },
+    CHECK { stringStarts(service_name, 'epl-bb-') },
+}
+
+TABLE blackbox_deployment_service_instance {
+    service_registration REF blackbox_deployment_service_registration PRIMARY KEY CHILD OF blackbox_deployment_group,
+    port REF blackbox_deployment_port,
+}

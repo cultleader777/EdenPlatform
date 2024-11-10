@@ -1,0 +1,533 @@
+DATA STRUCT global_settings {
+  project_name: gcloud-multi-dc,
+  admin_email: admin@epl-infra.net,
+  google_cloud_artefacts_bucket_name: tnzatmjnrpbw,
+  google_cloud_project_id: test1-406308,
+}
+
+DATA admin_ssh_keys {
+  "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC3AkuDzzPrMaDav0kN7PIoaBU1Vtw1TfkHxWzPMrleocCltYl8TljwCqEJtmizx5DGKbXFQg31mRVswzuAq2vP2RFdPHQxfl5nJnWsQkelvpPO/Q3LUdtrm19zAgbbDL+AtIg3/lif6/2qNiWCSTfaUpjM7WOPszBNmMRGz/UBZTYc7COTt+I3lK8f6sBn5YyD796LBw6tsNpqfqF9NTAsLT8/PqrXeTpdxFe375gMxeIpNWeE5exMGJKgqnZCcOMOoKMJy61+wdEAYzDFNgIX7ZFvpBYQPf/rTs7LWgtyTSw3fqvMDnfwAf7oIF8rZRwYdVnqTGCWA2h3f4lOf6BERIPkKEK7/DGjmekKnXJrRiLSfcgRjri3VuGBxrJ+Va/Dn6e7o7CdzdJ+fkw7KxTFKuf17Z2r3ZFi1xOduIxXW8/QY6zhq2A11e+HsMe/oaBh3bRcpdMFmW5mqQjGm05xvxArSCAARBKkHjywGs6mRLN2PjNPYdzlI2J8nF6bmSk= henlo";
+}
+
+DATA STRUCT EXCLUSIVE datacenter [
+    {
+        dc_name: dc1,
+        network_cidr: '10.17.0.0/16',
+        implementation: gcloud,
+        implementation_settings: '
+            availability_zone: us-west2-a
+        ',
+    },
+    {
+        dc_name: dc2,
+        network_cidr: '10.18.0.0/16',
+        implementation: gcloud,
+        implementation_settings: '
+            availability_zone: us-west2-b
+        ',
+    },
+    {
+        dc_name: dc3,
+        network_cidr: '10.19.0.0/16',
+        implementation: gcloud,
+        implementation_settings: '
+            availability_zone: us-west2-c
+        ',
+    },
+]
+
+DEFAULTS {
+  server.dc dc1,
+  server.nixpkgs_environment default_nixpkgs,
+  datacenter.region us-west,
+  datacenter.implementation aws,
+  datacenter.default_server_kind gcloud.e2-standard-4,
+  server_disk.disk_kind default-ssd,
+  region.tld epl-infra.net,
+  rust_compilation_environment.nixpkgs_environment default_nixpkgs,
+  frontend_application_deployment.region us-west,
+  backend_application_deployment.region us-west,
+  pg_deployment.region us-west,
+  nats_cluster.region us-west,
+  minio_cluster.region us-west,
+  monitoring_cluster.region us-west,
+  grafana.region us-west,
+  loki_cluster.region us-west,
+  tempo_cluster.region us-west,
+  ch_deployment.region us-west,
+  ch_keeper_deployment.region us-west,
+  blackbox_deployment.region us-west,
+}
+
+DATA STRUCT disk_kind {
+  kind: default-ssd,
+  medium: ssd,
+  capacity_bytes: 21474836480,
+}
+
+DATA STRUCT region {
+  region_name: us-west,
+  is_dns_master: true,
+  availability_mode: multi_dc,
+}
+
+DATA STRUCT EXCLUSIVE tld [
+  {
+    domain: epl-infra.net,
+    expose_admin: true,
+    automatic_certificates: false,
+  }
+]
+
+DATA STRUCT network [
+  {
+    network_name: lan,
+    cidr: '10.0.0.0/8',
+  },
+  {
+    network_name: vpn,
+    cidr: '172.21.0.0/16',
+  },
+  {
+    network_name: internet,
+    cidr: '0.0.0.0/0',
+  },
+]
+
+DATA STRUCT server [
+  {
+    hostname: server-a,
+    dc: dc1,
+    ssh_interface: void,
+    is_consul_master: true,
+    is_nomad_master: false,
+    is_vault_instance: false,
+    is_dns_master: false,
+    is_dns_slave: false,
+    is_vpn_gateway: true,
+    root_disk: sda,
+    WITH server_disk {
+      disk_id: sda,
+      disk_kind: gcloud.pd-balanced,
+      capacity_bytes: 21474836480,
+    }
+    WITH network_interface [
+      {
+        if_name: eth0,
+        if_network: lan,
+        if_ip: 10.17.0.10,
+        if_prefix: 24,
+      },
+      {
+        if_name: void,
+        if_network: internet,
+        if_ip: 77.77.77.10,
+        if_prefix: 32,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.7.10,
+        if_prefix: 16,
+      },
+    ]
+    WITH server_root_volume [
+      {
+        volume_name: pgtest1,
+      },
+      {
+        volume_name: minio-docker-a,
+        zfs_recordsize: 1M,
+      },
+      {
+        volume_name: mon-default,
+      },
+      {
+        volume_name: mon-am,
+      },
+    ]
+  },
+  {
+    hostname: server-b,
+    dc: dc1,
+    ssh_interface: void,
+    is_consul_master: false,
+    is_nomad_master: true,
+    is_vault_instance: true,
+    is_dns_master: false,
+    is_dns_slave: true,
+    is_vpn_gateway: true,
+    is_ingress: true,
+    root_disk: sda,
+    WITH server_disk {
+      disk_id: sda,
+      disk_kind: gcloud.pd-balanced,
+      capacity_bytes: 21474836480,
+    }
+    WITH network_interface [
+      {
+        if_name: eth0,
+        if_network: lan,
+        if_ip: 10.17.0.11,
+        if_prefix: 24,
+      },
+      {
+        if_name: void,
+        if_network: internet,
+        if_ip: 77.77.77.11,
+        if_prefix: 32,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.7.11,
+        if_prefix: 16,
+      },
+    ]
+    WITH server_root_volume [
+      {
+        volume_name: nats1,
+      },
+      {
+        volume_name: minio-docker-b,
+        zfs_recordsize: 1M,
+      },
+    ]
+  },
+  {
+    hostname: server-c,
+    dc: dc2,
+    ssh_interface: void,
+    is_consul_master: true,
+    is_nomad_master: false,
+    is_vault_instance: true,
+    is_dns_master: false,
+    is_dns_slave: true,
+    is_ingress: true,
+    is_vpn_gateway: true,
+    root_disk: sda,
+    WITH server_disk {
+      disk_id: sda,
+      disk_kind: gcloud.pd-balanced,
+      capacity_bytes: 21474836480,
+    }
+    WITH network_interface [
+      {
+        if_name: eth0,
+        if_network: lan,
+        if_ip: 10.18.0.10,
+        if_prefix: 24,
+      },
+      {
+        if_name: void,
+        if_network: internet,
+        if_ip: 77.77.77.12,
+        if_prefix: 32,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.7.12,
+        if_prefix: 16,
+      },
+    ]
+    WITH server_root_volume [
+      {
+        volume_name: pgtest1,
+      },
+      {
+        volume_name: nats1,
+      },
+      {
+        volume_name: minio-docker-c,
+        zfs_recordsize: 1M,
+      },
+    ]
+  },
+  {
+    hostname: server-d,
+    dc: dc2,
+    ssh_interface: void,
+    is_consul_master: false,
+    is_nomad_master: true,
+    is_vault_instance: false,
+    is_dns_master: false,
+    is_dns_slave: false,
+    is_ingress: false,
+    is_vpn_gateway: true,
+    root_disk: sda,
+    WITH server_disk {
+      disk_id: sda,
+      disk_kind: gcloud.pd-balanced,
+      capacity_bytes: 21474836480,
+    }
+    WITH network_interface [
+      {
+        if_name: eth0,
+        if_network: lan,
+        if_ip: 10.18.0.11,
+        if_prefix: 24,
+      },
+      {
+        if_name: void,
+        if_network: internet,
+        if_ip: 77.77.77.13,
+        if_prefix: 32,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.7.13,
+        if_prefix: 16,
+      },
+    ]
+    WITH server_root_volume [
+      {
+        volume_name: nats1,
+      },
+      {
+        volume_name: mon-default,
+      },
+      {
+        volume_name: mon-am,
+      },
+    ]
+  },
+  {
+    hostname: server-e,
+    dc: dc3,
+    ssh_interface: void,
+    is_consul_master: true,
+    is_nomad_master: false,
+    is_vault_instance: false,
+    is_dns_master: true,
+    is_dns_slave: false,
+    is_ingress: true,
+    is_vpn_gateway: true,
+    root_disk: sda,
+    WITH server_disk {
+      disk_id: sda,
+      disk_kind: gcloud.pd-balanced,
+      capacity_bytes: 21474836480,
+    }
+    WITH network_interface [
+      {
+        if_name: eth0,
+        if_network: lan,
+        if_ip: 10.19.0.10,
+        if_prefix: 24,
+      },
+      {
+        if_name: void,
+        if_network: internet,
+        if_ip: 77.77.77.14,
+        if_prefix: 32,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.7.14,
+        if_prefix: 16,
+      },
+    ]
+    WITH server_root_volume [
+      {
+        volume_name: nats1,
+      },
+      {
+        volume_name: minio-docker-e,
+        zfs_recordsize: 1M,
+      },
+      {
+        volume_name: mon-am,
+      },
+    ]
+  },
+  {
+    hostname: server-f,
+    dc: dc3,
+    ssh_interface: void,
+    is_consul_master: false,
+    is_nomad_master: true,
+    is_vault_instance: true,
+    is_dns_master: false,
+    is_dns_slave: false,
+    is_ingress: true,
+    is_vpn_gateway: true,
+    root_disk: sda,
+    WITH server_disk {
+      disk_id: sda,
+      disk_kind: gcloud.pd-balanced,
+      capacity_bytes: 21474836480,
+    }
+    WITH network_interface [
+      {
+        if_name: eth0,
+        if_network: lan,
+        if_ip: 10.19.0.11,
+        if_prefix: 24,
+      },
+      {
+        if_name: void,
+        if_network: internet,
+        if_ip: 77.77.77.15,
+        if_prefix: 32,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.7.15,
+        if_prefix: 16,
+      },
+    ]
+    WITH server_root_volume [
+      {
+        volume_name: nats1,
+      },
+      {
+        volume_name: minio-docker-d,
+        zfs_recordsize: 1M,
+      },
+      {
+        volume_name: mon-am,
+      },
+    ]
+  }
+]
+
+DATA STRUCT pg_deployment [
+  {
+    deployment_name: testdb,
+    docker_image_pg: pg_15.1,
+    WITH pg_deployment_instance [
+      {
+        instance_id: 1,
+        pg_server: server-a=>pgtest1,
+      },
+      {
+        instance_id: 2,
+        pg_server: server-c=>pgtest1,
+      },
+    ]
+    WITH pg_deployment_unmanaged_db [
+      {
+        db_name: grafana,
+      }
+    ]
+  }
+]
+
+
+DATA STRUCT monitoring_cluster [
+  {
+    cluster_name: default,
+    is_region_default: true,
+    WITH monitoring_instance [
+      { instance_id: 1, monitoring_server: server-a=>mon-default, },
+      { instance_id: 2, monitoring_server: server-d=>mon-default, },
+    ]
+    WITH alertmanager_instance [
+      { instance_id: 1, alertmanager_server: server-a=>mon-am, },
+      { instance_id: 2, alertmanager_server: server-d=>mon-am, },
+      { instance_id: 3, alertmanager_server: server-f=>mon-am, },
+    ]
+    WITH monitoring_cluster_alert_group [
+      { alert_group_name: Default, telegram_channel: default, telegram_bot: default, }
+    ]
+  }
+]
+
+DATA STRUCT telegram_channel {
+  channel_name: default,
+  channel_id: 12345,
+}
+
+DATA STRUCT telegram_bot {
+  bot_name: default,
+  bot_token: 1234567,
+}
+
+DATA STRUCT grafana [
+  {
+    deployment_name: main,
+    database: testdb=>grafana,
+  }
+]
+
+DATA STRUCT loki_cluster [
+  {
+    cluster_name: main,
+    is_region_default: true,
+    storage_bucket: global=>loki,
+  }
+]
+
+DATA STRUCT docker_registry_instance {
+  region: us-west,
+  minio_bucket: global=>docker,
+}
+
+DATA STRUCT tempo_cluster {
+  region: us-west,
+  cluster_name: r1-tempo,
+  storage_bucket: global=>tempo,
+}
+
+DATA STRUCT minio_cluster {
+  cluster_name: global,
+  WITH minio_instance [
+    {
+      instance_id: 1,
+      instance_volume: server-a=>minio-docker-a,
+    },
+    {
+      instance_id: 2,
+      instance_volume: server-b=>minio-docker-b,
+    },
+    {
+      instance_id: 3,
+      instance_volume: server-c=>minio-docker-c,
+    },
+    {
+      instance_id: 4,
+      instance_volume: server-e=>minio-docker-e,
+    },
+  ]
+  WITH minio_bucket [
+    {
+      bucket_name: docker,
+    },
+    {
+      bucket_name: loki,
+    },
+    {
+      bucket_name: tempo,
+    },
+  ]
+}
+
+DATA STRUCT alert_group {
+  alert_group_name: Default
+  WITH alert [
+    {
+        alert_name: FilesystemSpaceLow,
+        expr: '
+          round((node_filesystem_free_bytes{fstype=~"(btrfs|zfs|xfs|ext4)"} * 100
+          / node_filesystem_size_bytes{fstype=~"(btrfs|zfs|xfs|ext4)"}), 0.1) < 20
+        ',
+        description: 'Filesystem {{ $labels.device }} at {{ $labels.instance }} has less than 20% disk space remaining',
+        WITH alert_trigger_test [
+            {
+                expected_message: 'Filesystem /mookie at some-server:9090 has less than 20% disk space remaining',
+                eval_time: 10m,
+                input_series: '
+                    - series: node_filesystem_free_bytes{device="/mookie",instance="some-server:9090",fstype="zfs"}
+                      values: 1 1 1 1 1 1 1 1 1 1
+                    - series: node_filesystem_size_bytes{device="/mookie",instance="some-server:9090",fstype="zfs"}
+                      values: 10 10 10 10 10 10 10 10 10 10
+                '
+            }
+        ]
+    }
+  ]
+}

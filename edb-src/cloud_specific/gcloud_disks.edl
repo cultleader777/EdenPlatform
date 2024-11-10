@@ -1,0 +1,55 @@
+
+// https://cloud.google.com/compute/docs/disks#disk-types
+DATA STRUCT disk_kind [
+  {
+     kind: gcloud.pd-standard,
+     medium: hdd,
+     is_elastic: true,
+     max_capacity_bytes: 281474976710656, // 256TiB little shorter than maximum 257
+  },
+  {
+     kind: gcloud.pd-balanced,
+     medium: ssd,
+     is_elastic: true,
+     max_capacity_bytes: 281474976710656, // 256TiB little shorter than maximum 257
+  },
+  {
+     kind: gcloud.pd-ssd,
+     medium: ssd,
+     is_elastic: true,
+     max_capacity_bytes: 281474976710656, // 256TiB little shorter than maximum 257
+  },
+  {
+     kind: gcloud.pd-extreme,
+     medium: ssd,
+     is_elastic: true,
+     max_capacity_bytes: 281474976710656, // 256TiB little shorter than maximum 257
+  },
+  {
+     kind: gcloud.hyperdisk-balanced,
+     medium: ssd,
+     is_elastic: true,
+     has_extra_config: true,
+     non_eligible_reason: 'google cloud faggots only allow attaching this disk to very large machines and in the spirit of eden platform buying big machines in cloud is a waste of time and money anyway',
+     max_capacity_bytes: 69269232549888, // 63TiB little shorter than maximum 64
+  },
+  {
+     kind: gcloud.hyperdisk-throughput,
+     medium: ssd,
+     is_elastic: true,
+     has_extra_config: true,
+     // I copy pasted right but I get this error?
+     // Error: Error creating Disk: googleapi: Error 400: Invalid value for field 'resource.type': 'projects/test1-406308/zones/us-west1-b/diskTypes/hyperdisk-throughput'. The referenced diskType resource cannot be found., invalid
+     non_eligible_reason: 'hyperdisk-throughput untested and not supported yet',
+     max_capacity_bytes: 69269232549888, // 63TiB little shorter than maximum 64
+  },
+  {
+     kind: gcloud.hyperdisk-extreme,
+     medium: ssd,
+     is_elastic: true,
+     has_extra_config: true,
+     min_capacity_bytes: 68719476736, // 64GB minimum
+     max_capacity_bytes: 69269232549888, // 63TiB little shorter than maximum 64
+     non_eligible_reason: 'google cloud faggots only allow attaching this disk to very large machines and in the spirit of eden platform buying big machines in cloud is a waste of time and money anyway',
+  },
+]

@@ -1,0 +1,13 @@
+- cluster_name: default
+  mirrors:
+  - http://10.17.0.10:9090
+  - http://10.17.0.12:9090
+  scrapes:
+  - name: vault_sealed_clusters
+    expression: max_over_time( sum by (cluster) (vault_core_unsealed)[7d:] ) - sum by (cluster) (vault_core_unsealed) > 0
+  - name: epl_l1_provisioning_last_hash
+    expression: max by (hostname, hash) (epl_l1_provisioning_last_hash)
+  - name: node_boot_time_seconds
+    expression: node_boot_time_seconds
+  - name: postgres_instances_replication_lag
+    expression: pg_stat_replication_pg_wal_lsn_diff

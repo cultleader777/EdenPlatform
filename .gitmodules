@@ -1,0 +1,3 @@
+[submodule "third-party/EdenDB"]
+	path = third-party/EdenDB
+	url = https://github.com/cultleader777/EdenDB.git

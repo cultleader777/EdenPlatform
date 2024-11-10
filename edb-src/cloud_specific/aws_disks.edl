@@ -1,0 +1,52 @@
+
+// max sizes from here
+// https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
+DATA STRUCT disk_kind [
+  {
+     kind: aws.standard,
+     medium: hdd,
+     is_elastic: true,
+     max_capacity_bytes: 1098437885952, // 1023GiB, 1GB short of maximum
+  },
+  {
+     kind: aws.gp2,
+     medium: ssd,
+     is_elastic: true,
+     max_capacity_bytes: 17591112302592,
+  },
+  {
+     kind: aws.gp3,
+     medium: ssd,
+     is_elastic: true,
+     has_extra_config: true, // IOPS and throughput
+     max_capacity_bytes: 17591112302592, // 1GB short of 16TB
+  },
+  {
+     kind: aws.io1,
+     medium: ssd,
+     is_elastic: true,
+     has_extra_config: true, // IOPS
+     max_capacity_bytes: 17591112302592,
+  },
+  {
+     kind: aws.io2, // 63TiB, 1TiB short of maximum EBS limit
+     medium: ssd,
+     is_elastic: true,
+     has_extra_config: true, // IOPS
+     max_capacity_bytes: 69269232549888,
+  },
+  {
+     kind: aws.sc1,
+     medium: ssd,
+     is_elastic: true,
+     min_capacity_bytes: 134217728000,
+     max_capacity_bytes: 69269232549888,
+  },
+  {
+     kind: aws.st1,
+     medium: ssd,
+     is_elastic: true,
+     min_capacity_bytes: 134217728000,
+     max_capacity_bytes: 69269232549888,
+  },
+]

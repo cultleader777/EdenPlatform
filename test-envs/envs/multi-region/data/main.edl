@@ -1,0 +1,140 @@
+INCLUDE "region_us_west.edl"
+INCLUDE "region_us_east.edl"
+
+DATA STRUCT global_settings {
+  project_name: multi-region,
+  admin_email: admin@epl-infra.net,
+}
+
+DATA STRUCT region [
+  {
+    region_name: us-west,
+    is_dns_master: true,
+  },
+  {
+    region_name: us-east,
+    is_dns_slave: true,
+  },
+]
+
+DATA STRUCT EXCLUSIVE tld [
+  {
+    domain: epl-infra.net,
+    expose_admin: true,
+    automatic_certificates: false,
+  }
+]
+
+DATA STRUCT EXCLUSIVE datacenter [
+  {
+    dc_name: dc1,
+    region: us-west,
+    network_cidr: '10.17.0.0/16',
+  },
+  {
+    dc_name: dc2,
+    region: us-east,
+    network_cidr: '10.18.0.0/16',
+  },
+]
+
+DATA STRUCT server_kind [
+  {
+    kind: testvm.cpu4ram5120,
+    cores: 4,
+    memory_bytes: 5368709120,
+    architecture: x86_64,
+  },
+  {
+    kind: testvm.cpu1ram5120,
+    cores: 1,
+    memory_bytes: 5368709120,
+    architecture: x86_64,
+  },
+]
+
+DEFAULTS {
+  server.dc none,
+  server.nixpkgs_environment default_nixpkgs,
+  datacenter.region none,
+  datacenter.implementation testvms,
+  datacenter.default_server_kind testvm.cpu1ram5120,
+  server_disk.disk_kind default-ssd,
+  region.tld epl-infra.net,
+  rust_compilation_environment.nixpkgs_environment default_nixpkgs,
+  frontend_application_deployment.region none,
+  backend_application_deployment.region none,
+  pg_deployment.region none,
+  nats_cluster.region none,
+  minio_cluster.region none,
+  monitoring_cluster.region none,
+  grafana.region none,
+  loki_cluster.region none,
+  tempo_cluster.region none,
+  ch_deployment.region us-west,
+  ch_keeper_deployment.region us-west,
+  blackbox_deployment.region us-west,
+}
+
+DATA STRUCT disk_kind {
+  kind: default-ssd,
+  medium: ssd,
+  capacity_bytes: 21474836480,
+}
+
+DATA STRUCT network [
+  {
+    network_name: lan,
+    cidr: '10.0.0.0/8',
+  },
+  {
+    network_name: vpn,
+    cidr: '172.21.0.0/16',
+  },
+  {
+    network_name: internet,
+    cidr: '0.0.0.0/0',
+  },
+]
+
+DATA subnet_router_floating_ip {
+  '10.17.0.2/24';
+  '10.18.0.2/24';
+}
+
+
+DATA STRUCT alert_group {
+  alert_group_name: Default
+  WITH alert [
+    {
+        alert_name: FilesystemSpaceLow,
+        expr: '
+          round((node_filesystem_free_bytes{fstype=~"(btrfs|zfs|xfs|ext4)"} * 100
+          / node_filesystem_size_bytes{fstype=~"(btrfs|zfs|xfs|ext4)"}), 0.1) < 20
+        ',
+        description: 'Filesystem {{ $labels.device }} at {{ $labels.instance }} has less than 20% disk space remaining',
+        WITH alert_trigger_test [
+            {
+                expected_message: 'Filesystem /mookie at some-server:9090 has less than 20% disk space remaining',
+                eval_time: 10m,
+                input_series: '
+                    - series: node_filesystem_free_bytes{device="/mookie",instance="some-server:9090",fstype="zfs"}
+                      values: 1 1 1 1 1 1 1 1 1 1
+                    - series: node_filesystem_size_bytes{device="/mookie",instance="some-server:9090",fstype="zfs"}
+                      values: 10 10 10 10 10 10 10 10 10 10
+                '
+            }
+        ]
+    }
+  ]
+}
+
+DATA STRUCT telegram_channel {
+  channel_name: default,
+  channel_id: 12345,
+}
+
+DATA STRUCT telegram_bot {
+  bot_name: default,
+  bot_token: 1234567,
+}

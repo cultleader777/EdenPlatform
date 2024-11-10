@@ -1,0 +1,18 @@
+
+
+TABLE versioned_type {
+    type_name TEXT PRIMARY KEY,
+    CHECK { type_name ~= 'raw' and type_name ~= 'json' }, // reserved for raw backend http types
+}
+
+TABLE versioned_type_snapshot {
+    version INT PRIMARY KEY CHILD OF versioned_type,
+    snapshot_source TEXT,
+    CHECK { version >= 1 and version < 65536 } // version should fit in two bytes in binary message
+}
+
+TABLE versioned_type_migration {
+    version INT PRIMARY KEY CHILD OF versioned_type,
+    migration_source TEXT,
+    CHECK { version >= 1 and version < 65536 }
+}

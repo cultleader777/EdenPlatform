@@ -1,0 +1,36 @@
+TABLE tempo_cluster {
+    cluster_name TEXT PRIMARY KEY,
+    namespace REF nomad_namespace DEFAULT epl,
+    region REF region DETACHED DEFAULT,
+    workload_architecture TEXT DEFAULT x86_64,
+    docker_image REF docker_image_pin DETACHED DEFAULT,
+    is_region_default BOOL DEFAULT false,
+    loki_cluster TEXT DEFAULT region_default,
+    monitoring_cluster TEXT DEFAULT region_default,
+    storage_bucket REF FOREIGN CHILD minio_bucket,
+    http_port INT DEFAULT 4310,
+    grpc_port INT GENERATED AS { http_port + 1 },
+    p2p_port INT GENERATED AS { grpc_port + 1 },
+    otlp_http_port INT GENERATED AS { p2p_port + 1 },
+    otlp_grpc_port INT GENERATED AS { otlp_http_port + 1 },
+    tempo_instances INT DEFAULT 2,
+    placement TEXT DEFAULT '',
+    trace_retention_days INT DEFAULT 30,
+
+    memory_mb INT DEFAULT 128,
+
+    CHECK { trace_retention_days >= 1 and trace_retention_days <= 10000 },
+    CHECK { isKebabCase(cluster_name) },
+    CHECK { isValidPort(http_port) },
+    CHECK {
+        local res = areNumbersInSequence(
+            http_port,
+            grpc_port,
+            metrics_port,
+            p2p_port)
+        res
+    },
+
+    CHECK { memory_mb >= 64 },
+    CHECK { tempo_instances >= 2 },
+}

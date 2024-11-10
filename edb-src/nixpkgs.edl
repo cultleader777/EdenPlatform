@@ -1,0 +1,28 @@
+
+TABLE nixpkgs_version {
+    version TEXT PRIMARY KEY,
+    checksum TEXT,
+    tarball_checksum TEXT,
+    UNIQUE(checksum),
+
+    CHECK { isValidNixVersion(version) },
+    CHECK { isValidGitHash(checksum) },
+    CHECK { isValidBase32Sha256Hash(tarball_checksum) },
+}
+
+// to produce tarball hash download url
+// nix-prefetch-url --unpack https://github.com/NixOS/nixpkgs/archive/057f9aecfb71c4437d2b27d3323df7f93c010b7e.tar.gz
+DATA EXCLUSIVE nixpkgs_version {
+    23.11, 057f9aecfb71c4437d2b27d3323df7f93c010b7e, 1ndiv385w1qyb3b18vw13991fzb9wg4cl21wglk89grsfsnra41k;
+}
+
+TABLE nixpkgs_environment {
+    name TEXT PRIMARY KEY,
+    version REF nixpkgs_version,
+
+    CHECK { isSnakeCase(name) },
+}
+
+DATA nixpkgs_environment {
+    default_nixpkgs, 23.11;
+}

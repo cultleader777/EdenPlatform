@@ -1,0 +1,39 @@
+TABLE server_zpool {
+  zpool_name TEXT PRIMARY KEY CHILD OF server,
+  is_redundant BOOL DEFAULT true,
+
+  CHECK { isKebabCase(zpool_name) },
+}
+
+TABLE server_zpool_vdev {
+  vdev_number INT PRIMARY KEY CHILD OF server_zpool,
+  vdev_type TEXT,
+  CHECK { vdev_number >= 1 },
+  CHECK { isValidZfsVdevType(vdev_type) },
+}
+
+TABLE server_zpool_spare {
+  disk_id REF server_disk PRIMARY KEY CHILD OF server_zpool,
+}
+
+TABLE server_zpool_cache {
+  disk_id REF server_disk PRIMARY KEY CHILD OF server_zpool,
+}
+
+TABLE server_zpool_log {
+  disk_id REF server_disk PRIMARY KEY CHILD OF server_zpool,
+}
+
+TABLE server_zpool_vdev_disk {
+  disk_id REF server_disk PRIMARY KEY CHILD OF server_zpool_vdev,
+}
+
+TABLE server_zfs_dataset {
+  dataset_name TEXT PRIMARY KEY CHILD OF server_zpool,
+  intended_usage REF server_volume_usage_contract DEFAULT exclusive,
+  zfs_recordsize TEXT DEFAULT 4k,
+  zfs_compression BOOL DEFAULT true,
+  zfs_encryption BOOL DEFAULT true,
+
+  CHECK { isKebabCase(dataset_name) },
+}

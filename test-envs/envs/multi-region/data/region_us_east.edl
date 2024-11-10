@@ -1,0 +1,239 @@
+
+DATA STRUCT server [
+  {
+    hostname: server-e,
+    dc: dc2,
+    kind: testvm.cpu4ram5120,
+    ssh_interface: eth0,
+    is_consul_master: true,
+    is_nomad_master: true,
+    is_vault_instance: false,
+    is_dns_master: false,
+    is_dns_slave: false,
+    WITH server_disk [
+      { disk_id: 'vda' },
+      { disk_id: 'vdb', xfs_format: true },
+    ]
+    WITH network_interface {
+      if_name: eth0,
+      if_network: lan,
+      if_ip: 10.18.0.10,
+      if_prefix: 24,
+    }
+    WITH server_xfs_volume [
+      {
+        volume_name: minio-docker,
+        xfs_disk: vdb,
+      },
+    ]
+    WITH server_root_volume [
+      { volume_name: pgtest1 },
+      { volume_name: mon-secondary },
+      { volume_name: mon-am },
+    ]
+  },
+  {
+    hostname: server-f,
+    dc: dc2,
+    ssh_interface: eth0,
+    is_consul_master: true,
+    is_nomad_master: false,
+    is_vault_instance: true,
+    is_dns_master: false,
+    is_dns_slave: false
+    WITH server_disk [
+      { disk_id: 'vda' },
+      { disk_id: 'vdb', xfs_format: true },
+    ]
+    WITH network_interface [
+      {
+        if_name: eth0,
+        if_network: lan,
+        if_ip: 10.18.0.11,
+        if_prefix: 24,
+      },
+    ]
+    WITH server_xfs_volume [
+      {
+        volume_name: minio-docker,
+        xfs_disk: vdb,
+      },
+    ]
+    WITH server_root_volume [
+      { volume_name: pgtest1 },
+      { volume_name: nats1 },
+    ]
+  },
+  {
+    hostname: server-g,
+    dc: dc2,
+    ssh_interface: eth1,
+    is_consul_master: true,
+    is_nomad_master: true,
+    is_vault_instance: true,
+    is_dns_master: false,
+    is_dns_slave: true,
+    is_ingress: true,
+    is_vpn_gateway: true,
+    WITH server_disk [
+      { disk_id: 'vda' },
+      { disk_id: 'vdb', xfs_format: true },
+    ]
+    WITH network_interface [
+      {
+        if_name: eth0,
+        if_network: lan,
+        if_ip: 10.18.0.12,
+        if_prefix: 24,
+      },
+      {
+        if_name: eth1,
+        if_network: internet,
+        if_ip: 77.77.77.12,
+        if_prefix: 24,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.7.12,
+        if_prefix: 16,
+      },
+    ]
+    WITH server_xfs_volume [
+      {
+        volume_name: minio-docker,
+        xfs_disk: vdb,
+      },
+    ]
+    WITH server_root_volume [
+      { volume_name: nats1 },
+      { volume_name: mon-default },
+      { volume_name: mon-am },
+      { volume_name: mon-secondary },
+    ]
+  },
+  {
+    hostname: server-h,
+    dc: dc2,
+    ssh_interface: eth1,
+    is_consul_master: false,
+    is_nomad_master: true,
+    is_vault_instance: true,
+    is_dns_master: true,
+    is_dns_slave: false,
+    is_ingress: true,
+    is_vpn_gateway: true,
+    WITH server_disk [
+      { disk_id: 'vda' },
+      { disk_id: 'vdb', xfs_format: true },
+    ]
+    WITH network_interface [
+      {
+        if_name: eth0,
+        if_network: lan,
+        if_ip: 10.18.0.13,
+        if_prefix: 24,
+      },
+      {
+        if_name: eth1,
+        if_network: internet,
+        if_ip: 77.77.77.13,
+        if_prefix: 24,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.7.13,
+        if_prefix: 16,
+      },
+    ]
+    WITH server_xfs_volume [
+      {
+        volume_name: minio-docker,
+        xfs_disk: vdb,
+      },
+    ]
+    WITH server_root_volume [
+      { volume_name: nats1 },
+      { volume_name: mon-default },
+      { volume_name: mon-am },
+      { volume_name: mon-secondary },
+    ]
+  }
+]
+
+DATA STRUCT monitoring_cluster [
+  {
+    cluster_name: main-us-east,
+    region: us-east,
+    is_region_default: true,
+    WITH monitoring_instance [
+      { instance_id: 2, monitoring_server: server-g=>mon-default, },
+      { instance_id: 3, monitoring_server: server-h=>mon-default, },
+    ]
+    WITH alertmanager_instance [
+      { instance_id: 1, alertmanager_server: server-e=>mon-am, },
+      { instance_id: 2, alertmanager_server: server-g=>mon-am, },
+      { instance_id: 3, alertmanager_server: server-h=>mon-am, },
+    ]
+    WITH monitoring_cluster_alert_group [
+      { alert_group_name: Default, telegram_channel: default, telegram_bot: default, }
+    ]
+  }
+]
+
+DATA STRUCT loki_cluster [
+  {
+    cluster_name: main-us-east,
+    region: us-east,
+    is_region_default: true,
+    storage_bucket: main-us-east=>loki,
+    loki_writer_http_port: 3020,
+  }
+]
+
+DATA STRUCT docker_registry_instance {
+  region: us-east,
+  minio_bucket: main-us-east=>docker,
+}
+
+DATA STRUCT tempo_cluster {
+  region: us-east,
+  cluster_name: r2-tempo,
+  storage_bucket: main-us-east=>tempo,
+  http_port: 4320,
+}
+
+DATA STRUCT minio_cluster {
+  cluster_name: main-us-east,
+  region: us-east,
+  WITH minio_instance [
+    {
+      instance_id: 1,
+      instance_volume: server-e=>minio-docker,
+    },
+    {
+      instance_id: 2,
+      instance_volume: server-f=>minio-docker,
+    },
+    {
+      instance_id: 3,
+      instance_volume: server-g=>minio-docker,
+    },
+    {
+      instance_id: 4,
+      instance_volume: server-h=>minio-docker,
+    },
+  ]
+  WITH minio_bucket [
+    {
+      bucket_name: docker,
+    },
+    {
+      bucket_name: loki,
+    },
+    {
+      bucket_name: tempo,
+    },
+  ]
+}

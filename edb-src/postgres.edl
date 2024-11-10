@@ -1,0 +1,162 @@
+TABLE pg_deployment {
+    deployment_name TEXT PRIMARY KEY,
+    namespace REF nomad_namespace DEFAULT epl,
+    region REF region DETACHED DEFAULT,
+    loki_cluster TEXT DEFAULT region_default,
+    monitoring_cluster TEXT DEFAULT region_default,
+    // no defaults provided as for most other images
+    // because pg upgrades need to be done carefully
+    // we make sure users always specify postgres version
+    docker_image_pg REF docker_image_pin,
+    docker_image_haproxy REF docker_image_pin DETACHED DEFAULT,
+    docker_image_pg_exporter REF docker_image_pin DETACHED DEFAULT,
+    workload_architecture TEXT DEFAULT x86_64,
+    distribute_over_dcs BOOL DEFAULT true,
+
+    synchronous_replication BOOL DEFAULT false,
+    shared_buffers_mb INT DEFAULT 256,
+    work_mem_mb INT DEFAULT 16,
+    maintenance_work_mem_mb INT DEFAULT 128,
+    overhead_mem_mb INT DEFAULT 64, // for patroni process and stuff
+    max_connections INT DEFAULT 400,
+
+    replica_rolling_update_delay_seconds INT DEFAULT 60,
+
+    instance_pg_port INT DEFAULT 5432,
+    instance_pg_master_port INT GENERATED AS { instance_pg_port + 1 },
+    instance_pg_slave_port INT GENERATED AS { instance_pg_master_port + 1 },
+    instance_patroni_port INT GENERATED AS { instance_pg_slave_port + 1 },
+    instance_haproxy_metrics_port INT GENERATED AS { instance_patroni_port + 1 },
+    instance_pg_exporter_port INT GENERATED AS { instance_haproxy_metrics_port + 1 },
+
+    // between minute and two days
+    CHECK { replica_rolling_update_delay_seconds >= 60 and replica_rolling_update_delay_seconds <= 172800 },
+    CHECK { shared_buffers_mb > 0 },
+    CHECK { work_mem_mb > 0 },
+    CHECK { maintenance_work_mem_mb > 0 },
+    CHECK { overhead_mem_mb > 0 },
+    CHECK { max_connections >= 10 and max_connections < 10000 },
+
+    // first and last ports
+    CHECK { isValidPort(instance_pg_port) and isValidPort(instance_pg_exporter_port) },
+    CHECK {
+        -- all ports must go in a row
+        local res = areNumbersInSequence(
+            instance_pg_port,
+            instance_pg_master_port,
+            instance_pg_slave_port,
+            instance_patroni_port,
+            instance_haproxy_metrics_port,
+            instance_pg_exporter_port
+        )
+        res -- TODO: return
+    },
+    // is in consul dns name
+    CHECK { isKebabCase(deployment_name) },
+    CHECK { isValidArchitecture(workload_architecture) },
+}
+
+TABLE pg_deployment_schemas {
+    db_name TEXT PRIMARY KEY CHILD OF pg_deployment,
+    pg_schema REF pg_schema,
+
+    CHECK { isSnakeCase(db_name) },
+    CHECK { db_name ~= 'postgres' },
+}
+
+TABLE pg_deployment_unmanaged_db {
+    db_name TEXT PRIMARY KEY CHILD OF pg_deployment,
+
+    CHECK { isSnakeCase(db_name) },
+    CHECK { db_name ~= 'postgres' },
+}
+
+TABLE pg_deployment_instance {
+    instance_id INT PRIMARY KEY CHILD OF pg_deployment,
+    pg_server REF FOREIGN CHILD server_volume,
+
+    UNIQUE(pg_server, deployment_name),
+    UNIQUE(instance_id, deployment_name),
+
+    CHECK { instance_id > 0 },
+}
+
+TABLE pg_schema {
+    schema_name TEXT PRIMARY KEY,
+
+    CHECK { isSnakeCase(schema_name) },
+}
+
+TABLE pg_migration {
+    time INT PRIMARY KEY CHILD OF pg_schema,
+    upgrade TEXT,
+    downgrade TEXT,
+    needs_admin BOOL DEFAULT false,
+    CHECK { time >= 0 },
+    CHECK { noEOF(upgrade) },
+    CHECK { noEOF(downgrade) },
+}
+
+TABLE pg_query {
+    query_name TEXT PRIMARY KEY CHILD OF pg_schema,
+    query_expression TEXT,
+    is_mutating BOOL DEFAULT false,
+    seqscan_ok BOOL DEFAULT false,
+    opt_fields TEXT DEFAULT '',
+    CHECK { isSnakeCase(query_name) },
+}
+
+TABLE pg_query_test {
+    arguments TEXT PRIMARY KEY CHILD OF pg_query,
+    outputs TEXT,
+    test_dataset REF pg_test_dataset,
+}
+
+TABLE pg_mutator {
+    mutator_name TEXT PRIMARY KEY CHILD OF pg_schema,
+    mutator_expression TEXT,
+    seqscan_ok BOOL DEFAULT false,
+    CHECK { isSnakeCase(mutator_name) },
+}
+
+TABLE pg_mutator_test {
+    arguments TEXT PRIMARY KEY CHILD OF pg_mutator,
+    test_dataset REF pg_test_dataset,
+    // resulting data for checking mutator did what we expect
+    resulting_data TEXT,
+}
+
+TABLE pg_transaction {
+    transaction_name TEXT PRIMARY KEY CHILD OF pg_schema,
+    steps TEXT,
+    is_read_only BOOL DEFAULT false,
+
+    CHECK { isSnakeCase(transaction_name) }
+}
+
+TABLE pg_mat_view_update_frequency {
+    frequency TEXT PRIMARY KEY,
+}
+
+DATA EXCLUSIVE pg_mat_view_update_frequency {
+    manual;
+    hourly;
+    daily;
+    weekly;
+}
+
+TABLE pg_mat_view {
+    mview_name TEXT PRIMARY KEY CHILD OF pg_schema,
+    update_frequency REF pg_mat_view_update_frequency,
+}
+
+TABLE pg_mat_view_test {
+    expected_data TEXT PRIMARY KEY CHILD OF pg_mat_view,
+    test_dataset REF pg_test_dataset,
+}
+
+TABLE pg_test_dataset {
+    dataset_name TEXT PRIMARY KEY CHILD OF pg_schema,
+    dataset_contents TEXT,
+    min_time INT DEFAULT 0,
+}

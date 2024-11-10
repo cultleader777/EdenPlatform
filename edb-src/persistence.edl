@@ -1,0 +1,81 @@
+TABLE server_disk {
+  disk_id TEXT PRIMARY KEY CHILD OF server,
+  disk_kind REF disk_kind DETACHED DEFAULT,
+  // XFS supported only as JBODs
+  xfs_format BOOL DEFAULT false,
+  extra_config TEXT DEFAULT '',
+  // only for elastic disk kinds
+  capacity_bytes INT DEFAULT -1,
+
+  CHECK { isValidDiskId(disk_id) },
+}
+
+MATERIALIZED VIEW server_volume {
+  volume_name TEXT PRIMARY KEY CHILD OF server,
+  mountpoint TEXT,
+  intended_usage REF server_volume_usage_contract,
+  source TEXT,
+  UNIQUE(hostname, mountpoint),
+  UNIQUE(hostname, volume_name),
+  CHECK { mountpoint ~= "/" }
+} AS {
+  SELECT
+    hostname,
+    dataset_name AS volume_name,
+    ('/srv/volumes/' || dataset_name) AS mountpoint,
+    intended_usage,
+    'server_zfs_dataset'
+  FROM server_zfs_dataset
+
+  UNION
+
+  SELECT
+    hostname,
+    volume_name,
+    mountpoint,
+    intended_usage,
+    'server_root_volume'
+  FROM server_root_volume
+
+  UNION
+
+  SELECT
+    hostname,
+    volume_name,
+    ('/srv/xfs-jbods/' || xfs_disk || '/' || volume_name) AS mountpoint,
+    intended_usage,
+    'server_xfs_volume'
+  FROM server_xfs_volume
+}
+
+TABLE server_root_volume {
+  volume_name TEXT PRIMARY KEY CHILD OF server,
+  intended_usage REF server_volume_usage_contract DEFAULT exclusive,
+  mountpoint TEXT GENERATED AS { "/srv/volumes/" .. volume_name },
+  // on modern ssd 4k is optimal choice, only in specialty cases,
+  // like minio something else should be picked
+  zfs_recordsize TEXT DEFAULT 4k,
+  zfs_compression BOOL DEFAULT true,
+  zfs_encryption BOOL DEFAULT true,
+
+  CHECK { isValidZfsRecordSize(zfs_recordsize) },
+  CHECK { isKebabCase(volume_name) },
+}
+
+TABLE server_xfs_volume {
+  volume_name TEXT PRIMARY KEY CHILD OF server,
+  xfs_disk REF server_disk,
+  intended_usage REF server_volume_usage_contract DEFAULT exclusive,
+
+  CHECK { isKebabCase(volume_name) },
+}
+
+TABLE server_volume_usage_contract {
+    usage_contract TEXT PRIMARY KEY,
+}
+
+DATA EXCLUSIVE server_volume_usage_contract {
+    read_only;
+    one_writer_many_readers;
+    exclusive;
+}

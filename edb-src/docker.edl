@@ -1,0 +1,34 @@
+// for all image versions that do the same
+// thing, postgres 10, 11 and etc
+TABLE docker_image_set {
+  set_name TEXT PRIMARY KEY,
+}
+
+// to pin images to certain environment
+TABLE docker_image_pin {
+  pin_name TEXT PRIMARY KEY,
+}
+
+// ensure that all images have unique architecture
+TABLE docker_image_pin_images {
+  checksum REF docker_image PRIMARY KEY CHILD OF docker_image_pin,
+}
+
+TABLE docker_image {
+  checksum TEXT PRIMARY KEY,
+  image_set REF docker_image_set,
+  repository TEXT,
+  architecture TEXT DEFAULT x86_64,
+  // for reference, we only use checksums
+  tag TEXT,
+  CHECK { isValidArchitecture(architecture) },
+}
+
+TABLE docker_registry_instance {
+  region REF region PRIMARY KEY,
+  minio_bucket REF FOREIGN CHILD minio_bucket,
+  memory_mb INT DEFAULT 128,
+  docker_image REF docker_image_pin DETACHED DEFAULT,
+
+  CHECK { memory_mb >= 32 },
+}

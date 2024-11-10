@@ -1,0 +1,53 @@
+
+TABLE nats_cluster {
+    cluster_name TEXT PRIMARY KEY,
+    namespace REF nomad_namespace DEFAULT epl,
+    region REF region DETACHED DEFAULT,
+    loki_cluster TEXT DEFAULT region_default,
+    monitoring_cluster TEXT DEFAULT region_default,
+    distribute_over_dcs BOOL DEFAULT true,
+
+    workload_architecture TEXT DEFAULT x86_64,
+    docker_image_nats REF docker_image_pin DETACHED DEFAULT,
+    docker_image_nats_exporter REF docker_image_pin DETACHED DEFAULT,
+
+    nats_clients_port INT DEFAULT 4222,
+    nats_cluster_port INT GENERATED AS { nats_clients_port + 1 },
+    nats_http_mon_port INT GENERATED AS { nats_cluster_port + 1 },
+    nats_prometheus_port INT GENERATED AS { nats_http_mon_port + 1 },
+
+    instance_memory_mb INT DEFAULT 256,
+
+    // used in fqdn
+    CHECK { isKebabCase(cluster_name) }
+
+    // first and last ports
+    CHECK { isValidPort(nats_clients_port) and isValidPort(nats_prometheus_port) },
+    CHECK {
+        -- all ports must go in a row
+        areNumbersInSequence(nats_clients_port, nats_cluster_port, nats_http_mon_port, nats_prometheus_port)
+    },
+
+    CHECK { instance_memory_mb >= 32 },
+}
+
+TABLE nats_jetstream_stream {
+    stream_name TEXT PRIMARY KEY CHILD OF nats_cluster,
+    stream_type REF versioned_type,
+    max_bytes INT DEFAULT 1073741824,
+    max_msg_size INT DEFAULT 1048576,
+    enable_subjects BOOL DEFAULT false,
+
+    CHECK { max_bytes >= 16777216 },
+    CHECK { max_msg_size >= 1024 },
+    CHECK { isSnakeCase(stream_name) },
+}
+
+TABLE nats_deployment_instance {
+    instance_id INT PRIMARY KEY CHILD OF nats_cluster,
+    nats_server REF FOREIGN CHILD server_volume,
+
+    UNIQUE(nats_server, cluster_name),
+
+    CHECK { instance_id > 0 },
+}

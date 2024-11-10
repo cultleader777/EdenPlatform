@@ -1,0 +1,124 @@
+
+DATA server(hostname, ssh_interface) {
+    server1, eth0 WITH network_interface(if_name, if_network, if_ip, if_prefix) {
+        eth0, internet, 123.123.123.123, 32;
+    };
+}
+
+DATA STRUCT EXCLUSIVE region {
+    region_name: us-west,
+}
+
+DATA STRUCT EXCLUSIVE datacenter {
+    dc_name: dc1,
+    network_cidr: '10.17.0.0/16',
+}
+
+DEFAULTS {
+    server.dc dc1,
+    server.nixpkgs_environment default_nixpkgs,
+    datacenter.region us-west,
+    datacenter.implementation testvms,
+    datacenter.default_server_kind testvm.cpu4ram8192,
+    server_disk.disk_kind default-ssd,
+    region.tld epl-infra.net,
+    rust_compilation_environment.nixpkgs_environment default_nixpkgs,
+    frontend_application_deployment.region us-west,
+    backend_application_deployment.region us-west,
+    grafana.region us-west,
+    pg_deployment.region us-west,
+    nats_cluster.region us-west,
+    minio_cluster.region us-west,
+    monitoring_cluster.region us-west,
+    loki_cluster.region us-west,
+    tempo_cluster.region us-west,
+    ch_deployment.region us-west,
+    ch_keeper_deployment.region us-west,
+    blackbox_deployment.region us-west,
+}
+
+DATA STRUCT EXCLUSIVE tld {
+    domain: epl-infra.net,
+    expose_admin: true,
+}
+
+INCLUDE LUA {
+    standard_24_disk_setup('server1')
+}
+
+// TODO: prove that disks are referred only once
+// TODO: prove with REF EXCLUSIVE that certain resource referred to only once
+DATA server_zpool {
+    server1, tank
+      WITH server_zpool_spare {
+        "vdz";
+      }
+      WITH server_zpool_vdev {
+        1, mirror WITH server_zpool_vdev_disk {
+            "vdb";
+            "vdc";
+        };
+        2, mirror WITH server_zpool_vdev_disk {
+            "vdd";
+            "vde";
+        };
+        3, mirror WITH server_zpool_vdev_disk {
+            "vdf";
+            "vdg";
+        };
+        4, mirror WITH server_zpool_vdev_disk {
+            "vdh";
+            "vdi";
+        };
+        5, mirror WITH server_zpool_vdev_disk {
+            "vdj";
+            "vdk";
+        };
+        6, mirror WITH server_zpool_vdev_disk {
+            "vdl";
+            "vdm";
+        };
+        7, mirror WITH server_zpool_vdev_disk {
+            "vdn";
+            "vdo";
+        };
+        8, mirror WITH server_zpool_vdev_disk {
+            "vdp";
+            "vdr";
+        };
+        9, mirror WITH server_zpool_vdev_disk {
+            "vds";
+            "vdt";
+        };
+        10, mirror WITH server_zpool_vdev_disk {
+            "vdu";
+            "vdv";
+        };
+        11, mirror WITH server_zpool_vdev_disk {
+            "vdx";
+            "vdy";
+        };
+      }
+}
+
+DATA server_zfs_dataset {
+    server1, tank, pg-instance-1;
+    server1, tank, pg-instance-2;
+}
+
+DATA EXCLUSIVE network {
+    internet, "0.0.0.0/0";
+}
+
+DATA STRUCT server_kind {
+    kind: testvm.cpu4ram8192,
+    cores: 4,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+}
+
+DATA STRUCT disk_kind {
+    kind: default-ssd,
+    medium: ssd,
+    capacity_bytes: 21474836480,
+}

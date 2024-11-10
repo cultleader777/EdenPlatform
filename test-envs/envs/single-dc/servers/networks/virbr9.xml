@@ -1,0 +1,13 @@
+
+<network>
+  <name>virbr9</name>
+  <bridge name='virbr9'/>
+  <forward/>
+  <ip address='172.21.7.1' netmask='255.255.255.0'>
+    <dhcp>
+      <host mac='6e:fe:69:2f:7f:5b' name='server-c' ip='172.21.7.10' />
+      <host mac='22:6a:89:4e:e2:46' name='server-d' ip='172.21.7.11' />
+
+    </dhcp>
+  </ip>
+</network>

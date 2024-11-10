@@ -1,0 +1,37 @@
+#!/bin/sh
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source $SCRIPT_DIR/library.sh
+EPL_EXECUTABLE=${EPL_EXECUTABLE:-../../target/debug/epl}
+REGION=$1
+SERVER_IP=$2
+
+if ! which $EPL_EXECUTABLE
+then
+  echo eden platform executable not found
+  exit 7
+fi
+
+ensure_script_running_from_its_directory
+
+# if repo is cloned permissions are too open for ssh key
+chmod 600 aux/root_ssh_key
+
+INFRA_ROOT_NOMAD_TOKEN=$( $EPL_EXECUTABLE get-secret --output-directory .. --key nomad_region_${REGION}_bootstrap_acl_token )
+INFRA_ROOT_VAULT_TOKEN=$( $EPL_EXECUTABLE get-secret --output-directory .. --key vault_region_${REGION}_initial_keys | grep 'Initial Root Token:' | sed -E 's/.*: hvs./hvs./' )
+CONSUL_ROOT_TOKEN=$( $EPL_EXECUTABLE get-secret --output-directory .. --key consul_region_${REGION}_acl_management_token )
+
+rsync -av --mkpath --delete -e 'ssh -i aux/root_ssh_key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=false -o ConnectTimeout=2' \
+  ../l2-provisioning/$REGION/ admin@$SERVER_IP:/run/secdir/provisioning
+rsync -av --exclude apps/*/result --exclude=apps/*/target --exclude=apps/*/target/** --delete -e 'ssh -i aux/root_ssh_key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=false -o ConnectTimeout=2' \
+  ../apps admin@$SERVER_IP:/run/secdir/provisioning/
+
+ssh admin@$SERVER_IP -i aux/root_ssh_key \
+    -o UserKnownHostsFile=/dev/null \
+    -o StrictHostKeyChecking=false \
+    -o ConnectTimeout=2 "
+    tmux new-session -d '\
+        export VAULT_TOKEN=$INFRA_ROOT_VAULT_TOKEN; \
+        export NOMAD_TOKEN=$INFRA_ROOT_NOMAD_TOKEN; \
+        export CONSUL_HTTP_TOKEN=$CONSUL_ROOT_TOKEN; \
+        export EPL_PROVISIONING_DIR=/run/secdir/provisioning; \
+      cd /run/secdir/provisioning && /bin/sh /run/secdir/provisioning/provision.sh'"

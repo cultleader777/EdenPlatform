@@ -1,0 +1,1 @@
+/nix/store/bs25ch85ia6hda9vk8mha0xk6gs4gcmq-nixos-disk-image/nixos.qcow2

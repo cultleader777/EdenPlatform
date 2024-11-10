@@ -1,0 +1,6158 @@
+DATA STRUCT server_kind [
+  {
+    kind: aws.a1.2xlarge,
+    cores: 8,
+    memory_bytes: 17179869184,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.a1.4xlarge,
+    cores: 16,
+    memory_bytes: 34359738368,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.a1.large,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.a1.medium,
+    cores: 1,
+    memory_bytes: 2147483648,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.a1.metal,
+    cores: 16,
+    memory_bytes: 34359738368,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.a1.xlarge,
+    cores: 4,
+    memory_bytes: 8589934592,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c4.2xlarge,
+    cores: 8,
+    memory_bytes: 16106127360,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.c4.4xlarge,
+    cores: 16,
+    memory_bytes: 32212254720,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.c4.8xlarge,
+    cores: 36,
+    memory_bytes: 64424509440,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.c4.large,
+    cores: 2,
+    memory_bytes: 4026531840,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.c4.xlarge,
+    cores: 4,
+    memory_bytes: 8053063680,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.c5.12xlarge,
+    cores: 48,
+    memory_bytes: 103079215104,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5.18xlarge,
+    cores: 72,
+    memory_bytes: 154618822656,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5.24xlarge,
+    cores: 96,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5.2xlarge,
+    cores: 8,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5.4xlarge,
+    cores: 16,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5.9xlarge,
+    cores: 36,
+    memory_bytes: 77309411328,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5.large,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5.metal,
+    cores: 96,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.c5.xlarge,
+    cores: 4,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5a.12xlarge,
+    cores: 48,
+    memory_bytes: 103079215104,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5a.16xlarge,
+    cores: 64,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5a.24xlarge,
+    cores: 96,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5a.2xlarge,
+    cores: 8,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5a.4xlarge,
+    cores: 16,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5a.8xlarge,
+    cores: 32,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5a.large,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5a.xlarge,
+    cores: 4,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5d.12xlarge,
+    cores: 48,
+    memory_bytes: 103079215104,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5d.18xlarge,
+    cores: 72,
+    memory_bytes: 154618822656,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5d.24xlarge,
+    cores: 96,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5d.2xlarge,
+    cores: 8,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5d.4xlarge,
+    cores: 16,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5d.9xlarge,
+    cores: 36,
+    memory_bytes: 77309411328,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5d.large,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5d.metal,
+    cores: 96,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.c5d.xlarge,
+    cores: 4,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5n.18xlarge,
+    cores: 72,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5n.2xlarge,
+    cores: 8,
+    memory_bytes: 22548578304,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5n.4xlarge,
+    cores: 16,
+    memory_bytes: 45097156608,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5n.9xlarge,
+    cores: 36,
+    memory_bytes: 103079215104,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5n.large,
+    cores: 2,
+    memory_bytes: 5637144576,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c5n.metal,
+    cores: 72,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.c5n.xlarge,
+    cores: 4,
+    memory_bytes: 11274289152,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6a.12xlarge,
+    cores: 48,
+    memory_bytes: 103079215104,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6a.16xlarge,
+    cores: 64,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6a.24xlarge,
+    cores: 96,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6a.2xlarge,
+    cores: 8,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6a.32xlarge,
+    cores: 128,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6a.48xlarge,
+    cores: 192,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6a.4xlarge,
+    cores: 16,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6a.8xlarge,
+    cores: 32,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6a.large,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6a.metal,
+    cores: 192,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.c6a.xlarge,
+    cores: 4,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6g.12xlarge,
+    cores: 48,
+    memory_bytes: 103079215104,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6g.16xlarge,
+    cores: 64,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6g.2xlarge,
+    cores: 8,
+    memory_bytes: 17179869184,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6g.4xlarge,
+    cores: 16,
+    memory_bytes: 34359738368,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6g.8xlarge,
+    cores: 32,
+    memory_bytes: 68719476736,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6g.large,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6g.medium,
+    cores: 1,
+    memory_bytes: 2147483648,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6g.metal,
+    cores: 64,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.c6g.xlarge,
+    cores: 4,
+    memory_bytes: 8589934592,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6gd.12xlarge,
+    cores: 48,
+    memory_bytes: 103079215104,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6gd.16xlarge,
+    cores: 64,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6gd.2xlarge,
+    cores: 8,
+    memory_bytes: 17179869184,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6gd.4xlarge,
+    cores: 16,
+    memory_bytes: 34359738368,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6gd.8xlarge,
+    cores: 32,
+    memory_bytes: 68719476736,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6gd.large,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6gd.medium,
+    cores: 1,
+    memory_bytes: 2147483648,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6gd.metal,
+    cores: 64,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.c6gd.xlarge,
+    cores: 4,
+    memory_bytes: 8589934592,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6gn.12xlarge,
+    cores: 48,
+    memory_bytes: 103079215104,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6gn.16xlarge,
+    cores: 64,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6gn.2xlarge,
+    cores: 8,
+    memory_bytes: 17179869184,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6gn.4xlarge,
+    cores: 16,
+    memory_bytes: 34359738368,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6gn.8xlarge,
+    cores: 32,
+    memory_bytes: 68719476736,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6gn.large,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6gn.medium,
+    cores: 1,
+    memory_bytes: 2147483648,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6gn.xlarge,
+    cores: 4,
+    memory_bytes: 8589934592,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6i.12xlarge,
+    cores: 48,
+    memory_bytes: 103079215104,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6i.16xlarge,
+    cores: 64,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6i.24xlarge,
+    cores: 96,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6i.2xlarge,
+    cores: 8,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6i.32xlarge,
+    cores: 128,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6i.4xlarge,
+    cores: 16,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6i.8xlarge,
+    cores: 32,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6i.large,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6i.metal,
+    cores: 128,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.c6i.xlarge,
+    cores: 4,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6in.12xlarge,
+    cores: 48,
+    memory_bytes: 103079215104,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6in.16xlarge,
+    cores: 64,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6in.24xlarge,
+    cores: 96,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6in.2xlarge,
+    cores: 8,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6in.32xlarge,
+    cores: 128,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6in.4xlarge,
+    cores: 16,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6in.8xlarge,
+    cores: 32,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6in.large,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c6in.metal,
+    cores: 128,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.c6in.xlarge,
+    cores: 4,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7g.12xlarge,
+    cores: 48,
+    memory_bytes: 103079215104,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7g.16xlarge,
+    cores: 64,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7g.2xlarge,
+    cores: 8,
+    memory_bytes: 17179869184,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7g.4xlarge,
+    cores: 16,
+    memory_bytes: 34359738368,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7g.8xlarge,
+    cores: 32,
+    memory_bytes: 68719476736,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7g.large,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7g.medium,
+    cores: 1,
+    memory_bytes: 2147483648,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7g.metal,
+    cores: 64,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.c7g.xlarge,
+    cores: 4,
+    memory_bytes: 8589934592,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7gd.12xlarge,
+    cores: 48,
+    memory_bytes: 103079215104,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7gd.16xlarge,
+    cores: 64,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7gd.2xlarge,
+    cores: 8,
+    memory_bytes: 17179869184,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7gd.4xlarge,
+    cores: 16,
+    memory_bytes: 34359738368,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7gd.8xlarge,
+    cores: 32,
+    memory_bytes: 68719476736,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7gd.large,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7gd.medium,
+    cores: 1,
+    memory_bytes: 2147483648,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7gd.metal,
+    cores: 64,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.c7gd.xlarge,
+    cores: 4,
+    memory_bytes: 8589934592,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7i.12xlarge,
+    cores: 48,
+    memory_bytes: 103079215104,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7i.16xlarge,
+    cores: 64,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7i.24xlarge,
+    cores: 96,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7i.2xlarge,
+    cores: 8,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7i.48xlarge,
+    cores: 192,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7i.4xlarge,
+    cores: 16,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7i.8xlarge,
+    cores: 32,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7i.large,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.c7i.metal-24xl,
+    cores: 96,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.c7i.metal-48xl,
+    cores: 192,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.c7i.xlarge,
+    cores: 4,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.d2.2xlarge,
+    cores: 8,
+    memory_bytes: 65498251264,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.d2.4xlarge,
+    cores: 16,
+    memory_bytes: 130996502528,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.d2.8xlarge,
+    cores: 36,
+    memory_bytes: 261993005056,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.d2.xlarge,
+    cores: 4,
+    memory_bytes: 32749125632,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.d3.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.d3.4xlarge,
+    cores: 16,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.d3.8xlarge,
+    cores: 32,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.d3.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.g4dn.12xlarge,
+    cores: 48,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.g4dn.16xlarge,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.g4dn.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.g4dn.4xlarge,
+    cores: 16,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.g4dn.8xlarge,
+    cores: 32,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.g4dn.metal,
+    cores: 96,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.g4dn.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.g5.12xlarge,
+    cores: 48,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.g5.16xlarge,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.g5.24xlarge,
+    cores: 96,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.g5.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.g5.48xlarge,
+    cores: 192,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.g5.4xlarge,
+    cores: 16,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.g5.8xlarge,
+    cores: 32,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.g5.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.i2.2xlarge,
+    cores: 8,
+    memory_bytes: 65498251264,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.i2.4xlarge,
+    cores: 16,
+    memory_bytes: 130996502528,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.i2.8xlarge,
+    cores: 32,
+    memory_bytes: 261993005056,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.i2.xlarge,
+    cores: 4,
+    memory_bytes: 32749125632,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.i3.16xlarge,
+    cores: 64,
+    memory_bytes: 523986010112,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.i3.2xlarge,
+    cores: 8,
+    memory_bytes: 65498251264,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.i3.4xlarge,
+    cores: 16,
+    memory_bytes: 130996502528,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.i3.8xlarge,
+    cores: 32,
+    memory_bytes: 261993005056,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.i3.large,
+    cores: 2,
+    memory_bytes: 16374562816,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.i3.metal,
+    cores: 72,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.i3.xlarge,
+    cores: 4,
+    memory_bytes: 32749125632,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.i3en.12xlarge,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.i3en.24xlarge,
+    cores: 96,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.i3en.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.i3en.3xlarge,
+    cores: 12,
+    memory_bytes: 103079215104,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.i3en.6xlarge,
+    cores: 24,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.i3en.large,
+    cores: 2,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.i3en.metal,
+    cores: 96,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.i3en.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.i4i.12xlarge,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.i4i.16xlarge,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.i4i.24xlarge,
+    cores: 96,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.i4i.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.i4i.32xlarge,
+    cores: 128,
+    memory_bytes: 1099511627776,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.i4i.4xlarge,
+    cores: 16,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.i4i.8xlarge,
+    cores: 32,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.i4i.large,
+    cores: 2,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.i4i.metal,
+    cores: 128,
+    memory_bytes: 1099511627776,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.i4i.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.inf1.24xlarge,
+    cores: 96,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.inf1.2xlarge,
+    cores: 8,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.inf1.6xlarge,
+    cores: 24,
+    memory_bytes: 51539607552,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.inf1.xlarge,
+    cores: 4,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.inf2.24xlarge,
+    cores: 96,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.inf2.48xlarge,
+    cores: 192,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.inf2.8xlarge,
+    cores: 32,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.inf2.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.is4gen.2xlarge,
+    cores: 8,
+    memory_bytes: 51539607552,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.is4gen.4xlarge,
+    cores: 16,
+    memory_bytes: 103079215104,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.is4gen.8xlarge,
+    cores: 32,
+    memory_bytes: 206158430208,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.is4gen.large,
+    cores: 2,
+    memory_bytes: 12884901888,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.is4gen.medium,
+    cores: 1,
+    memory_bytes: 6442450944,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.is4gen.xlarge,
+    cores: 4,
+    memory_bytes: 25769803776,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m4.10xlarge,
+    cores: 40,
+    memory_bytes: 171798691840,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.m4.16xlarge,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.m4.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.m4.4xlarge,
+    cores: 16,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.m4.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.m4.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.m5.12xlarge,
+    cores: 48,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5.16xlarge,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5.24xlarge,
+    cores: 96,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5.4xlarge,
+    cores: 16,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5.8xlarge,
+    cores: 32,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5.metal,
+    cores: 96,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.m5.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5a.12xlarge,
+    cores: 48,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5a.16xlarge,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5a.24xlarge,
+    cores: 96,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5a.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5a.4xlarge,
+    cores: 16,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5a.8xlarge,
+    cores: 32,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5a.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5a.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5ad.12xlarge,
+    cores: 48,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5ad.16xlarge,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5ad.24xlarge,
+    cores: 96,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5ad.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5ad.4xlarge,
+    cores: 16,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5ad.8xlarge,
+    cores: 32,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5ad.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5ad.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5d.12xlarge,
+    cores: 48,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5d.16xlarge,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5d.24xlarge,
+    cores: 96,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5d.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5d.4xlarge,
+    cores: 16,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5d.8xlarge,
+    cores: 32,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5d.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m5d.metal,
+    cores: 96,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.m5d.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6a.12xlarge,
+    cores: 48,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6a.16xlarge,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6a.24xlarge,
+    cores: 96,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6a.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6a.32xlarge,
+    cores: 128,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6a.48xlarge,
+    cores: 192,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6a.4xlarge,
+    cores: 16,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6a.8xlarge,
+    cores: 32,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6a.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6a.metal,
+    cores: 192,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.m6a.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6g.12xlarge,
+    cores: 48,
+    memory_bytes: 206158430208,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6g.16xlarge,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6g.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6g.4xlarge,
+    cores: 16,
+    memory_bytes: 68719476736,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6g.8xlarge,
+    cores: 32,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6g.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6g.medium,
+    cores: 1,
+    memory_bytes: 4294967296,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6g.metal,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.m6g.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6gd.12xlarge,
+    cores: 48,
+    memory_bytes: 206158430208,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6gd.16xlarge,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6gd.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6gd.4xlarge,
+    cores: 16,
+    memory_bytes: 68719476736,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6gd.8xlarge,
+    cores: 32,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6gd.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6gd.medium,
+    cores: 1,
+    memory_bytes: 4294967296,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6gd.metal,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.m6gd.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6i.12xlarge,
+    cores: 48,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6i.16xlarge,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6i.24xlarge,
+    cores: 96,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6i.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6i.32xlarge,
+    cores: 128,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6i.4xlarge,
+    cores: 16,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6i.8xlarge,
+    cores: 32,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6i.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6i.metal,
+    cores: 128,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.m6i.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6id.12xlarge,
+    cores: 48,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6id.16xlarge,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6id.24xlarge,
+    cores: 96,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6id.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6id.32xlarge,
+    cores: 128,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6id.4xlarge,
+    cores: 16,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6id.8xlarge,
+    cores: 32,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6id.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m6id.metal,
+    cores: 128,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.m6id.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7g.12xlarge,
+    cores: 48,
+    memory_bytes: 206158430208,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7g.16xlarge,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7g.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7g.4xlarge,
+    cores: 16,
+    memory_bytes: 68719476736,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7g.8xlarge,
+    cores: 32,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7g.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7g.medium,
+    cores: 1,
+    memory_bytes: 4294967296,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7g.metal,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.m7g.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7gd.12xlarge,
+    cores: 48,
+    memory_bytes: 206158430208,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7gd.16xlarge,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7gd.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7gd.4xlarge,
+    cores: 16,
+    memory_bytes: 68719476736,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7gd.8xlarge,
+    cores: 32,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7gd.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7gd.medium,
+    cores: 1,
+    memory_bytes: 4294967296,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7gd.metal,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.m7gd.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7i-flex.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7i-flex.4xlarge,
+    cores: 16,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7i-flex.8xlarge,
+    cores: 32,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7i-flex.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7i-flex.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7i.12xlarge,
+    cores: 48,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7i.16xlarge,
+    cores: 64,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7i.24xlarge,
+    cores: 96,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7i.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7i.48xlarge,
+    cores: 192,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7i.4xlarge,
+    cores: 16,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7i.8xlarge,
+    cores: 32,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7i.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.m7i.metal-24xl,
+    cores: 96,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.m7i.metal-48xl,
+    cores: 192,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.m7i.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.mac1.metal,
+    cores: 12,
+    memory_bytes: 34359738368,
+    architecture: x86_64_mac,
+    non_eligible_reason: "Architecture x86_64_mac not supported in eden platform",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.p2.16xlarge,
+    cores: 64,
+    memory_bytes: 785979015168,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.p2.8xlarge,
+    cores: 32,
+    memory_bytes: 523986010112,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.p2.xlarge,
+    cores: 4,
+    memory_bytes: 65498251264,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.r3.2xlarge,
+    cores: 8,
+    memory_bytes: 65498251264,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.r3.4xlarge,
+    cores: 16,
+    memory_bytes: 130996502528,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.r3.8xlarge,
+    cores: 32,
+    memory_bytes: 261993005056,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.r3.large,
+    cores: 2,
+    memory_bytes: 16106127360,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.r3.xlarge,
+    cores: 4,
+    memory_bytes: 32749125632,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.r4.16xlarge,
+    cores: 64,
+    memory_bytes: 523986010112,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.r4.2xlarge,
+    cores: 8,
+    memory_bytes: 65498251264,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.r4.4xlarge,
+    cores: 16,
+    memory_bytes: 130996502528,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.r4.8xlarge,
+    cores: 32,
+    memory_bytes: 261993005056,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.r4.large,
+    cores: 2,
+    memory_bytes: 16374562816,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.r4.xlarge,
+    cores: 4,
+    memory_bytes: 32749125632,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.r5.12xlarge,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5.16xlarge,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5.24xlarge,
+    cores: 96,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5.4xlarge,
+    cores: 16,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5.8xlarge,
+    cores: 32,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5.large,
+    cores: 2,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5.metal,
+    cores: 96,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.r5.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5a.12xlarge,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5a.16xlarge,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5a.24xlarge,
+    cores: 96,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5a.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5a.4xlarge,
+    cores: 16,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5a.8xlarge,
+    cores: 32,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5a.large,
+    cores: 2,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5a.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5ad.12xlarge,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5ad.16xlarge,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5ad.24xlarge,
+    cores: 96,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5ad.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5ad.4xlarge,
+    cores: 16,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5ad.8xlarge,
+    cores: 32,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5ad.large,
+    cores: 2,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5ad.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5d.12xlarge,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5d.16xlarge,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5d.24xlarge,
+    cores: 96,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5d.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5d.4xlarge,
+    cores: 16,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5d.8xlarge,
+    cores: 32,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5d.large,
+    cores: 2,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5d.metal,
+    cores: 96,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.r5d.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5n.12xlarge,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5n.16xlarge,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5n.24xlarge,
+    cores: 96,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5n.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5n.4xlarge,
+    cores: 16,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5n.8xlarge,
+    cores: 32,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5n.large,
+    cores: 2,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r5n.metal,
+    cores: 96,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.r5n.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6a.12xlarge,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6a.16xlarge,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6a.24xlarge,
+    cores: 96,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6a.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6a.32xlarge,
+    cores: 128,
+    memory_bytes: 1099511627776,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6a.48xlarge,
+    cores: 192,
+    memory_bytes: 1649267441664,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6a.4xlarge,
+    cores: 16,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6a.8xlarge,
+    cores: 32,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6a.large,
+    cores: 2,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6a.metal,
+    cores: 192,
+    memory_bytes: 1649267441664,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.r6a.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6g.12xlarge,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6g.16xlarge,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6g.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6g.4xlarge,
+    cores: 16,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6g.8xlarge,
+    cores: 32,
+    memory_bytes: 274877906944,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6g.large,
+    cores: 2,
+    memory_bytes: 17179869184,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6g.medium,
+    cores: 1,
+    memory_bytes: 8589934592,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6g.metal,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.r6g.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6gd.12xlarge,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6gd.16xlarge,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6gd.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6gd.4xlarge,
+    cores: 16,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6gd.8xlarge,
+    cores: 32,
+    memory_bytes: 274877906944,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6gd.large,
+    cores: 2,
+    memory_bytes: 17179869184,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6gd.medium,
+    cores: 1,
+    memory_bytes: 8589934592,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6gd.metal,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.r6gd.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6i.12xlarge,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6i.16xlarge,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6i.24xlarge,
+    cores: 96,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6i.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6i.32xlarge,
+    cores: 128,
+    memory_bytes: 1099511627776,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6i.4xlarge,
+    cores: 16,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6i.8xlarge,
+    cores: 32,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6i.large,
+    cores: 2,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6i.metal,
+    cores: 128,
+    memory_bytes: 1099511627776,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.r6i.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6id.12xlarge,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6id.16xlarge,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6id.24xlarge,
+    cores: 96,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6id.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6id.32xlarge,
+    cores: 128,
+    memory_bytes: 1099511627776,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6id.4xlarge,
+    cores: 16,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6id.8xlarge,
+    cores: 32,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6id.large,
+    cores: 2,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r6id.metal,
+    cores: 128,
+    memory_bytes: 1099511627776,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.r6id.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7g.12xlarge,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7g.16xlarge,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7g.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7g.4xlarge,
+    cores: 16,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7g.8xlarge,
+    cores: 32,
+    memory_bytes: 274877906944,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7g.large,
+    cores: 2,
+    memory_bytes: 17179869184,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7g.medium,
+    cores: 1,
+    memory_bytes: 8589934592,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7g.metal,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.r7g.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7gd.12xlarge,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7gd.16xlarge,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7gd.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7gd.4xlarge,
+    cores: 16,
+    memory_bytes: 137438953472,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7gd.8xlarge,
+    cores: 32,
+    memory_bytes: 274877906944,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7gd.large,
+    cores: 2,
+    memory_bytes: 17179869184,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7gd.medium,
+    cores: 1,
+    memory_bytes: 8589934592,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7gd.metal,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.r7gd.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7i.12xlarge,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7i.16xlarge,
+    cores: 64,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7i.24xlarge,
+    cores: 96,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7i.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7i.48xlarge,
+    cores: 192,
+    memory_bytes: 1649267441664,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7i.4xlarge,
+    cores: 16,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7i.8xlarge,
+    cores: 32,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7i.large,
+    cores: 2,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.r7i.metal-24xl,
+    cores: 96,
+    memory_bytes: 824633720832,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.r7i.metal-48xl,
+    cores: 192,
+    memory_bytes: 1649267441664,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.r7i.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t2.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.t2.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.t2.medium,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.t2.micro,
+    cores: 1,
+    memory_bytes: 1073741824,
+    architecture: x86_64,
+    non_eligible_reason: "Too little memory to run Eden platform node, node size is 1.0GB, minimum required is 1.5GB (1.0GB system reserved + 0.5GB for workloads)",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.t2.nano,
+    cores: 1,
+    memory_bytes: 536870912,
+    architecture: x86_64,
+    non_eligible_reason: "Too little memory to run Eden platform node, node size is 0.5GB, minimum required is 1.5GB (1.0GB system reserved + 0.5GB for workloads)",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.t2.small,
+    cores: 1,
+    memory_bytes: 2147483648,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.t2.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.t3.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t3.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t3.medium,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t3.micro,
+    cores: 2,
+    memory_bytes: 1073741824,
+    architecture: x86_64,
+    non_eligible_reason: "Too little memory to run Eden platform node, node size is 1.0GB, minimum required is 1.5GB (1.0GB system reserved + 0.5GB for workloads)",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t3.nano,
+    cores: 2,
+    memory_bytes: 536870912,
+    architecture: x86_64,
+    non_eligible_reason: "Too little memory to run Eden platform node, node size is 0.5GB, minimum required is 1.5GB (1.0GB system reserved + 0.5GB for workloads)",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t3.small,
+    cores: 2,
+    memory_bytes: 2147483648,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t3.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t3a.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t3a.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t3a.medium,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t3a.micro,
+    cores: 2,
+    memory_bytes: 1073741824,
+    architecture: x86_64,
+    non_eligible_reason: "Too little memory to run Eden platform node, node size is 1.0GB, minimum required is 1.5GB (1.0GB system reserved + 0.5GB for workloads)",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t3a.nano,
+    cores: 2,
+    memory_bytes: 536870912,
+    architecture: x86_64,
+    non_eligible_reason: "Too little memory to run Eden platform node, node size is 0.5GB, minimum required is 1.5GB (1.0GB system reserved + 0.5GB for workloads)",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t3a.small,
+    cores: 2,
+    memory_bytes: 2147483648,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t3a.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t4g.2xlarge,
+    cores: 8,
+    memory_bytes: 34359738368,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t4g.large,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t4g.medium,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t4g.micro,
+    cores: 2,
+    memory_bytes: 1073741824,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t4g.nano,
+    cores: 2,
+    memory_bytes: 536870912,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t4g.small,
+    cores: 2,
+    memory_bytes: 2147483648,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.t4g.xlarge,
+    cores: 4,
+    memory_bytes: 17179869184,
+    architecture: arm64,
+    non_eligible_reason: "Architecture arm64 not supported in eden platform",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.u-12tb1.112xlarge,
+    cores: 448,
+    memory_bytes: 13194139533312,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.u-6tb1.112xlarge,
+    cores: 448,
+    memory_bytes: 6597069766656,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.u-6tb1.56xlarge,
+    cores: 224,
+    memory_bytes: 6597069766656,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.x1.16xlarge,
+    cores: 64,
+    memory_bytes: 1047972020224,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.x1.32xlarge,
+    cores: 128,
+    memory_bytes: 2095944040448,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.x1e.16xlarge,
+    cores: 64,
+    memory_bytes: 2095944040448,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.x1e.2xlarge,
+    cores: 8,
+    memory_bytes: 261993005056,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.x1e.32xlarge,
+    cores: 128,
+    memory_bytes: 4191888080896,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.x1e.4xlarge,
+    cores: 16,
+    memory_bytes: 523986010112,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.x1e.8xlarge,
+    cores: 32,
+    memory_bytes: 1047972020224,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.x1e.xlarge,
+    cores: 4,
+    memory_bytes: 130996502528,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: xen,
+    }
+  },
+  {
+    kind: aws.x2idn.16xlarge,
+    cores: 64,
+    memory_bytes: 1099511627776,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.x2idn.24xlarge,
+    cores: 96,
+    memory_bytes: 1649267441664,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.x2idn.32xlarge,
+    cores: 128,
+    memory_bytes: 2199023255552,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.x2idn.metal,
+    cores: 128,
+    memory_bytes: 2199023255552,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.x2iedn.16xlarge,
+    cores: 64,
+    memory_bytes: 2199023255552,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.x2iedn.24xlarge,
+    cores: 96,
+    memory_bytes: 3298534883328,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.x2iedn.2xlarge,
+    cores: 8,
+    memory_bytes: 274877906944,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.x2iedn.32xlarge,
+    cores: 128,
+    memory_bytes: 4398046511104,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.x2iedn.4xlarge,
+    cores: 16,
+    memory_bytes: 549755813888,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.x2iedn.8xlarge,
+    cores: 32,
+    memory_bytes: 1099511627776,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.x2iedn.metal,
+    cores: 128,
+    memory_bytes: 4398046511104,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.x2iedn.xlarge,
+    cores: 4,
+    memory_bytes: 137438953472,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.z1d.12xlarge,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.z1d.2xlarge,
+    cores: 8,
+    memory_bytes: 68719476736,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.z1d.3xlarge,
+    cores: 12,
+    memory_bytes: 103079215104,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.z1d.6xlarge,
+    cores: 24,
+    memory_bytes: 206158430208,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.z1d.large,
+    cores: 2,
+    memory_bytes: 17179869184,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+  {
+    kind: aws.z1d.metal,
+    cores: 48,
+    memory_bytes: 412316860416,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: true,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: metal,
+    }
+  },
+  {
+    kind: aws.z1d.xlarge,
+    cores: 4,
+    memory_bytes: 34359738368,
+    architecture: x86_64,
+    non_eligible_reason: "",
+    bare_metal: false,
+    WITH server_kind_attribute {
+      key: hypervisor,
+      value: nitro,
+    }
+  },
+]

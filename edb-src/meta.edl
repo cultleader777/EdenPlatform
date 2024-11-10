@@ -1,0 +1,36 @@
+
+TABLE global_settings {
+  project_name TEXT,
+  docker_registry_port INT DEFAULT 5000,
+  docker_registry_service_name TEXT DEFAULT epl-docker-registry,
+  aws_artefacts_s3_bucket_name TEXT DEFAULT '',
+  local_docker_cache_port INT DEFAULT 12779,
+  // user for public dns name certificate validation
+  admin_email TEXT,
+  google_cloud_project_id TEXT DEFAULT '',
+  google_cloud_artefacts_bucket_name TEXT DEFAULT '',
+  disable_consul_quorum_tests BOOL DEFAULT false,
+  disable_nomad_quorum_tests BOOL DEFAULT false,
+  disable_vault_quorum_tests BOOL DEFAULT false,
+  disable_dns_quorum_tests BOOL DEFAULT false,
+  disable_deployment_min_server_tests BOOL DEFAULT false,
+  disable_deployment_min_ingress_tests BOOL DEFAULT false,
+  disable_region_docker_registry_tests BOOL DEFAULT false,
+  disable_region_monitoring_tests BOOL DEFAULT false,
+  disable_region_tracing_tests BOOL DEFAULT false,
+  disable_region_logging_tests BOOL DEFAULT false,
+  disable_vpn_gateway_tests BOOL DEFAULT false,
+  experimental_enable_arm64_support BOOL DEFAULT false,
+  update_edl_public_ips_from_terraform BOOL DEFAULT true,
+  // in case ipv6 subnets clash in AWS you have option
+  // to disable it if you don't use ipv6
+  enable_ipv6 BOOL DEFAULT true,
+  // enabling this flag ensures all ingresses is required
+  force_ipv6 BOOL DEFAULT false,
+
+  CHECK { isValidPort(docker_registry_port) },
+  CHECK { isValidPort(local_docker_cache_port) },
+  CHECK { isKebabCase(docker_registry_service_name) },
+  // in this case ipv6 is disabled but we force ipv6? no good
+  CHECK { not (not enable_ipv6 and force_ipv6) },
+}

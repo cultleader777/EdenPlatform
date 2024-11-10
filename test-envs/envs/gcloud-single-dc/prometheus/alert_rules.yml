@@ -1,0 +1,12 @@
+
+groups:
+- name: Alerts
+  rules:
+
+  - alert: FilesystemSpaceLow
+    expr: round((node_filesystem_free_bytes{fstype=~"(btrfs|zfs|xfs|ext4)"} * 100           / node_filesystem_size_bytes{fstype=~"(btrfs|zfs|xfs|ext4)"}), 0.1) < 20
+    for: 5m
+    labels:
+      severity: 50
+    annotations:
+      description: "Filesystem {{ $labels.device }} at {{ $labels.instance }} has less than 20% disk space remaining"

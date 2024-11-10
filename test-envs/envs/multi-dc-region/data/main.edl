@@ -1,0 +1,123 @@
+
+INCLUDE "servers.edl"
+INCLUDE "databases.edl"
+INCLUDE "storage.edl"
+INCLUDE "monitoring.edl"
+
+DATA STRUCT docker_registry_instance {
+  region: us-west,
+  minio_bucket: global=>docker,
+}
+
+DATA STRUCT EXCLUSIVE datacenter [
+  {
+    dc_name: dc1,
+    network_cidr: '10.17.0.0/16',
+    allow_small_subnets: true,
+  },
+  {
+    dc_name: dc2,
+    network_cidr: '10.18.0.0/16',
+  },
+  {
+    dc_name: dc3,
+    network_cidr: '10.19.0.0/16',
+    allow_small_subnets: true,
+  },
+]
+
+DATA subnet_router_floating_ip {
+  '10.17.0.2/24';
+  '10.18.0.2/24';
+  '10.19.0.2/24';
+}
+
+DATA STRUCT EXCLUSIVE region [
+  { region_name: us-west, is_dns_master: true, availability_mode: multi_dc }
+]
+
+DATA STRUCT EXCLUSIVE tld [
+  {
+    domain: epl-infra.net,
+    expose_admin: true,
+    automatic_certificates: false,
+  }
+]
+
+DATA STRUCT network [
+  {
+    network_name: lan,
+    cidr: '10.0.0.0/8',
+  },
+  {
+    network_name: vpn,
+    cidr: '172.21.0.0/16',
+  },
+  {
+    network_name: internet,
+    cidr: '0.0.0.0/0',
+  },
+  {
+    network_name: dcrouter,
+    cidr: '10.0.0.0/8',
+  },
+]
+
+DATA STRUCT global_settings {
+  project_name: multi-dc-region,
+  admin_email: admin@epl-infra.net,
+}
+
+DATA admin_ssh_keys {
+  "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC3AkuDzzPrMaDav0kN7PIoaBU1Vtw1TfkHxWzPMrleocCltYl8TljwCqEJtmizx5DGKbXFQg31mRVswzuAq2vP2RFdPHQxfl5nJnWsQkelvpPO/Q3LUdtrm19zAgbbDL+AtIg3/lif6/2qNiWCSTfaUpjM7WOPszBNmMRGz/UBZTYc7COTt+I3lK8f6sBn5YyD796LBw6tsNpqfqF9NTAsLT8/PqrXeTpdxFe375gMxeIpNWeE5exMGJKgqnZCcOMOoKMJy61+wdEAYzDFNgIX7ZFvpBYQPf/rTs7LWgtyTSw3fqvMDnfwAf7oIF8rZRwYdVnqTGCWA2h3f4lOf6BERIPkKEK7/DGjmekKnXJrRiLSfcgRjri3VuGBxrJ+Va/Dn6e7o7CdzdJ+fkw7KxTFKuf17Z2r3ZFi1xOduIxXW8/QY6zhq2A11e+HsMe/oaBh3bRcpdMFmW5mqQjGm05xvxArSCAARBKkHjywGs6mRLN2PjNPYdzlI2J8nF6bmSk= henlo";
+}
+
+DEFAULTS {
+  server.dc dc1,
+  server.nixpkgs_environment default_nixpkgs,
+  region.tld epl-infra.net,
+  rust_compilation_environment.nixpkgs_environment default_nixpkgs,
+  frontend_application_deployment.region us-west,
+  backend_application_deployment.region us-west,
+  datacenter.region us-west,
+  datacenter.implementation testvms,
+  datacenter.default_server_kind testvm.cpu2ram3072,
+  server_disk.disk_kind default-ssd,
+  pg_deployment.region us-west,
+  nats_cluster.region us-west,
+  minio_cluster.region us-west,
+  monitoring_cluster.region us-west,
+  grafana.region us-west,
+  loki_cluster.region us-west,
+  tempo_cluster.region us-west,
+  ch_deployment.region us-west,
+  ch_keeper_deployment.region us-west,
+  blackbox_deployment.region us-west,
+}
+
+DATA STRUCT disk_kind {
+  kind: default-ssd,
+  medium: ssd,
+  capacity_bytes: 21474836480,
+}
+
+DATA STRUCT server_kind [
+  {
+    kind: testvm.cpu8ram4096,
+    cores: 8,
+    memory_bytes: 4294967296,
+    architecture: x86_64,
+  },
+  {
+    kind: testvm.cpu2ram4096,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: x86_64,
+  },
+  {
+    kind: testvm.cpu2ram3072,
+    cores: 2,
+    memory_bytes: 3221225472,
+    architecture: x86_64,
+  },
+]

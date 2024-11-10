@@ -1,0 +1,283 @@
+
+DATA STRUCT server [
+  {
+    dc: dc1,
+    hostname: server-a,
+    kind: testvm.cpu8ram4096,
+    ssh_interface: enp1s0,
+    is_consul_master: true,
+    is_nomad_master: true,
+    is_vault_instance: false,
+    is_dns_master: true,
+    is_dns_slave: false,
+    is_vpn_gateway: true,
+    WITH server_disk {
+      disk_id: 'vda'
+    }
+    WITH network_interface [
+      {
+        if_name: enp1s0,
+        if_network: lan,
+        if_ip: 10.17.0.10,
+        if_prefix: 24,
+      },
+      {
+        if_name: enp2s0,
+        if_network: internet,
+        if_ip: 77.77.77.10,
+        if_prefix: 24,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.7.10,
+        if_prefix: 16,
+      },
+    ]
+
+    WITH server_root_volume [
+      {
+        volume_name: minio-docker-a,
+        zfs_recordsize: 1M,
+      },
+      {
+        volume_name: mon-default,
+      },
+      {
+        volume_name: am-default,
+      },
+      {
+        volume_name: pgtest1,
+      },
+    ]
+  },
+  {
+    dc: dc1,
+    hostname: server-b,
+    ssh_interface: enp1s0,
+    kind: testvm.cpu2ram4096,
+    is_consul_master: false,
+    is_nomad_master: false,
+    is_vault_instance: true,
+    is_dns_master: false,
+    is_dns_slave: false,
+    is_vpn_gateway: true,
+    is_ingress: true,
+    WITH server_disk {
+      disk_id: 'vda'
+    }
+    WITH network_interface [
+      {
+        if_name: enp1s0,
+        if_network: lan,
+        if_ip: 10.17.0.13,
+        if_prefix: 24,
+      },
+      {
+        if_name: enp2s0,
+        if_network: internet,
+        if_ip: 77.77.77.11,
+        if_prefix: 24,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.7.11,
+        if_prefix: 16,
+      },
+    ]
+    WITH server_root_volume [
+      {
+        volume_name: minio-docker-b,
+        zfs_recordsize: 1M,
+      },
+    ]
+  },
+  {
+    dc: dc2,
+    hostname: server-c,
+    ssh_interface: enp1s0,
+    kind: testvm.cpu2ram4096,
+    is_consul_master: true,
+    is_nomad_master: true,
+    is_vault_instance: true,
+    is_dns_master: false,
+    is_dns_slave: true,
+    is_ingress: true,
+    is_vpn_gateway: true,
+    WITH server_disk {
+      disk_id: 'vda'
+    }
+    WITH network_interface [
+      {
+        if_name: enp1s0,
+        if_network: lan,
+        if_ip: 10.18.0.10,
+        if_prefix: 24,
+      },
+      {
+        if_name: enp2s0,
+        if_network: internet,
+        if_ip: 77.77.77.12,
+        if_prefix: 24,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.7.12,
+        if_prefix: 16,
+      },
+    ]
+    WITH server_root_volume [
+      {
+        volume_name: minio-docker-c,
+        zfs_recordsize: 1M,
+      },
+      {
+        volume_name: mon-default,
+      },
+      {
+        volume_name: am-default,
+      },
+      {
+        volume_name: pgtest1,
+      },
+    ]
+  },
+  {
+    dc: dc2,
+    hostname: server-d,
+    ssh_interface: enp1s0,
+    kind: testvm.cpu2ram4096,
+    is_consul_master: false,
+    is_nomad_master: true,
+    is_vault_instance: true,
+    is_dns_master: false,
+    is_dns_slave: false,
+    is_ingress: true,
+    is_vpn_gateway: true,
+    WITH server_disk {
+      disk_id: 'vda'
+    }
+    WITH network_interface [
+      {
+        if_name: enp1s0,
+        if_network: lan,
+        if_ip: 10.18.0.11,
+        if_prefix: 24,
+      },
+      {
+        if_name: enp2s0,
+        if_network: internet,
+        if_ip: 77.77.77.13,
+        if_prefix: 24,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.7.13,
+        if_prefix: 16,
+      },
+    ]
+    WITH server_root_volume [
+      {
+        volume_name: nats1,
+      },
+    ]
+  },
+  {
+    dc: dc3,
+    hostname: server-e,
+    ssh_interface: enp1s0,
+    is_consul_master: true,
+    is_nomad_master: true,
+    is_vault_instance: true,
+    is_dns_master: false,
+    is_dns_slave: true,
+    is_ingress: true,
+    is_vpn_gateway: true,
+    WITH server_disk {
+      disk_id: 'vda'
+    }
+    WITH network_interface [
+      {
+        if_name: enp1s0,
+        if_network: lan,
+        if_ip: 10.19.0.10,
+        if_prefix: 24,
+      },
+      {
+        if_name: enp2s0,
+        if_network: internet,
+        if_ip: 77.77.77.14,
+        if_prefix: 24,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.7.14,
+        if_prefix: 16,
+      },
+    ]
+    WITH server_root_volume [
+      {
+        volume_name: nats1,
+      },
+      {
+        volume_name: minio-docker-c,
+        zfs_recordsize: 1M,
+      },
+      {
+        volume_name: am-default,
+      },
+      {
+        volume_name: minio-docker-e,
+        zfs_recordsize: 1M,
+      },
+    ]
+  },
+  {
+    dc: dc3,
+    hostname: server-f,
+    ssh_interface: enp1s0,
+    is_consul_master: false,
+    is_nomad_master: true,
+    is_vault_instance: true,
+    is_dns_master: false,
+    is_dns_slave: false,
+    is_ingress: true,
+    is_vpn_gateway: true,
+    WITH server_disk {
+      disk_id: 'vda'
+    }
+    WITH network_interface [
+      {
+        if_name: enp1s0,
+        if_network: lan,
+        if_ip: 10.19.0.11,
+        if_prefix: 24,
+      },
+      {
+        if_name: enp2s0,
+        if_network: internet,
+        if_ip: 77.77.77.15,
+        if_prefix: 24,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.7.15,
+        if_prefix: 16,
+      },
+    ]
+    WITH server_root_volume [
+      {
+        volume_name: nats1,
+      },
+      {
+        volume_name: minio-docker-d,
+        zfs_recordsize: 1M,
+      },
+    ]
+  },
+]

@@ -1,0 +1,3 @@
+IdentityFile=aux/root_ssh_key
+StrictHostKeyChecking=false
+UserKnownHostsFile=/dev/null

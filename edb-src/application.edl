@@ -1,0 +1,477 @@
+
+TABLE nomad_namespace {
+  namespace TEXT PRIMARY KEY,
+  description TEXT DEFAULT '',
+
+  CHECK { isKebabCase(namespace) },
+  CHECK { not stringContains(description, '"') },
+}
+
+// default if someone is lazy to pick
+DATA STRUCT nomad_namespace [
+  {
+    namespace: epl,
+    description: 'Eden platform',
+  },
+]
+
+TABLE rust_compilation_environment {
+    env_name TEXT PRIMARY KEY,
+    rust_edition TEXT DEFAULT 2021,
+    nixpkgs_environment REF nixpkgs_environment DETACHED DEFAULT,
+    environment_kind TEXT,
+
+    CHECK { isValidRustEdition(rust_edition) },
+    CHECK { isValidRustCompilerEnvKind(environment_kind) },
+}
+
+TABLE rust_crate_version {
+    crate_name TEXT PRIMARY KEY CHILD OF rust_compilation_environment,
+    version TEXT,
+    features TEXT DEFAULT '',
+    default_features BOOL DEFAULT true,
+
+    CHECK { isValidSemver(version) },
+}
+
+TABLE backend_application {
+    application_name TEXT PRIMARY KEY,
+    build_environment REF rust_compilation_environment DEFAULT 'default_backend',
+
+    // will be used as fqdn
+    CHECK { isKebabCase(application_name) }
+}
+
+// dedicated tokio worker with lifetime intended
+// to continually run in the background
+TABLE backend_application_background_job {
+    job_name TEXT PRIMARY KEY CHILD OF backend_application,
+    CHECK { isSnakeCase(job_name) },
+}
+
+TABLE backend_application_config {
+    config_name TEXT PRIMARY KEY CHILD OF backend_application,
+    config_type TEXT,
+    default_value TEXT DEFAULT '',
+    min_value TEXT DEFAULT '',
+    max_value TEXT DEFAULT '',
+    regex_check TEXT DEFAULT '',
+
+    CHECK { isSnakeCase(config_name) },
+    CHECK { isValidConfigType(config_type) },
+}
+
+TABLE backend_application_s3_bucket {
+    bucket_name TEXT PRIMARY KEY CHILD OF backend_application,
+
+    CHECK { isSnakeCase(bucket_name) },
+}
+
+TABLE backend_application_pg_shard {
+    shard_name TEXT PRIMARY KEY CHILD OF backend_application,
+    pg_schema REF pg_schema,
+    used_queries TEXT DEFAULT '',
+    used_mutators TEXT DEFAULT '',
+    used_transactions TEXT DEFAULT '',
+
+    CHECK { isSnakeCase(shard_name) },
+}
+
+TABLE backend_application_ch_shard {
+    shard_name TEXT PRIMARY KEY CHILD OF backend_application,
+    ch_schema REF ch_schema,
+    used_queries TEXT DEFAULT '',
+    used_inserters TEXT DEFAULT '',
+    used_mutators TEXT DEFAULT '',
+
+    CHECK { isSnakeCase(shard_name) },
+}
+
+TABLE backend_application_deployment {
+    deployment_name TEXT PRIMARY KEY,
+    namespace REF nomad_namespace DEFAULT epl,
+    application_name REF backend_application,
+    workload_architecture TEXT DEFAULT x86_64,
+    count INT DEFAULT 1,
+    placement TEXT DEFAULT '',
+    pg_shard_wiring TEXT DEFAULT '',
+    ch_shard_wiring TEXT DEFAULT '',
+    nats_stream_wiring TEXT DEFAULT '',
+    s3_bucket_wiring TEXT DEFAULT '',
+    config TEXT DEFAULT '',
+    http_port INT DEFAULT 7347,
+    memory_mb INT DEFAULT 64,
+    region REF region DETACHED DEFAULT,
+    loki_cluster TEXT DEFAULT region_default,
+    monitoring_cluster TEXT DEFAULT region_default,
+    tracing_cluster TEXT DEFAULT region_default,
+
+    // if count is more than 1024 probably
+    // number is passed by mistake
+    CHECK { count >= 1 and count <= 1024 },
+    CHECK { isValidPort(http_port) },
+    // will end up as service in consul
+    CHECK { isKebabCase(deployment_name) }
+}
+
+TABLE backend_application_deployment_ingress {
+    deployment REF backend_application_deployment,
+    mountpoint TEXT DEFAULT '/',
+    subdomain TEXT DEFAULT '',
+    tld REF tld,
+    // expose all endpoints mentioned.
+    // what about metrics? Do we generate proxy pass except
+    // metrics path?
+    endpoint_list TEXT DEFAULT '',
+}
+
+TABLE backend_application_nats_stream {
+    stream_name TEXT PRIMARY KEY CHILD OF backend_application,
+    stream_type REF versioned_type,
+    enable_consumer BOOL DEFAULT false,
+    enable_producer BOOL DEFAULT false,
+    // in batched consumer batches of messages are acked
+    is_batch_consumer BOOL DEFAULT false,
+    enable_subjects BOOL DEFAULT false,
+
+    // consumer or producer must be enabled
+    CHECK { enable_consumer or enable_producer },
+    // both cannot be enabled
+    CHECK { not(enable_consumer and enable_producer) },
+}
+
+TABLE backend_http_endpoint {
+    http_endpoint_name TEXT PRIMARY KEY CHILD OF backend_application,
+    path TEXT, // inline arguments encoded
+    http_method REF http_methods,
+    input_body_type TEXT DEFAULT '',
+    output_body_type TEXT DEFAULT '',
+    data_type REF http_endpoint_data_type,
+    max_input_body_size_bytes INT DEFAULT 262144,
+    needs_headers BOOL DEFAULT false,
+    receive_body_as_stream BOOL DEFAULT false,
+
+    CHECK { not stringStarts(path, "/metrics") and not stringStarts(path, "/health") },
+    CHECK { isSnakeCase(http_endpoint_name) }
+    CHECK { max_input_body_size_bytes > 0 }
+}
+
+TABLE frontend_application {
+    application_name TEXT PRIMARY KEY,
+    build_environment REF rust_compilation_environment DEFAULT 'default_frontend',
+    index_page_title TEXT DEFAULT 'Trunk App',
+
+    // will be used as fqdn
+    CHECK { isKebabCase(application_name) }
+}
+
+// generate page swaps
+TABLE frontend_page {
+    page_name TEXT PRIMARY KEY CHILD OF frontend_application,
+    // only no arguments
+    // raw paths are allowed
+    path TEXT,
+}
+
+// if same subdomain has only one reference to the endpoint
+// use that, if more than one exists, specify explicitly? (do this when encountered)
+TABLE frontend_application_used_endpoint {
+    endpoint_name TEXT PRIMARY KEY CHILD OF frontend_application,
+    backend_endpoint REF FOREIGN CHILD backend_http_endpoint,
+
+    CHECK { isSnakeCase(endpoint_name) },
+}
+
+TABLE frontend_application_external_link {
+    link_name TEXT PRIMARY KEY CHILD OF frontend_application,
+    // backend endpoint must be HTML type
+    backend_endpoint REF FOREIGN CHILD backend_http_endpoint,
+    CHECK { isSnakeCase(link_name) },
+}
+
+TABLE frontend_application_external_page {
+    link_name TEXT PRIMARY KEY CHILD OF frontend_application,
+    frontend_page REF EXPLICIT FOREIGN CHILD frontend_page,
+    CHECK { isSnakeCase(link_name) },
+}
+
+TABLE frontend_application_deployment {
+    deployment_name TEXT PRIMARY KEY,
+    application_name REF frontend_application,
+    namespace REF nomad_namespace DEFAULT epl,
+    // point to non inferred endpoints
+    // to use in REST api
+    explicit_endpoint_wiring TEXT DEFAULT '',
+    workload_backend_architecture TEXT DEFAULT x86_64,
+    placement TEXT DEFAULT '',
+    // point to backend endpoints
+    link_wiring TEXT DEFAULT '',
+    // point to frontend pages
+    page_wiring TEXT DEFAULT '',
+    count INT DEFAULT 3,
+    http_port INT DEFAULT 7437,
+    memory_mb INT DEFAULT 16,
+    region REF region DETACHED DEFAULT,
+    loki_cluster TEXT DEFAULT region_default,
+
+    // if count is more than 1024 probably
+    // number is passed by mistake
+    CHECK { count >= 1 and count <= 1024 },
+    CHECK { isValidPort(http_port) },
+    // will end up as service in consul
+    CHECK { isKebabCase(deployment_name) },
+}
+
+TABLE frontend_application_deployment_ingress {
+    deployment REF frontend_application_deployment,
+    // everything is deployed relative to the mountpoint
+    mountpoint TEXT DEFAULT '/',
+    subdomain TEXT DEFAULT '',
+    tld REF tld,
+}
+
+TABLE http_methods {
+    http_method_name TEXT PRIMARY KEY,
+}
+
+DATA EXCLUSIVE http_methods {
+    GET;
+    POST;
+    PUT;
+}
+
+TABLE http_endpoint_data_type {
+    http_endpoint_data_type TEXT PRIMARY KEY,
+}
+
+DATA EXCLUSIVE http_endpoint_data_type {
+    json;
+    html;
+    raw; // give low level control about handling input/output body
+}
+
+DATA STRUCT rust_compilation_environment {
+    env_name: default_backend,
+    environment_kind: backend_app,
+    WITH rust_crate_version [
+        {
+            crate_name: tokio,
+            version: 1.20.1,
+            features: full,
+        },
+        {
+            crate_name: async-trait,
+            version: 0.1.58,
+        },
+        {
+            crate_name: prometheus,
+            version: 0.13.3,
+        },
+        {
+            crate_name: futures,
+            version: 0.3.25,
+        },
+        {
+            crate_name: futures-util,
+            version: 0.3.25,
+        },
+        {
+            crate_name: log,
+            version: 0.4.17,
+        },
+        {
+            crate_name: json_env_logger2,
+            version: 0.2.1,
+            features: iso-timestamps,
+        },
+        {
+            crate_name: kv-log-macro,
+            version: 1.0.7,
+        },
+        {
+            crate_name: lazy_static,
+            version: 1.4.0,
+        },
+        {
+            crate_name: serde,
+            version: 1.0.145,
+        },
+        {
+            crate_name: serde_json,
+            version: 1.0.87,
+        },
+        {
+            crate_name: bincode,
+            version: 1.3.3,
+        },
+        {
+            crate_name: tokio-postgres,
+            version: 0.7.7,
+        },
+        {
+            crate_name: bb8,
+            version: 0.8.0,
+        },
+        {
+            crate_name: bb8-postgres,
+            version: 0.8.1,
+        },
+        {
+            crate_name: async-nats,
+            version: 0.34.0,
+        },
+        {
+            crate_name: bytes,
+            version: 1.2.1,
+        },
+        {
+            crate_name: actix-web,
+            version: 4.2.1,
+        },
+        {
+            crate_name: qstring,
+            version: 0.7.2,
+        },
+        {
+            crate_name: derive_more,
+            version: 0.99.17,
+        },
+        {
+            crate_name: maud,
+            version: 0.24.0,
+        },
+        {
+            crate_name: opentelemetry,
+            version: 0.22.0,
+        },
+        {
+            crate_name: opentelemetry_sdk,
+            version: 0.22.1,
+            features: rt-tokio,
+        },
+        {
+            crate_name: opentelemetry-otlp,
+            version: 0.15.0,
+            features: 'grpc-tonic+trace',
+        },
+        {
+            crate_name: opentelemetry-semantic-conventions,
+            version: 0.14.0,
+        },
+        {
+            crate_name: rand,
+            version: 0.8.5,
+        },
+        {
+            crate_name: rust-s3,
+            version: 0.33.0,
+            default_features: false,
+            features: tokio-rustls-tls,
+        },
+        {
+            crate_name: reqwest,
+            version: 0.12.4,
+            features: rustls-tls,
+            default_features: false,
+        },
+        {
+            crate_name: base64,
+            version: 0.22.1,
+        },
+        {
+            crate_name: unescaper,
+            version: 0.1.4,
+        },
+        {
+            crate_name: chrono,
+            version: 0.4.38,
+        },
+    ]
+}
+
+DATA STRUCT rust_compilation_environment {
+    env_name: default_frontend,
+    environment_kind: frontend_app,
+    WITH rust_crate_version [
+        {
+            crate_name: yew,
+            version: 0.20.0,
+            features: csr,
+        },
+        {
+            crate_name: yew-router,
+            version: 0.17.0,
+        },
+        {
+            crate_name: gloo,
+            version: 0.8.1,
+        },
+        {
+            crate_name: gloo-net,
+            version: 0.3.0,
+        },
+        {
+            crate_name: web-sys,
+            version: 0.3.61,
+        },
+        {
+            crate_name: js-sys,
+            version: 0.3.61,
+        },
+        {
+            crate_name: serde,
+            version: 1.0.164,
+            features: derive,
+        },
+        {
+            crate_name: serde_json,
+            version: 1.0.99,
+        },
+        {
+            crate_name: bincode,
+            version: 1.3.3,
+        },
+        {
+            crate_name: wasm-bindgen-futures,
+            version: 0.4.34,
+        },
+        {
+            crate_name: wasm-bindgen,
+            version: =0.2.90,
+        },
+        {
+            crate_name: urlencoding,
+            version: 2.1.2,
+        },
+        {
+            crate_name: num256,
+            version: 0.5.2,
+        },
+    ]
+}
+
+// enforce deployment names between frontend
+// and backend apps are unique
+MATERIALIZED VIEW unique_deployment_names {
+    deployment_name TEXT PRIMARY KEY,
+    source TEXT,
+} AS {
+    SELECT deployment_name, 'backend_app'
+    FROM backend_application_deployment
+    UNION ALL
+    SELECT deployment_name, 'frontend_app'
+    FROM frontend_application_deployment
+}
+
+// enforce unique application names between
+// frontend and backend docker images
+MATERIALIZED VIEW unique_application_names {
+    application_name TEXT PRIMARY KEY,
+    source TEXT,
+} AS {
+    SELECT application_name, 'backend_app'
+    FROM backend_application
+    UNION ALL
+    SELECT application_name, 'frontend_app'
+    FROM frontend_application
+}

@@ -1,0 +1,78 @@
+TABLE server {
+  hostname TEXT PRIMARY KEY,
+  dc REF datacenter DETACHED DEFAULT,
+  ssh_interface REF CHILD network_interface,
+  root_disk REF CHILD server_disk DEFAULT 'vda',
+  is_consul_master BOOL DEFAULT false,
+  is_nomad_master BOOL DEFAULT false,
+  is_vault_instance BOOL DEFAULT false,
+  is_dns_master BOOL DEFAULT false,
+  is_dns_slave BOOL DEFAULT false,
+  is_ingress BOOL DEFAULT false,
+  is_vpn_gateway BOOL DEFAULT false,
+  is_coprocessor_gateway BOOL DEFAULT false,
+  is_router BOOL DEFAULT false,
+  public_ipv6_address TEXT DEFAULT '',
+  public_ipv6_address_prefix INT DEFAULT 128,
+  // anything that is not this value check in server_kind table
+  kind TEXT DEFAULT 'dc_default',
+  nixpkgs_environment REF nixpkgs_environment DETACHED DEFAULT,
+  run_unassigned_workloads BOOL DEFAULT true,
+  // server can be dns master or slave
+  // but never both at once
+  CHECK { server_dns_check(is_dns_master, is_dns_slave) },
+  CHECK { public_ipv6_address_prefix >= 1 and public_ipv6_address_prefix <= 128 },
+}
+
+TABLE admin_ssh_keys {
+  contents TEXT
+}
+
+TABLE server_kind {
+  kind TEXT PRIMARY KEY,
+  cores INT,
+  memory_bytes INT,
+  architecture TEXT,
+  // in future we want to deploy standalone VMs
+  // and we want to make sure they only run on bare metals
+  bare_metal BOOL DEFAULT false,
+  // if node cannot be used specify reason
+  non_eligible_reason TEXT DEFAULT '',
+
+  CHECK { cores >= 1 and cores <= 1024 },
+  // Min 128MB Max 64TB
+  CHECK { memory_bytes >= 1024 * 1024 * 128 and memory_bytes <= 1024 * 1024 * 1024 * 1024 * 64 },
+}
+
+TABLE server_kind_attribute {
+  key TEXT PRIMARY KEY CHILD OF server_kind,
+  value TEXT,
+}
+
+TABLE disk_kind {
+  kind TEXT PRIMARY KEY,
+  medium TEXT DEFAULT ssd,
+  is_elastic BOOL DEFAULT false,
+  min_capacity_bytes INT DEFAULT -1,
+  max_capacity_bytes INT DEFAULT -1,
+  capacity_bytes INT DEFAULT -1,
+  has_extra_config BOOL DEFAULT false,
+  non_eligible_reason TEXT DEFAULT '',
+}
+
+TABLE valid_server_labels {
+  label_name TEXT PRIMARY KEY,
+
+  CHECK { isSnakeCase(label_name) },
+}
+
+TABLE server_label {
+  label_name REF valid_server_labels PRIMARY KEY CHILD OF server,
+  label_value TEXT,
+
+  CHECK { stringHasNoFunnyValues(label_value) },
+}
+
+DATA valid_server_labels {
+  arch;
+}

@@ -1,0 +1,17 @@
+
+<network>
+  <name>virbr8</name>
+  <bridge stp='off' delay='0' name='virbr8'/>
+
+  <forward mode='nat'/>
+  <ip address='10.18.0.1' netmask='255.255.255.0'>
+    <dhcp>
+      <host mac='1e:ce:4c:c4:6d:bb' name='server-e' ip='10.18.0.10' />
+      <host mac='7e:49:27:d8:ad:9c' name='server-f' ip='10.18.0.11' />
+      <host mac='d6:6e:99:2a:89:37' name='server-g' ip='10.18.0.12' />
+      <host mac='d6:eb:80:fb:35:15' name='server-h' ip='10.18.0.13' />
+
+    </dhcp>
+  </ip>
+
+</network>

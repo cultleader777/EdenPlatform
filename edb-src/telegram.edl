@@ -1,0 +1,17 @@
+
+TABLE telegram_bot {
+  bot_name TEXT PRIMARY KEY,
+  // Yeah we could move this to secrets but worst case
+  // if this was compromised people could spam chat messages
+  // maybe this could be a honeypot?
+  bot_token TEXT,
+
+  UNIQUE(bot_token)
+}
+
+TABLE telegram_channel {
+  channel_name TEXT PRIMARY KEY,
+  channel_id INT,
+
+  UNIQUE(channel_id)
+}

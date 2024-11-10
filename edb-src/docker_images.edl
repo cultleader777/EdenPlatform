@@ -1,0 +1,229 @@
+
+DATA docker_image_set(set_name) {
+  postgres_wpatroni_wconsul;
+  minio;
+  minio_mc;
+  grafana;
+  grafana_loki;
+  grafana_tempo;
+  prometheus;
+  alertmanager;
+  victoria_metrics;
+  docker_registry;
+  haproxy;
+  postgres_exporter;
+  openresty;
+  promxy;
+  nginx;
+  nats;
+  nats_exporter;
+  clickhouse;
+}
+
+DEFAULTS {
+  pg_deployment.docker_image_pg_exporter postgres_exporter_default,
+  pg_deployment.docker_image_haproxy haproxy_default,
+  grafana.docker_image_grafana grafana_default,
+  grafana.docker_image_promxy promxy_default,
+  loki_cluster.docker_image_loki loki_default,
+  tempo_cluster.docker_image tempo_default,
+  minio_cluster.docker_image_minio minio_default,
+  minio_cluster.docker_image_minio_mc minio_mc_default,
+  minio_cluster.docker_image_nginx nginx_default,
+  monitoring_cluster.docker_image_prometheus prometheus_default,
+  monitoring_cluster.docker_image_alertmanager alertmanager_default,
+  monitoring_cluster.docker_image_victoriametrics victoriametrics_default,
+  nats_cluster.docker_image_nats nats_default,
+  nats_cluster.docker_image_nats_exporter nats_exporter_default,
+  region.docker_image_external_lb openresty_default,
+  docker_registry_instance.docker_image docker_registry_default,
+  ch_deployment.docker_image clickhouse_default,
+  ch_keeper_deployment.docker_image clickhouse_default,
+}
+
+DATA docker_image_pin {
+  pg_15.1 WITH docker_image_pin_images {
+    'sha256:9bddbbbe30e2eb6030158ecc1e9375e26105f557aa45df4ce66c7abde698db0c';
+  };
+  docker_registry_default WITH docker_image_pin_images {
+    'sha256:ce14a6258f37702ff3cd92232a6f5b81ace542d9f1631966999e9f7c1ee6ddba';
+  };
+  haproxy_default WITH docker_image_pin_images {
+    'sha256:ebdd23975d25d1fb360ee54f81af26ca9fff6fa05516d43980c99ee5a88ff56e';
+  };
+  postgres_exporter_default WITH docker_image_pin_images {
+    'sha256:f34d50a64a4d558ad118ffc73be45a359ac8f30b8daba4b241458bcb9f94e254';
+  };
+  openresty_default WITH docker_image_pin_images {
+    'sha256:f3fa9a80b4e8fae569bf85bf40ae9bb149e9f9ec1fc786aa4d34a117eedc0845';
+  };
+  grafana_default WITH docker_image_pin_images {
+    'sha256:39c849cebccccb22c0a5194f07c535669386190e029aa440ad535226974a5809';
+  };
+  promxy_default WITH docker_image_pin_images {
+    'sha256:9d53be3c6cad0a791bf5eee64103f7c402f20cd19ca9d5afe6208c11033e605f';
+  };
+  loki_default WITH docker_image_pin_images {
+    'sha256:22caa5cdd21d227145acf3cca49db63898152ba470744e2b6962eed7c3469f9e';
+  };
+  tempo_default WITH docker_image_pin_images {
+    'sha256:50fec6c2cf621141218edee9e23e8860b6158088d18fac54cf0c29df7fdf29db';
+  };
+  minio_default WITH docker_image_pin_images {
+    'sha256:5db7e40b69f0c3ad5a878521ff5029468e3070ef146c084dc2540e2d492075c4';
+  };
+  minio_mc_default WITH docker_image_pin_images {
+    'sha256:1f374e2f61a8a4902ed528fb1d19f93a44b3d81a158b003779f85883833990c3';
+  };
+  nginx_default WITH docker_image_pin_images {
+    'sha256:b8f2383a95879e1ae064940d9a200f67a6c79e710ed82ac42263397367e7cc4e';
+  };
+  prometheus_default WITH docker_image_pin_images {
+    'sha256:fa5181c0bb2843c181bdbc97571a7938f7ee2778d198b4be3b4f2ad43297e8a7';
+  };
+  alertmanager_default WITH docker_image_pin_images {
+    'sha256:a676ae08b0d1e06d5cf3e0e9a4d5cc90e919d1ebce895bea9dcfcc41bffcc0ca';
+  };
+  victoriametrics_default WITH docker_image_pin_images {
+    'sha256:8b57b33434c062bfdfc2e8993bfac0158db1c351929a3c69419a30e39fb95713';
+  };
+  nats_default WITH docker_image_pin_images {
+    'sha256:3ba544a6bbef5767fb28be2737308833ea6f6fbddcb36cc0c8f42bef58ebaf33';
+  };
+  nats_exporter_default WITH docker_image_pin_images {
+    'sha256:31c02aac089a0e9bc5cd9bd1726064f8c6bfa771acbef85a8be88a687e87daba';
+  };
+  clickhouse_default WITH docker_image_pin_images {
+    'sha256:2e6587b81a267c6152cf2112c3532516424d3eaa36f1b150d5b8847c0e3d5b01';
+  };
+}
+
+DATA STRUCT docker_image [
+  {
+    image_set: postgres_wpatroni_wconsul,
+    checksum: 'sha256:9bddbbbe30e2eb6030158ecc1e9375e26105f557aa45df4ce66c7abde698db0c',
+    repository: 'cultleader777/patroni-pg',
+    tag: v2.1.4-pg15.1,
+    architecture: x86_64,
+  },
+  {
+    image_set: docker_registry,
+    // 2.8.1
+    checksum: 'sha256:ce14a6258f37702ff3cd92232a6f5b81ace542d9f1631966999e9f7c1ee6ddba',
+    repository: 'registry',
+    tag: 2.8.1,
+    architecture: x86_64,
+  },
+  {
+    image_set: haproxy,
+    checksum: 'sha256:ebdd23975d25d1fb360ee54f81af26ca9fff6fa05516d43980c99ee5a88ff56e',
+    repository: 'haproxy',
+    tag: 2.7.1,
+    architecture: x86_64,
+  },
+  {
+    image_set: postgres_exporter,
+    checksum: 'sha256:f34d50a64a4d558ad118ffc73be45a359ac8f30b8daba4b241458bcb9f94e254',
+    repository: 'quay.io/prometheuscommunity/postgres-exporter',
+    tag: 0.12.0,
+    architecture: x86_64,
+  },
+  {
+    image_set: openresty,
+    checksum: 'sha256:f3fa9a80b4e8fae569bf85bf40ae9bb149e9f9ec1fc786aa4d34a117eedc0845',
+    repository: 'openresty/openresty',
+    tag: 1.21.4.1-6-bullseye-fat,
+    architecture: x86_64,
+  },
+  {
+    image_set: grafana,
+    checksum: 'sha256:39c849cebccccb22c0a5194f07c535669386190e029aa440ad535226974a5809',
+    repository: 'grafana/grafana',
+    tag: 9.5.2,
+    architecture: x86_64,
+  },
+  {
+    image_set: promxy,
+    checksum: 'sha256:9d53be3c6cad0a791bf5eee64103f7c402f20cd19ca9d5afe6208c11033e605f',
+    repository: 'giantswarm/promxy',
+    tag: v0.0.81,
+    architecture: x86_64,
+  },
+  {
+    image_set: grafana_loki,
+    checksum: 'sha256:22caa5cdd21d227145acf3cca49db63898152ba470744e2b6962eed7c3469f9e',
+    repository: 'grafana/loki',
+    tag: 2.9.9,
+    architecture: x86_64,
+  },
+  {
+    image_set: grafana_tempo,
+    checksum: 'sha256:50fec6c2cf621141218edee9e23e8860b6158088d18fac54cf0c29df7fdf29db',
+    repository: 'grafana/tempo',
+    tag: 2.4.0,
+    architecture: x86_64,
+  },
+  {
+    image_set: minio,
+    checksum: 'sha256:5db7e40b69f0c3ad5a878521ff5029468e3070ef146c084dc2540e2d492075c4',
+    repository: 'minio/minio',
+    tag: 'RELEASE.2024-07-04T14-25-45Z',
+    architecture: x86_64,
+  },
+  {
+    image_set: minio_mc,
+    checksum: 'sha256:1f374e2f61a8a4902ed528fb1d19f93a44b3d81a158b003779f85883833990c3',
+    repository: 'minio/mc',
+    tag: 'RELEASE.2023-01-11T03-14-16Z',
+    architecture: x86_64,
+  },
+  {
+    image_set: nginx,
+    checksum: 'sha256:b8f2383a95879e1ae064940d9a200f67a6c79e710ed82ac42263397367e7cc4e',
+    repository: 'nginx',
+    tag: '1.23.3',
+    architecture: x86_64,
+  },
+  {
+    image_set: prometheus,
+    checksum: 'sha256:fa5181c0bb2843c181bdbc97571a7938f7ee2778d198b4be3b4f2ad43297e8a7',
+    repository: 'bitnami/prometheus',
+    tag: '2.43.1',
+    architecture: x86_64,
+  },
+  {
+    image_set: victoria_metrics,
+    checksum: 'sha256:8b57b33434c062bfdfc2e8993bfac0158db1c351929a3c69419a30e39fb95713',
+    repository: 'victoriametrics/victoria-metrics',
+    tag: 'v1.87.5',
+    architecture: x86_64,
+  },
+  {
+    image_set: alertmanager,
+    checksum: 'sha256:a676ae08b0d1e06d5cf3e0e9a4d5cc90e919d1ebce895bea9dcfcc41bffcc0ca',
+    repository: 'bitnami/alertmanager',
+    tag: '0.25.0',
+    architecture: x86_64,
+  },
+  {
+    image_set: nats,
+    checksum: 'sha256:3ba544a6bbef5767fb28be2737308833ea6f6fbddcb36cc0c8f42bef58ebaf33',
+    repository: 'nats',
+    tag: '2.9.11',
+    architecture: x86_64,
+  },
+  {
+    image_set: nats_exporter,
+    checksum: 'sha256:31c02aac089a0e9bc5cd9bd1726064f8c6bfa771acbef85a8be88a687e87daba',
+    repository: 'natsio/prometheus-nats-exporter',
+    tag: '0.11.0',
+    architecture: x86_64,
+  },
+  {
+    image_set: clickhouse,
+    checksum: 'sha256:2e6587b81a267c6152cf2112c3532516424d3eaa36f1b150d5b8847c0e3d5b01',
+    repository: 'clickhouse/clickhouse-server',
+    tag: '24.4.1.2088',
+    architecture: x86_64,
+  },
+]

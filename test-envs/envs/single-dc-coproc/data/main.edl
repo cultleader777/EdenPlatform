@@ -1,0 +1,645 @@
+DATA STRUCT global_settings {
+  project_name: single-dc,
+  admin_email: admin@epl-infra.net,
+}
+
+DATA admin_ssh_keys {
+  "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC3AkuDzzPrMaDav0kN7PIoaBU1Vtw1TfkHxWzPMrleocCltYl8TljwCqEJtmizx5DGKbXFQg31mRVswzuAq2vP2RFdPHQxfl5nJnWsQkelvpPO/Q3LUdtrm19zAgbbDL+AtIg3/lif6/2qNiWCSTfaUpjM7WOPszBNmMRGz/UBZTYc7COTt+I3lK8f6sBn5YyD796LBw6tsNpqfqF9NTAsLT8/PqrXeTpdxFe375gMxeIpNWeE5exMGJKgqnZCcOMOoKMJy61+wdEAYzDFNgIX7ZFvpBYQPf/rTs7LWgtyTSw3fqvMDnfwAf7oIF8rZRwYdVnqTGCWA2h3f4lOf6BERIPkKEK7/DGjmekKnXJrRiLSfcgRjri3VuGBxrJ+Va/Dn6e7o7CdzdJ+fkw7KxTFKuf17Z2r3ZFi1xOduIxXW8/QY6zhq2A11e+HsMe/oaBh3bRcpdMFmW5mqQjGm05xvxArSCAARBKkHjywGs6mRLN2PjNPYdzlI2J8nF6bmSk= henlo";
+}
+
+DATA STRUCT EXCLUSIVE datacenter [
+  {
+    dc_name: dc1,
+    network_cidr: '10.17.0.0/16',
+  },
+  {
+    dc_name: dc2,
+    network_cidr: '10.18.0.0/16',
+    implementation: coprocessor,
+  },
+]
+
+DATA STRUCT server_kind [
+  {
+    kind: testvm.cpu8ram8192,
+    cores: 8,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+  },
+  {
+    kind: testvm.cpu2ram8192,
+    cores: 2,
+    memory_bytes: 8589934592,
+    architecture: x86_64,
+  },
+  {
+    kind: testvm.cpu2ram4096,
+    cores: 2,
+    memory_bytes: 4294967296,
+    architecture: x86_64,
+  },
+]
+
+DEFAULTS {
+  server.dc dc1,
+  server.nixpkgs_environment default_nixpkgs,
+  datacenter.region us-west,
+  datacenter.implementation testvms,
+  datacenter.default_server_kind testvm.cpu2ram8192,
+  server_disk.disk_kind default-ssd,
+  region.tld epl-infra.net,
+  rust_compilation_environment.nixpkgs_environment default_nixpkgs,
+  frontend_application_deployment.region us-west,
+  backend_application_deployment.region us-west,
+  pg_deployment.region us-west,
+  nats_cluster.region us-west,
+  minio_cluster.region us-west,
+  monitoring_cluster.region us-west,
+  grafana.region us-west,
+  loki_cluster.region us-west,
+  tempo_cluster.region us-west,
+  ch_deployment.region us-west,
+  ch_keeper_deployment.region us-west,
+  blackbox_deployment.region us-west,
+}
+
+DATA STRUCT disk_kind {
+  kind: default-ssd,
+  medium: ssd,
+  capacity_bytes: 21474836480,
+}
+
+DATA STRUCT region {
+  region_name: us-west,
+  is_dns_master: true,
+  has_coprocessor_dc: true,
+}
+
+DATA STRUCT EXCLUSIVE tld [
+  {
+    domain: epl-infra.net,
+    expose_admin: true,
+    automatic_certificates: false,
+  }
+]
+
+DATA STRUCT network [
+  {
+    network_name: lan,
+    cidr: '10.0.0.0/8',
+  },
+  {
+    network_name: vpn,
+    cidr: '172.21.0.0/16',
+  },
+  {
+    network_name: internet,
+    cidr: '0.0.0.0/0',
+  },
+]
+
+DATA valid_server_labels {
+  loki_reader;
+  loki_writer;
+}
+
+DATA subnet_router_floating_ip {
+  '10.17.0.2/24';
+}
+
+DATA STRUCT server [
+  {
+    hostname: server-e,
+    kind: testvm.cpu2ram4096,
+    dc: dc2,
+    ssh_interface: 'eth0:1',
+    WITH server_disk [
+      { disk_id: 'vda' },
+    ]
+    WITH network_interface [
+      {
+        if_name: 'eth0',
+        if_network: lan,
+        if_ip: 10.18.0.10,
+        if_prefix: 32,
+      },
+      {
+        if_name: 'eth0:1',
+        if_network: internet,
+        if_ip: 77.77.77.14,
+        if_prefix: 24,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.8.10,
+        if_prefix: 16,
+      },
+      {
+        if_name: wg1,
+        if_network: vpn,
+        if_ip: 172.21.8.11,
+        if_prefix: 16,
+      },
+    ]
+  },
+  {
+    hostname: server-f,
+    kind: testvm.cpu2ram4096,
+    dc: dc2,
+    ssh_interface: 'eth0:1',
+    WITH server_disk [
+      { disk_id: 'vda' },
+    ]
+    WITH network_interface [
+      {
+        if_name: eth0,
+        if_network: lan,
+        if_ip: 10.18.0.11,
+        if_prefix: 32,
+      },
+      {
+        if_name: 'eth0:1',
+        if_network: internet,
+        if_ip: 77.77.77.15,
+        if_prefix: 24,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.8.12,
+        if_prefix: 16,
+      },
+      {
+        if_name: wg1,
+        if_network: vpn,
+        if_ip: 172.21.8.13,
+        if_prefix: 16,
+      },
+    ]
+  },
+]
+
+DATA STRUCT server [
+  {
+    hostname: server-a,
+    kind: testvm.cpu8ram8192,
+    ssh_interface: eth0,
+    is_consul_master: true,
+    is_nomad_master: true,
+    is_vault_instance: false,
+    is_dns_master: false,
+    is_dns_slave: false,
+    WITH server_label [
+      { label_name: loki_reader, label_value: true },
+    ]
+    WITH server_disk [
+      { disk_id: 'vda' },
+      { disk_id: 'vdb', xfs_format: true },
+      { disk_id: 'vdc' },
+      { disk_id: 'vdd' },
+      { disk_id: 'vde' },
+      { disk_id: 'vdf' },
+      { disk_id: 'vdg' },
+      { disk_id: 'vdh' },
+      { disk_id: 'vdi' },
+      { disk_id: 'vdj' },
+    ]
+    WITH server_zpool {
+      zpool_name: extra,
+      WITH server_zfs_dataset [
+        { dataset_name: bigone },
+      ]
+      WITH server_zpool_vdev [
+        {
+          vdev_number: 1,
+          vdev_type: mirror,
+          WITH server_zpool_vdev_disk [
+            { disk_id: vdc },
+            { disk_id: vdd },
+          ]
+        },
+        {
+          vdev_number: 2,
+          vdev_type: mirror,
+          WITH server_zpool_vdev_disk [
+            { disk_id: vde },
+            { disk_id: vdf },
+          ]
+        },
+      ]
+      WITH server_zpool_spare [
+        { disk_id: vdg },
+      ]
+      WITH server_zpool_cache [
+        { disk_id: vdh },
+      ]
+      WITH server_zpool_log [
+        { disk_id: vdi },
+        { disk_id: vdj },
+      ]
+    }
+    WITH network_interface {
+      if_name: eth0,
+      if_network: lan,
+      if_ip: 10.17.0.10,
+      if_prefix: 24,
+    }
+    WITH server_xfs_volume [
+      {
+        volume_name: minio-docker,
+        xfs_disk: vdb,
+      },
+    ]
+    WITH server_root_volume [
+      { volume_name: pgtest1 },
+      { volume_name: mon-am },
+    ]
+  },
+  {
+    hostname: server-b,
+    ssh_interface: eth0,
+    is_consul_master: true,
+    is_nomad_master: false,
+    is_vault_instance: true,
+    is_dns_master: false,
+    is_dns_slave: false
+    WITH server_label [
+      { label_name: loki_reader, label_value: true },
+      { label_name: loki_writer, label_value: true },
+    ]
+    WITH server_disk [
+      { disk_id: 'vda' },
+      { disk_id: 'vdb', xfs_format: true },
+    ]
+    WITH network_interface [
+      {
+        if_name: eth0,
+        if_network: lan,
+        if_ip: 10.17.0.11,
+        if_prefix: 24,
+      },
+    ]
+    WITH server_xfs_volume [
+      {
+        volume_name: minio-docker,
+        xfs_disk: vdb,
+      },
+    ]
+    WITH server_root_volume [
+      { volume_name: pgtest1 },
+      { volume_name: nats1 },
+    ]
+  },
+  {
+    hostname: server-c,
+    ssh_interface: eth1,
+    is_consul_master: true,
+    is_nomad_master: true,
+    is_vault_instance: true,
+    is_dns_master: false,
+    is_dns_slave: true,
+    is_ingress: true,
+    is_vpn_gateway: true,
+    is_coprocessor_gateway: true,
+    WITH server_label [
+      { label_name: loki_writer, label_value: true },
+    ]
+    WITH server_disk [
+      { disk_id: 'vda' },
+      { disk_id: 'vdb', xfs_format: true },
+    ]
+    WITH network_interface [
+      {
+        if_name: eth0,
+        if_network: lan,
+        if_ip: 10.17.0.12,
+        if_prefix: 24,
+      },
+      {
+        if_name: eth1,
+        if_network: internet,
+        if_ip: 77.77.77.12,
+        if_prefix: 24,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.7.10,
+        if_prefix: 16,
+      },
+    ]
+    WITH server_xfs_volume [
+      {
+        volume_name: minio-docker,
+        xfs_disk: vdb,
+      },
+    ]
+    WITH server_root_volume [
+      { volume_name: nats1 },
+      { volume_name: mon-default },
+      { volume_name: mon-am },
+      { volume_name: pgtest1 },
+    ]
+  },
+  {
+    hostname: server-d,
+    ssh_interface: eth1,
+    is_consul_master: false,
+    is_nomad_master: true,
+    is_vault_instance: true,
+    is_dns_master: true,
+    is_dns_slave: false,
+    is_ingress: true,
+    is_vpn_gateway: true,
+    is_coprocessor_gateway: true,
+    WITH server_label [
+      { label_name: loki_writer, label_value: true },
+    ]
+    WITH server_disk [
+      { disk_id: 'vda' },
+      { disk_id: 'vdb', xfs_format: true },
+    ]
+    WITH network_interface [
+      {
+        if_name: eth0,
+        if_network: lan,
+        if_ip: 10.17.0.13,
+        if_prefix: 24,
+      },
+      {
+        if_name: eth1,
+        if_network: internet,
+        if_ip: 77.77.77.13,
+        if_prefix: 24,
+      },
+      {
+        if_name: wg0,
+        if_network: vpn,
+        if_ip: 172.21.7.11,
+        if_prefix: 16,
+      },
+    ]
+    WITH server_xfs_volume [
+      {
+        volume_name: minio-docker,
+        xfs_disk: vdb,
+      },
+    ]
+    WITH server_root_volume [
+      { volume_name: nats1 },
+      { volume_name: mon-default },
+      { volume_name: mon-am },
+    ]
+  }
+]
+
+DATA STRUCT nats_cluster [
+  {
+    cluster_name: main-nats,
+    WITH nats_jetstream_stream [
+      {
+        stream_name: some_test_stream,
+        stream_type: test_vtype,
+      },
+      {
+        stream_name: some_output_stream,
+        stream_type: test_vtype,
+      },
+    ]
+    WITH nats_deployment_instance [
+      {
+        instance_id: 1,
+        nats_server: server-b=>nats1,
+      },
+      {
+        instance_id: 2,
+        nats_server: server-c=>nats1,
+      },
+      {
+        instance_id: 3,
+        nats_server: server-d=>nats1,
+      },
+    ]
+  }
+]
+
+DATA STRUCT monitoring_cluster [
+  {
+    cluster_name: default,
+    is_region_default: true,
+    WITH monitoring_instance [
+      { instance_id: 1, monitoring_server: server-c=>mon-default, },
+      { instance_id: 2, monitoring_server: server-d=>mon-default, },
+    ]
+    WITH alertmanager_instance [
+      { instance_id: 1, alertmanager_server: server-a=>mon-am, },
+      { instance_id: 2, alertmanager_server: server-c=>mon-am, },
+      { instance_id: 3, alertmanager_server: server-d=>mon-am, },
+    ]
+    WITH monitoring_cluster_alert_group [
+      { alert_group_name: Default, telegram_channel: default, telegram_bot: default, }
+    ]
+  }
+]
+
+DATA STRUCT telegram_channel {
+  channel_name: default,
+  channel_id: 12345,
+}
+
+DATA STRUCT telegram_bot {
+  bot_name: default,
+  bot_token: 1234567,
+}
+
+DATA STRUCT grafana [
+  {
+    deployment_name: main,
+    database: testdb=>grafana,
+  }
+]
+
+DATA STRUCT loki_cluster [
+  {
+    cluster_name: main,
+    is_region_default: true,
+    storage_bucket: global=>loki,
+    writer_placement: '
+      match_keys_and_values:
+        loki_writer: true
+    ',
+    reader_placement: '
+      match_keys_and_values:
+        loki_reader: true
+    ',
+  }
+]
+
+DATA STRUCT tempo_cluster [
+  {
+    cluster_name: us-west,
+    storage_bucket: global=>tempo,
+  }
+]
+
+DATA STRUCT versioned_type [
+  {
+    type_name: test_vtype,
+    WITH versioned_type_snapshot [
+      {
+        version: 1,
+        snapshot_source: "{
+          some_field @0 :I64,
+        }"
+      },
+      {
+        version: 5,
+        snapshot_source: "{
+          some_field @0 :I64,
+          other_field @1 :F64 DEFAULT '1.23',
+          coordinates @2 :{
+            x @0 :F64 DEFAULT '0.0',
+            y @1 :F64 DEFAULT '0.0',
+          }?,
+          is_nice @3 :Bool DEFAULT 'true',
+        }"
+      }
+    ] WITH versioned_type_migration [
+      {
+        version: 2,
+        migration_source: "
+          ADD .other_field @1 F64 DEFAULT '1.23'
+        "
+      },
+      {
+        version: 3,
+        migration_source: "
+          ADD .coordinates?.x @0 F64 DEFAULT '0.0'
+          ADD .coordinates.y @1 F64 DEFAULT '0.0'
+        "
+      },
+      {
+        version: 4,
+        migration_source: "
+          ADD .is_good @3 Bool DEFAULT 'true'
+          ADD .nickname @4 String DEFAULT 'who knows'
+        "
+      },
+      {
+        version: 5,
+        migration_source: "
+          RENAME .is_good .is_nice
+          DROP .nickname
+        "
+      }
+    ]
+  },
+  {
+    type_name: test_output_type,
+    WITH versioned_type_snapshot [
+      {
+        version: 1,
+        snapshot_source: "{
+          output_field @0 :I64,
+        }"
+      },
+    ]
+  }
+]
+
+DATA STRUCT pg_deployment [
+  {
+    deployment_name: testdb,
+    synchronous_replication: true,
+    docker_image_pg: pg_15.1,
+    WITH pg_deployment_instance [
+      {
+        instance_id: 1,
+        pg_server: server-a=>pgtest1,
+      },
+      {
+        instance_id: 2,
+        pg_server: server-b=>pgtest1,
+      },
+      {
+        instance_id: 3,
+        pg_server: server-c=>pgtest1,
+      },
+    ] WITH pg_deployment_unmanaged_db [
+      {
+        db_name: grafana,
+      }
+    ]
+  }
+]
+
+DATA STRUCT docker_registry_instance {
+  region: us-west,
+  minio_bucket: global=>docker,
+}
+
+DATA STRUCT minio_cluster {
+  cluster_name: global,
+  WITH minio_instance [
+    {
+      instance_id: 1,
+      instance_volume: server-a=>minio-docker,
+    },
+    {
+      instance_id: 2,
+      instance_volume: server-b=>minio-docker,
+    },
+    {
+      instance_id: 3,
+      instance_volume: server-c=>minio-docker,
+    },
+    {
+      instance_id: 4,
+      instance_volume: server-d=>minio-docker,
+    },
+  ]
+  WITH minio_bucket [
+    {
+      bucket_name: docker,
+    },
+    {
+      bucket_name: loki,
+    },
+    {
+      bucket_name: loki2,
+    },
+    {
+      bucket_name: tempo,
+    },
+    {
+      bucket_name: app1,
+    },
+  ]
+}
+
+DATA STRUCT alert_group {
+  alert_group_name: Default
+  WITH alert [
+    {
+        alert_name: FilesystemSpaceLow,
+        expr: '
+          round((node_filesystem_free_bytes{fstype=~"(btrfs|zfs|xfs|ext4)"} * 100
+          / node_filesystem_size_bytes{fstype=~"(btrfs|zfs|xfs|ext4)"}), 0.1) < 20
+        ',
+        description: 'Filesystem {{ $labels.device }} at {{ $labels.instance }} has less than 20% disk space remaining',
+        WITH alert_trigger_test [
+            {
+                expected_message: 'Filesystem /mookie at some-server:9090 has less than 20% disk space remaining',
+                eval_time: 10m,
+                input_series: '
+                    - series: node_filesystem_free_bytes{device="/mookie",instance="some-server:9090",fstype="zfs"}
+                      values: 1 1 1 1 1 1 1 1 1 1
+                    - series: node_filesystem_size_bytes{device="/mookie",instance="some-server:9090",fstype="zfs"}
+                      values: 10 10 10 10 10 10 10 10 10 10
+                '
+            }
+        ]
+    }
+  ]
+}

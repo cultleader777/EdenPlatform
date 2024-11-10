@@ -1,0 +1,3 @@
+#!/bin/sh
+
+docker build -t cultleader777/patroni-pg:v2.1.4-pg15.1 .

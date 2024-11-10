@@ -1,0 +1,49 @@
+
+TABLE loki_cluster {
+    cluster_name TEXT PRIMARY KEY,
+    namespace REF nomad_namespace DEFAULT epl,
+    region REF region DETACHED DEFAULT,
+    workload_architecture TEXT DEFAULT x86_64,
+    docker_image_loki REF docker_image_pin DETACHED DEFAULT,
+    is_region_default BOOL DEFAULT false,
+    loki_cluster TEXT DEFAULT region_default,
+    monitoring_cluster TEXT DEFAULT region_default,
+    storage_bucket REF FOREIGN CHILD minio_bucket,
+    // retention period must be at least 24h, why bother with hours
+    // and not just use days instead so users don't count hours?
+    retention_period_days INT DEFAULT 30,
+    loki_writer_http_port INT DEFAULT 3010,
+    loki_writer_grpc_port INT GENERATED AS { loki_writer_http_port + 1 },
+    loki_reader_http_port INT GENERATED AS { loki_writer_grpc_port + 1 },
+    loki_reader_grpc_port INT GENERATED AS { loki_reader_http_port + 1 },
+    loki_backend_http_port INT GENERATED AS { loki_reader_grpc_port + 1 },
+    loki_backend_grpc_port INT GENERATED AS { loki_backend_http_port + 1 },
+
+    loki_writers INT DEFAULT 3,
+    loki_readers INT DEFAULT 2,
+
+    writer_placement TEXT DEFAULT '',
+    reader_placement TEXT DEFAULT '',
+    backend_placement TEXT DEFAULT '',
+
+    loki_reader_memory_mb INT DEFAULT 128,
+    loki_writer_memory_mb INT DEFAULT 128,
+    loki_backend_memory_mb INT DEFAULT 128,
+
+    CHECK { isKebabCase(cluster_name) },
+    CHECK { isValidPort(loki_writer_http_port) and isValidPort(loki_backend_http_port) },
+    CHECK {
+        local res = areNumbersInSequence(
+            loki_writer_http_port,
+            loki_writer_grpc_port,
+            loki_reader_http_port,
+            loki_reader_grpc_port,
+            loki_backend_http_port,
+            loki_backend_grpc_port)
+        res
+    },
+
+    CHECK { loki_readers >= 2 },
+    CHECK { loki_writers >= 2 },
+    CHECK { retention_period_days >= 1 and retention_period_days <= 10000 },
+}

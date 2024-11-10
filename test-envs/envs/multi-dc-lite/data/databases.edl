@@ -1,0 +1,21 @@
+
+DATA STRUCT pg_deployment [
+  {
+    deployment_name: testdb,
+    docker_image_pg: pg_15.1,
+    WITH pg_deployment_instance [
+      {
+        instance_id: 1,
+        pg_server: server-a=>pgtest1,
+      },
+      {
+        instance_id: 2,
+        pg_server: server-c=>pgtest1,
+      },
+    ] WITH pg_deployment_unmanaged_db [
+      {
+        db_name: grafana,
+      }
+    ]
+  }
+]
