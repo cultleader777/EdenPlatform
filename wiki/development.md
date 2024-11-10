@@ -1,5 +1,13 @@
 # Development
 
+## Directory structure
+
+- `edb-src` - EdenDB sources of schema for eden platform. If you need to change data layout of eden platform this is the place.
+- `misc` - misc additional software
+- `src` - rust sources
+- `src/tests` - rust tests
+- `test-envs` - test environments for Eden Platform, can also be used as copy bases for your own project (look into `clone-env` script on how to setup your project)
+
 ## Setup
 
 It is assumed that you're using NixOS to develop Eden platform. No other operating system will ever be supported.
