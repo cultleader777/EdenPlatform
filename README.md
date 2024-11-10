@@ -1,18 +1,13 @@
-# Developer setup
+# Eden Platform - most productive web development platform of all time
 
-For testing with libvirt in NixOS you must enable docker and libvirt virtualization
+[Motivation](https://mycodingcult.com/main-thesis/part-2-the-pattern/)
 
-```
-    virtualisation.docker.enable = true;
-    virtualisation.libvirtd.enable = true;
-    networking.firewall.allowedTCPPorts = [
-      12777 12778 # epl
-    ]; # expose nix store for development
+This is implementation of version 2 of [the pattern](https://mycodingcult.com/the-pattern-v2/)
 
-    # ensure virt-manager package is installed
-    environment.systemPackages = with pkgs; [
-      ..
-      virt-manager
-      ..
-    ];
-```
+- [Philosophy](wiki/philosophy.md)
+- [Productivity](wiki/productivity.md)
+- [Development](wiki/development.md)
+- [Contributors Guide](wiki/contributors-guide.md)
+- [Networking](wiki/networking.md)
+- [DNS](wiki/dns.md)
+

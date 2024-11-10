@@ -1,6 +1,6 @@
-#+title: Productivity
+# Productivity
 
-* The most productive web development platform of all time
+"Eden Platform - The most productive web development platform of all time"
 
 A bold statement. Let's quickly define what we mean and what we don't mean by saying productivity.
 
@@ -16,7 +16,7 @@ What we mean by productivity:
 
 And many more examples with queues, frontend queries and etc. that follow the same pattern - fix inconsistencies and compile time errors across your entire distributed system of thousands of services and thousands of servers or you cannot ship your code.
 
-Eden platform generates a lot of code to make this happen. We enjoy having a terse code (10x less from vanilla Rust) because things like database access simply turn into typesafe functions of tested queries in Eden platform that we already know work and that must hit indexes, because there must be at least one test written for database query. We enjoy typesafe, backwards compatible binary queues in our entire infrastructure the same way also and don't worry about manual parsing of queue messages.
+Eden platform generates a lot of code to make this happen. We enjoy having a terse code (10x less from vanilla Rust) because things like database access simply turn into typesafe functions of tested queries in Eden platform that we already know work and that must hit indexes, because there must be at least one test written for database query. We enjoy typesafe, backwards compatible queues in our entire infrastructure the same way also and don't worry about manual parsing of queue messages.
 
 We enjoy terseness of code, which is boasted by Ruby on Rails faggots, but we also enjoy typesafety of Rust across thousands of services. And unlike Ruby on Rails, which generates instant legacy code which then becomes your problem to maintain, Eden platform assumes responsibility over generated code. If you remove database query from Eden data language, that query will disappear from the generated code across all the applications that it was used in, generating compile time errors which you must fix before you can ship.
 

@@ -1,12 +1,12 @@
-#+title: DNS
+# DNS
 
 Eden platform makes assumptions about DNS and how it is configured.
 
-* BIND
+## BIND
 
 Bind is most stable and used DNS software out there. It is fully featured to create any configuration we can possibly imagine.
 
-* Architecture
+## Architecture
 
 Every server datacenter has master DNS server and from one to two slave servers. The rest of the servers in the datacenter simply forward to master and slave servers their queries from their local DNS instance. Bind instance on every server always forwards .consul zone to the consul port 8600 regardless if it is master, slave or forwarder.
 
@@ -22,7 +22,7 @@ dc1 - 1.10.in-addr.arpa.
 dc1 - 2.10.in-addr.arpa.
 dc1 - 3.10.in-addr.arpa.
 
-* Master datacenters
+## Master datacenters
 
 In multi DC setup one datacenter is picked a master and there are two slave datacenters. Master DNS servers in those datacenters must have public ip addresses and they forward the root TLD domains.
 
