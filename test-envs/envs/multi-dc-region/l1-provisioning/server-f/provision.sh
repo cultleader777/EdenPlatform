@@ -111,6 +111,9 @@ cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
   "encrypt": "1LO8k/WpiTZpGtmj654yrn95dhkE/ljylUw+9mD4tBo=",
   "encrypt_verify_incoming": true,
   "encrypt_verify_outgoing": true,
+  "limits": {
+    "rpc_max_conns_per_client": 1000
+  },
   "log_level": "INFO",
   "log_rotate_bytes": 0,
   "log_rotate_duration": "24h",
@@ -2701,7 +2704,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"dfe733433de16aff8c7e9e408bdfec4c0a75250356bd17f3283f7f7a6a4a1686\",hostname=\"server-f\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"0a203effe124356346f05650d437b4d0e8fffebc03abe26d60adafe00f2c79a1\",hostname=\"server-f\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE

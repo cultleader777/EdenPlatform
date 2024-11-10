@@ -768,10 +768,10 @@ refresh-static-server-infra-state: infra-state.sqlite
 	  DELETE FROM servers; \
 	  INSERT INTO servers(hostname, region, expected_l1_hash) \
 	  VALUES \
-	    ('server-a','us-west','0045aeb0546da7404f3d2f850877329f3c373b745b9878658c3f5c41587e273e'), \
-	    ('server-b','us-west','e6e7e8081a4407410ae9fd4447aca3772ea8326869fd9e8a90e21859480e1cff'), \
-	    ('server-c','us-west','a9b02644743fd74dbe44deb15c321fb320f2b40fe69b1939180eee7e8a11b38e'), \
-	    ('server-d','us-west','3c2a2c10ac66fcb232e50df9677df54289b1b06d6dcd5af5060252ac88519903'); \
+	    ('server-a','us-west','4d31956ac6e6031d7610b829321b764bd86793ba167f7cd78a57a7639c71c2f9'), \
+	    ('server-b','us-west','2df3a4bb9ca89fbbe6570fd7854094211b04ddc1730cb6fc375c1ac013fd5bb4'), \
+	    ('server-c','us-west','b18496e0252c45fe876f86f42c4e5d059cb9a9a6116c7ea34a3ebe7068a96c58'), \
+	    ('server-d','us-west','e579598f363d2c7337b07dd3d2fbd6e7233b331ba6e370c7c0997c6a606747ae'); \
 	" | sqlite3 infra-state.sqlite
 
 

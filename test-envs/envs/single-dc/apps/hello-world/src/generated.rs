@@ -257,7 +257,11 @@ impl AppResources {
         hm.append("X-Clickhouse-User", epl_ch_chshard_user.parse()?);
         hm.append("X-Clickhouse-Key", epl_ch_chshard_password.parse()?);
         let ch_chshard_client = ::reqwest::ClientBuilder::new()
+            // without disabled pooling we encounter hyper::Error(IncompleteMessage)
+            // errors https://github.com/hyperium/hyper/issues/2136
+            .pool_max_idle_per_host(0)
             .default_headers(hm)
+            .timeout(::std::time::Duration::from_secs(6000))
             .build()?;
 
         let mut nats_conns_ctx = Vec::with_capacity(nats_conns_urls.len());

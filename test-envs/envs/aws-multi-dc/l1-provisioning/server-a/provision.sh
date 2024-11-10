@@ -114,6 +114,9 @@ cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
   "encrypt": "lAtfSvwJ0KNTF7/224nfSNRl/6UWuvGxlyP9Lb4bPF8=",
   "encrypt_verify_incoming": true,
   "encrypt_verify_outgoing": true,
+  "limits": {
+    "rpc_max_conns_per_client": 1000
+  },
   "log_level": "INFO",
   "log_rotate_bytes": 0,
   "log_rotate_duration": "24h",
@@ -1419,21 +1422,21 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_consul-tls-server-cert.pem START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIICxDCCAmqgAwIBAgIQNUMOchnFwqgH/O7YpoNWFzAKBggqhkjOPQQDAjCBuTEL
+MIICwzCCAmqgAwIBAgIQE/sF9FBrXmv7IJrgpW/SSzAKBggqhkjOPQQDAjCBuTEL
 MAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1TYW4gRnJhbmNpc2Nv
 MRowGAYDVQQJExExMDEgU2Vjb25kIFN0cmVldDEOMAwGA1UEERMFOTQxMDUxFzAV
 BgNVBAoTDkhhc2hpQ29ycCBJbmMuMUAwPgYDVQQDEzdDb25zdWwgQWdlbnQgQ0Eg
-MjY2Nzk3NzMyNDE4MTUwNzMwNzg5MDE3OTUwMzYzMjI0MjI0ODg0MB4XDTIzMTEy
-MDEwNDMwM1oXDTI0MTExOTEwNDMwM1owIDEeMBwGA1UEAxMVc2VydmVyLnVzLXdl
-c3QuY29uc3VsMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEHz1SJ/MWYOYLXDD7
-K/NMUEr4oJMYu8gkabOLiJSR4589qDo96TFQKDFU4yV3Ets2g0cFVgd8BVtvl4v7
-jv3nkaOB6zCB6DAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEG
-CCsGAQUFBwMCMAwGA1UdEwEB/wQCMAAwKQYDVR0OBCIEICBTfQwENukPc5/hsDW0
-e5ZqQAgde6vxyrgPcHBgmsrRMCsGA1UdIwQkMCKAINVQF6juYquTyMXQKZinhuNZ
+MjY2Nzk3NzMyNDE4MTUwNzMwNzg5MDE3OTUwMzYzMjI0MjI0ODg0MB4XDTI0MTEx
+MDE1MzkzOFoXDTI1MTExMDE1MzkzOFowIDEeMBwGA1UEAxMVc2VydmVyLnVzLXdl
+c3QuY29uc3VsMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEUm8ZJ7IzCACjlkDP
+FKSJmBYuI70DZrKcO+jU+W50Zv3zCmAAyTcsYzcziSo3almHG6kRQ+2WPxOJMmOJ
+lxhrLqOB6zCB6DAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEG
+CCsGAQUFBwMCMAwGA1UdEwEB/wQCMAAwKQYDVR0OBCIEIFgz2+8z/Bx50VJbJTpP
+Ovc65R8ST6eXEKAaz651z1s6MCsGA1UdIwQkMCKAINVQF6juYquTyMXQKZinhuNZ
 B2tlTykQvRCgNapnJK6sMFEGA1UdEQRKMEiCHnNlcnZlci1hLnNlcnZlci51cy13
 ZXN0LmNvbnN1bIIVc2VydmVyLnVzLXdlc3QuY29uc3Vsgglsb2NhbGhvc3SHBH8A
-AAEwCgYIKoZIzj0EAwIDSAAwRQIhAMl/Z4ZKypwLXEvic1zT06bWA2jvWyL6F9tp
-6XyRVosXAiBw3kARfnc8VXY045AGS4RyedlXGRQIkz2mvVMTfO1Bmw==
+AAEwCgYIKoZIzj0EAwIDRwAwRAIgRDjKKDz8+OfSC6mH9yvc6QD4Ij1JArwjGrja
+9jpDKB4CIEZN+TxBJje1TipvDhMtVdKeq/sIDczHSCvIdmUyxT67
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -1452,9 +1455,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_consul-tls-server-pkey.pem START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIIRYK4ttZxJz1fncju2t8r9N2+wzLjMGuXPPbvuViRQYoAoGCCqGSM49
-AwEHoUQDQgAEHz1SJ/MWYOYLXDD7K/NMUEr4oJMYu8gkabOLiJSR4589qDo96TFQ
-KDFU4yV3Ets2g0cFVgd8BVtvl4v7jv3nkQ==
+MHcCAQEEIOKf+Nom5JNX35m7OvnxjDAgvEl1Vfc+V1oIJQCrI+nGoAoGCCqGSM49
+AwEHoUQDQgAEUm8ZJ7IzCACjlkDPFKSJmBYuI70DZrKcO+jU+W50Zv3zCmAAyTcs
+YzcziSo3almHG6kRQ+2WPxOJMmOJlxhrLg==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -1617,16 +1620,16 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-client.crt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIIByTCCAW6gAwIBAgIUEQ166wS2rwQ0+xHkWLi3l36XY80wCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjMxMTIwMTAzODAwWhcNMjQxMTE5MTAzODAw
-WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAED69oRaJZ9332OIdJSxOtEAC9
-BYVTUWxiSjagYamylwK2ZJMfFviqd8d/GMv1AGq7Cbx/yMajhXtukwyIEoBj3KOB
+MIIByDCCAW6gAwIBAgIUWiGZrBynvZ1dSaepGPrdS8Lt28IwCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjQxMTEwMTUzNTAwWhcNMjUxMTEwMTUzNTAw
+WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtDk4UbpdiKOFUs/D9KSyFfEH
+BbyRZ0IwVm/1uRQtFvxBq8vBweueH4q8jR97+Esid+MgcCx0LPtHuCU4OBapWqOB
 tTCBsjAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUF
-BwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFOGEhcjn70mnP54EuhKZY5CVZeLu
+BwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFA8tdHVM743lj5qPqA6ocqFY9rqh
 MB8GA1UdIwQYMBaAFI4IlhKIAHkibAR7SCYrHFaT38AqMDMGA1UdEQEB/wQpMCeC
 FGNsaWVudC51cy13ZXN0Lm5vbWFkgglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0E
-AwIDSQAwRgIhAIBuEa1rqU9XXCzxJwf2ZcRHzMOxehIyl8Vg2ji3F5hDAiEAgS8j
-cAembWvyppKgwRgv7srqlq43OdKvwAocfd5bTQQ=
+AwIDSAAwRQIgXxkgZEt3IKBuAz/uc4YXl+dBnaL4JKTqBz4UvssHB1ICIQD10n45
+bnVqWlKLeUFm0UjIoAPwg88tL/dQ4oek9uWWTA==
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -1643,9 +1646,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-client.key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIL7/R4s79DfKsscjbow90c5af3lGIWENZi0VaQL0VfpRoAoGCCqGSM49
-AwEHoUQDQgAED69oRaJZ9332OIdJSxOtEAC9BYVTUWxiSjagYamylwK2ZJMfFviq
-d8d/GMv1AGq7Cbx/yMajhXtukwyIEoBj3A==
+MHcCAQEEIAIYRdj9wlAphutn4ph0ZZuBuYmMYLU8qWDbLWhhw+MooAoGCCqGSM49
+AwEHoUQDQgAEtDk4UbpdiKOFUs/D9KSyFfEHBbyRZ0IwVm/1uRQtFvxBq8vBweue
+H4q8jR97+Esid+MgcCx0LPtHuCU4OBapWg==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -3801,7 +3804,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"06d3c3dc8632ee193d2e39e55ac70cce0716bf72c5a4edb9284393574cdd2e7c\",hostname=\"server-a\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"60222c88455a52ff6c6a3e23f2897f4cf5cba59202a73ce1da3d98c121bf0e7f\",hostname=\"server-a\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE
@@ -3809,12 +3812,12 @@ epl_l1_provisioning_last_hash{hash=\"06d3c3dc8632ee193d2e39e55ac70cce0716bf72c5a
   # l1 expected hash
   METRICS_FILE=/var/lib/node_exporter/epl_l1_expected_hash.prom
   echo '
-epl_l1_provisioning_expected_hash{hash="06d3c3dc8632ee193d2e39e55ac70cce0716bf72c5a4edb9284393574cdd2e7c",hostname="server-a"} 1
-epl_l1_provisioning_expected_hash{hash="9c285debaec339bceb9b27529e2067ae7058a13ca8f820ab25fb3c64168f8108",hostname="server-b"} 1
-epl_l1_provisioning_expected_hash{hash="652d30ef2dc46c4cbe9c684d1291dc0b2c6c0ff439878113a7814afc501f5692",hostname="server-c"} 1
-epl_l1_provisioning_expected_hash{hash="cf830751bc14ef36862792b0c14c4772f3a6ff782306c4d71b7676a6a8ef54af",hostname="server-d"} 1
-epl_l1_provisioning_expected_hash{hash="89c79a4cc55aa475e757fcfd969f3d4fb7eb1df54333e867eb024b0316466e3d",hostname="server-e"} 1
-epl_l1_provisioning_expected_hash{hash="8791dbf57057a2fe1fc95a24fe7717dc0f0266231fcbf22a908ece49df566149",hostname="server-f"} 1
+epl_l1_provisioning_expected_hash{hash="60222c88455a52ff6c6a3e23f2897f4cf5cba59202a73ce1da3d98c121bf0e7f",hostname="server-a"} 1
+epl_l1_provisioning_expected_hash{hash="8f06bbc5d91592544a6af38832ed1dad09225f3bc652b26ed2486039e3e886c0",hostname="server-b"} 1
+epl_l1_provisioning_expected_hash{hash="47d8b7126b544963cfc2c3c499c93c1418fd43753311633f3f58705ec641a1e6",hostname="server-c"} 1
+epl_l1_provisioning_expected_hash{hash="a7bdc6790ec16fc703f6e0602f0867a43a1c1fe09dcd6e5d0c52f9852c18333f",hostname="server-d"} 1
+epl_l1_provisioning_expected_hash{hash="d3f98a745b2a9facd22c611a0cbf8fe50a8321d755791d2316ebd1a2bb8d97b0",hostname="server-e"} 1
+epl_l1_provisioning_expected_hash{hash="1b7007acce839608b14d9744a882e7bb1c1ff7b6868c2becd05f2738c151b95e",hostname="server-f"} 1
 
 ' > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp

@@ -188,11 +188,15 @@ fn test_application_ch_wiring_inserter_table_column_type_is_invalid() {
             application: "hello-world".to_string(),
             inserter_table: "foo".to_string(),
             inserter_table_column: "a".to_string(),
-            inserter_table_column_type: "Int256".to_string(),
+            inserter_table_column_type: "UInt256".to_string(),
             supported_inserter_types: vec![
                 "String".to_string(),
                 "Int32".to_string(),
                 "Int64".to_string(),
+                "Int128".to_string(),
+                "Int256".to_string(),
+                "DateTime".to_string(),
+                "Date".to_string(),
                 "Float32".to_string(),
                 "Float64".to_string(),
                 "Bool".to_string(),
@@ -243,7 +247,7 @@ DATA STRUCT ch_schema [
         upgrade: "
           CREATE TABLE IF NOT EXISTS foo (
             id Int32,
-            a Int256
+            a UInt256
           ) ENGINE = MergeTree() ORDER BY id;
         ",
         downgrade: "

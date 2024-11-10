@@ -117,6 +117,9 @@ cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
   "encrypt": "uBTZpeYexgZOBLPETWQUSzrJGfW0mKBOI/hfsIOxx6I=",
   "encrypt_verify_incoming": true,
   "encrypt_verify_outgoing": true,
+  "limits": {
+    "rpc_max_conns_per_client": 1000
+  },
   "log_level": "INFO",
   "log_rotate_bytes": 0,
   "log_rotate_duration": "24h",
@@ -2564,7 +2567,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"b9ef82947418dbebcf3da22c2bd1fcf05a96b9287222786bda267e3fb64d47fd\",hostname=\"server-a\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"3c185c879b9c39b1ed5fecda23a804a01e56246444afb6019a4726ca3197d720\",hostname=\"server-a\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE
@@ -2572,10 +2575,10 @@ epl_l1_provisioning_last_hash{hash=\"b9ef82947418dbebcf3da22c2bd1fcf05a96b928722
   # l1 expected hash
   METRICS_FILE=/var/lib/node_exporter/epl_l1_expected_hash.prom
   echo '
-epl_l1_provisioning_expected_hash{hash="b9ef82947418dbebcf3da22c2bd1fcf05a96b9287222786bda267e3fb64d47fd",hostname="server-a"} 1
-epl_l1_provisioning_expected_hash{hash="d8e1e64a08ecd97b3f5a5e567d0afe60d4f93884ad8e23e72b3164a74d30375e",hostname="server-b"} 1
-epl_l1_provisioning_expected_hash{hash="f6f462bf8529cb8caca2e90b3eca273bcce17196cb491bc0776f76d167abc2e1",hostname="server-c"} 1
-epl_l1_provisioning_expected_hash{hash="b6dc6baae9a56b0f6612a0e0d846e3302238bb39c190d997e77880f2517ddbc8",hostname="server-d"} 1
+epl_l1_provisioning_expected_hash{hash="3c185c879b9c39b1ed5fecda23a804a01e56246444afb6019a4726ca3197d720",hostname="server-a"} 1
+epl_l1_provisioning_expected_hash{hash="8bcd77cc0d45743e485e235451a38016332c85cc1d873b371f7cffe7448e04d5",hostname="server-b"} 1
+epl_l1_provisioning_expected_hash{hash="bb01d59005e3d1ed862ad30bb608f77e6227a756c6a465166576feb24e0b84c4",hostname="server-c"} 1
+epl_l1_provisioning_expected_hash{hash="b3f330f0c14b8dcc82a30730085b9173a0d6bd7f4cee12d4807f1e779413c424",hostname="server-d"} 1
 
 ' > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp

@@ -201,7 +201,7 @@ job "clickhouse-testch" {
     <concurrent_threads_soft_limit_ratio_to_cores>2</concurrent_threads_soft_limit_ratio_to_cores>
 
     <!-- Maximum number of concurrent queries. -->
-    <max_concurrent_queries>8</max_concurrent_queries>
+    <max_concurrent_queries>100</max_concurrent_queries>
 
     <!-- Maximum memory usage (resident set size) for server process.
          Zero value or unset means default. Default is "max_server_memory_usage_to_ram_ratio" of available physical RAM.
@@ -223,7 +223,7 @@ job "clickhouse-testch" {
     of the time, in which case a higher number of threads might be required.
     -->
 
-    <max_thread_pool_size>1000</max_thread_pool_size>
+    <max_thread_pool_size>10000</max_thread_pool_size>
 
     <!-- Configure other thread pools: -->
 
@@ -1160,7 +1160,7 @@ EOL
     <concurrent_threads_soft_limit_ratio_to_cores>2</concurrent_threads_soft_limit_ratio_to_cores>
 
     <!-- Maximum number of concurrent queries. -->
-    <max_concurrent_queries>8</max_concurrent_queries>
+    <max_concurrent_queries>100</max_concurrent_queries>
 
     <!-- Maximum memory usage (resident set size) for server process.
          Zero value or unset means default. Default is "max_server_memory_usage_to_ram_ratio" of available physical RAM.
@@ -1182,7 +1182,7 @@ EOL
     of the time, in which case a higher number of threads might be required.
     -->
 
-    <max_thread_pool_size>1000</max_thread_pool_size>
+    <max_thread_pool_size>10000</max_thread_pool_size>
 
     <!-- Configure other thread pools: -->
 
@@ -2119,7 +2119,7 @@ EOL
     <concurrent_threads_soft_limit_ratio_to_cores>2</concurrent_threads_soft_limit_ratio_to_cores>
 
     <!-- Maximum number of concurrent queries. -->
-    <max_concurrent_queries>8</max_concurrent_queries>
+    <max_concurrent_queries>100</max_concurrent_queries>
 
     <!-- Maximum memory usage (resident set size) for server process.
          Zero value or unset means default. Default is "max_server_memory_usage_to_ram_ratio" of available physical RAM.
@@ -2141,7 +2141,7 @@ EOL
     of the time, in which case a higher number of threads might be required.
     -->
 
-    <max_thread_pool_size>1000</max_thread_pool_size>
+    <max_thread_pool_size>10000</max_thread_pool_size>
 
     <!-- Configure other thread pools: -->
 

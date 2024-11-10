@@ -319,6 +319,7 @@ pub static SUPPORTED_INSERTER_TYPES: &'static [&str] = &[
     "Int128",
     "Int256",
     "DateTime",
+    "Date",
     "Float32",
     "Float64",
     "Bool",

@@ -1781,6 +1781,7 @@ fn test_bad_original_arguments_curly_bracket() {
                 "Bool",
                 "String",
                 "DateTime",
+                "Date",
             ],
             unsupported_type: "Map".to_string(),
             query_expression: "SELECT max(id) AS max_id FROM foo WHERE id > {test_arg:Map}".to_string(),

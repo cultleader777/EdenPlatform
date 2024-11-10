@@ -31,9 +31,9 @@ echo "GRANT SELECT, SHOW ON chdb_a.* TO db_chdb_a_ro" | \
   curl --data-binary @- -s --fail-with-body $CH_URL
 echo "GRANT SELECT, SHOW ON chdb_a.* TO db_chdb_a_rw" | \
   curl --data-binary @- -s --fail-with-body $CH_URL
-echo "GRANT INSERT ON chdb_a.* TO db_chdb_a_admin" | \
+echo "GRANT INSERT, OPTIMIZE ON chdb_a.* TO db_chdb_a_admin" | \
   curl --data-binary @- -s --fail-with-body $CH_URL
-echo "GRANT INSERT ON chdb_a.* TO db_chdb_a_rw" | \
+echo "GRANT INSERT, OPTIMIZE ON chdb_a.* TO db_chdb_a_rw" | \
   curl --data-binary @- -s --fail-with-body $CH_URL
 echo "GRANT ALTER TABLE, ALTER VIEW, CREATE TABLE, CREATE VIEW, DROP TABLE, DROP VIEW, TRUNCATE ON chdb_a.* TO db_chdb_a_admin" | \
   curl --data-binary @- -s --fail-with-body $CH_URL
