@@ -5440,3 +5440,11 @@ TODO: revisit nats jetstream consumer tracing
 TODO: alert on consul service logs "rejecting RPC conn from because rpc_max_conns_per_client exceeded"
 TODO: clickhouse too many simultaneous queries
 make this customizeable '<max_concurrent_queries>100</max_concurrent_queries>'
+
+* 2024-11-11
+
+TODO: vault unseal doesn't always work after restart
+remedy: `systemctl restart vault.service` and unseal again
+```
+core.cluster-listener: no TLS config found for ALPN: ALPN=["raft_storage_v1"]
+```

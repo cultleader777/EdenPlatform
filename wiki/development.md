@@ -10,6 +10,25 @@
 
 ## Setup
 
+Nix shell described in `shell.nix` file. Use `direnv allow` to automatically evaluate shell environments.
+
+After cloning make sure you initialize the submodules
+```
+git submodule update --init --recursive
+```
+
+Build EdenDB submodule for the first time
+```
+cd third-party/EdenDB
+direnv allow
+cargo build --release
+```
+
+Build eden platform itself from the root directory
+```
+cargo build
+```
+
 It is assumed that you're using NixOS to develop Eden platform. No other operating system will ever be supported.
 
 Open these ports for virtual machines so they could take care of caching of nix store and docker containers
@@ -28,8 +47,6 @@ NixOS `configuration.nix`:
     # libvirtd required for running tests
     virtualisation.libvirtd.enable = true;
 ```
-
-Nix shell described in `shell.nix` file. Use `direnv allow` to automatically evaluate shell environments.
 
 ## Running tests
 
