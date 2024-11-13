@@ -386,6 +386,10 @@ DATA STRUCT rust_compilation_environment {
             crate_name: chrono,
             version: 0.4.38,
         },
+        {
+            crate_name: num256,
+            version: 0.5.2,
+        },
     ]
 }
 
@@ -442,10 +446,6 @@ DATA STRUCT rust_compilation_environment {
         {
             crate_name: urlencoding,
             version: 2.1.2,
-        },
-        {
-            crate_name: num256,
-            version: 0.5.2,
         },
     ]
 }
