@@ -55,6 +55,7 @@ pub fn deploy_monitoring_instances(
         let pm_port = db.monitoring_cluster().c_prometheus_port(mon_c);
         let vm_port = db.monitoring_cluster().c_victoriametrics_port(mon_c);
         let am_port = db.monitoring_cluster().c_alertmanager_port(mon_c);
+        let vm_retention_months = db.monitoring_cluster().c_victoriametrics_retention_months(mon_c);
 
         let mut am_ips = Vec::with_capacity(5);
         for inst in db.monitoring_cluster().c_children_alertmanager_instance(mon_c) {
@@ -272,7 +273,7 @@ pub fn deploy_monitoring_instances(
             vm_task.bind_volume(volume_lock.clone(), "/volume".to_string());
             vm_task.set_arguments(vec![
                 "-storageDataPath=/volume/victoriametrics-data".to_string(),
-                "-retentionPeriod=24".to_string(),
+                format!("-retentionPeriod={vm_retention_months}"),
                 format!("-httpListenAddr={this_ip}:{vm_port}"),
             ]);
         }

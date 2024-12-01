@@ -18,8 +18,10 @@ TABLE monitoring_cluster {
     victoriametrics_port INT GENERATED AS { prometheus_port + 1 },
     alertmanager_port INT GENERATED AS { victoriametrics_port + 1 },
     alertmanager_p2p_port INT GENERATED AS { alertmanager_port + 1 },
+    victoriametrics_retention_months INT DEFAULT 24,
 
     CHECK { isKebabCase(cluster_name) },
+    CHECK { victoriametrics_retention_months >= 1 and victoriametrics_retention_months <= 9999 },
     CHECK { isValidPort(prometheus_port) and isValidPort(alertmanager_p2p_port) },
     CHECK {
         -- all ports must go in a row

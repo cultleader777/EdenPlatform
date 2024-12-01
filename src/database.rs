@@ -1041,6 +1041,7 @@ pub struct TableRowMonitoringCluster {
     pub victoriametrics_port: i64,
     pub alertmanager_port: i64,
     pub alertmanager_p2p_port: i64,
+    pub victoriametrics_retention_months: i64,
     pub children_monitoring_cluster_scraped_metric: Vec<TableRowPointerMonitoringClusterScrapedMetric>,
     pub children_monitoring_cluster_alert_group: Vec<TableRowPointerMonitoringClusterAlertGroup>,
     pub children_monitoring_instance: Vec<TableRowPointerMonitoringInstance>,
@@ -2300,6 +2301,7 @@ pub struct TableDefinitionMonitoringCluster {
     c_victoriametrics_port: Vec<i64>,
     c_alertmanager_port: Vec<i64>,
     c_alertmanager_p2p_port: Vec<i64>,
+    c_victoriametrics_retention_months: Vec<i64>,
     c_children_monitoring_cluster_scraped_metric: Vec<Vec<TableRowPointerMonitoringClusterScrapedMetric>>,
     c_children_monitoring_cluster_alert_group: Vec<Vec<TableRowPointerMonitoringClusterAlertGroup>>,
     c_children_monitoring_instance: Vec<Vec<TableRowPointerMonitoringInstance>>,
@@ -5375,6 +5377,7 @@ impl Database {
         let monitoring_cluster_victoriametrics_port: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let monitoring_cluster_alertmanager_port: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let monitoring_cluster_alertmanager_p2p_port: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
+        let monitoring_cluster_victoriametrics_retention_months: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let monitoring_cluster_children_monitoring_cluster_scraped_metric: Vec<Vec<TableRowPointerMonitoringClusterScrapedMetric>> = ::bincode::deserialize_from(&mut cursor)?;
         let monitoring_cluster_children_monitoring_cluster_alert_group: Vec<Vec<TableRowPointerMonitoringClusterAlertGroup>> = ::bincode::deserialize_from(&mut cursor)?;
         let monitoring_cluster_children_monitoring_instance: Vec<Vec<TableRowPointerMonitoringInstance>> = ::bincode::deserialize_from(&mut cursor)?;
@@ -5397,6 +5400,7 @@ impl Database {
         assert_eq!(monitoring_cluster_len, monitoring_cluster_victoriametrics_port.len());
         assert_eq!(monitoring_cluster_len, monitoring_cluster_alertmanager_port.len());
         assert_eq!(monitoring_cluster_len, monitoring_cluster_alertmanager_p2p_port.len());
+        assert_eq!(monitoring_cluster_len, monitoring_cluster_victoriametrics_retention_months.len());
         assert_eq!(monitoring_cluster_len, monitoring_cluster_children_monitoring_cluster_scraped_metric.len());
         assert_eq!(monitoring_cluster_len, monitoring_cluster_children_monitoring_cluster_alert_group.len());
         assert_eq!(monitoring_cluster_len, monitoring_cluster_children_monitoring_instance.len());
@@ -5420,6 +5424,7 @@ impl Database {
                 victoriametrics_port: monitoring_cluster_victoriametrics_port[row],
                 alertmanager_port: monitoring_cluster_alertmanager_port[row],
                 alertmanager_p2p_port: monitoring_cluster_alertmanager_p2p_port[row],
+                victoriametrics_retention_months: monitoring_cluster_victoriametrics_retention_months[row],
                 children_monitoring_cluster_scraped_metric: monitoring_cluster_children_monitoring_cluster_scraped_metric[row].clone(),
                 children_monitoring_cluster_alert_group: monitoring_cluster_children_monitoring_cluster_alert_group[row].clone(),
                 children_monitoring_instance: monitoring_cluster_children_monitoring_instance[row].clone(),
@@ -7646,6 +7651,7 @@ impl Database {
                 c_victoriametrics_port: monitoring_cluster_victoriametrics_port,
                 c_alertmanager_port: monitoring_cluster_alertmanager_port,
                 c_alertmanager_p2p_port: monitoring_cluster_alertmanager_p2p_port,
+                c_victoriametrics_retention_months: monitoring_cluster_victoriametrics_retention_months,
                 c_children_monitoring_cluster_scraped_metric: monitoring_cluster_children_monitoring_cluster_scraped_metric,
                 c_children_monitoring_cluster_alert_group: monitoring_cluster_children_monitoring_cluster_alert_group,
                 c_children_monitoring_instance: monitoring_cluster_children_monitoring_instance,
@@ -10965,6 +10971,10 @@ impl TableDefinitionMonitoringCluster {
 
     pub fn c_alertmanager_p2p_port(&self, ptr: TableRowPointerMonitoringCluster) -> i64 {
         self.c_alertmanager_p2p_port[ptr.0]
+    }
+
+    pub fn c_victoriametrics_retention_months(&self, ptr: TableRowPointerMonitoringCluster) -> i64 {
+        self.c_victoriametrics_retention_months[ptr.0]
     }
 
     pub fn c_children_monitoring_cluster_scraped_metric(&self, ptr: TableRowPointerMonitoringCluster) -> &[TableRowPointerMonitoringClusterScrapedMetric] {
