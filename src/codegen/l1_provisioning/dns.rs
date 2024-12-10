@@ -581,10 +581,10 @@ fn provision_acme_certs(db: &CheckedDB, plans: &mut NixAllServerPlans, keys: &Ac
         if db.projections.dns_checks.certs_needed {
             let mut shell_script = r#"
 TARGET_TLD=$1
-TARGET_TLD_SANITIZED=$( echo $TARGET_TLD | tr '.-' '_' )
+TARGET_TLD_SANITIZED=$( echo $TARGET_TLD | ${pkgs.coreutils}/bin/tr '.-' '_' )
 
-SECRET_VALUE=$( echo "{\"full_chain\":\"$( cat fullchain.pem | sed 's/$/\\n/g' | tr -d '\n' )\",\"key\":\"$( cat key.pem | sed 's/$/\\n/g' | tr -d '\n' )\",\"cert\":\"$( cat cert.pem | sed 's/$/\\n/g' | tr -d '\n' )\"}" | jq -S )
-EXTLB_VALUE=$( echo "{\"full_chain_$TARGET_TLD_SANITIZED\":\"$( cat fullchain.pem | sed 's/$/\\n/g' | tr -d '\n' )\",\"key_$TARGET_TLD_SANITIZED\":\"$( cat key.pem | sed 's/$/\\n/g' | tr -d '\n' )\"}" | jq -S )
+SECRET_VALUE=$( echo "{\"full_chain\":\"$( ${pkgs.coreutils}/bin/cat fullchain.pem | ${pkgs.gnused}/bin/sed 's/$/\\n/g' | ${pkgs.coreutils}/bin/tr -d '\n' )\",\"key\":\"$( cat key.pem | ${pkgs.gnused}/bin/sed 's/$/\\n/g' | ${pkgs.coreutils}/bin/tr -d '\n' )\",\"cert\":\"$( ${pkgs.coreutils}/bin/cat cert.pem | ${pkgs.gnused}/bin/sed 's/$/\\n/g' | ${pkgs.coreutils}/bin/tr -d '\n' )\"}" | ${pkgs.jq}/bin/jq -S )
+EXTLB_VALUE=$( echo "{\"full_chain_$TARGET_TLD_SANITIZED\":\"$( ${pkgs.coreutils}/bin/cat fullchain.pem | ${pkgs.gnused}/bin/sed 's/$/\\n/g' | ${pkgs.coreutils}/bin/tr -d '\n' )\",\"key_$TARGET_TLD_SANITIZED\":\"$( ${pkgs.coreutils}/bin/cat key.pem | ${pkgs.gnused}/bin/sed 's/$/\\n/g' | ${pkgs.coreutils}/bin/tr -d '\n' )\"}" | ${pkgs.jq}/bin/jq -S )
 "#.to_string();
             let mut token_renewal_script = String::new();
 
