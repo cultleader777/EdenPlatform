@@ -77,5 +77,6 @@ TABLE server_volume_usage_contract {
 DATA EXCLUSIVE server_volume_usage_contract {
     read_only;
     one_writer_many_readers;
+    multiple_writers;
     exclusive;
 }

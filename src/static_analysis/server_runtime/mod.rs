@@ -2075,6 +2075,7 @@ pub struct LockedServerLabel {
 enum ServerVolumeLockContract {
     ReadOnly,
     OneWriterManyReaders,
+    MultipleWriters,
     Exclusive,
 }
 
@@ -2106,6 +2107,7 @@ impl ServerVolumeLocks {
         {
             "read_only" => ServerVolumeLockContract::ReadOnly,
             "one_writer_many_readers" => ServerVolumeLockContract::OneWriterManyReaders,
+            "multiple_writers" => ServerVolumeLockContract::MultipleWriters,
             "exclusive" => ServerVolumeLockContract::Exclusive,
             other => panic!("Unknown volume usage contract: {other}"),
         };
@@ -2178,6 +2180,9 @@ impl ServerVolumeLocks {
                 if self.write.len() + self.read.len() > 1 {
                     return err();
                 }
+            }
+            ServerVolumeLockContract::MultipleWriters => {
+                // anything goes
             }
         }
 
