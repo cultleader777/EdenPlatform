@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use crate::{static_analysis::{CheckedDB, networking::DcParameters, server_disks::{pick_disk_id_policy, DiskIdsPolicy, pick_absolute_disk_path_by_policy}}, database::{TableRowPointerServer, Database, TableRowPointerServerDisk}, codegen::l1_provisioning::utils::epl_arch_to_linux_arch};
 
 pub fn generate_server_preconditions(checked: &CheckedDB, server: TableRowPointerServer) -> String {
@@ -56,7 +58,9 @@ pub fn generate_server_preconditions(checked: &CheckedDB, server: TableRowPointe
     let dc_net = checked.sync_res.network.networking_answers.dcs.get(&dc).unwrap();
     let hostname = checked.db.server().c_hostname(server);
     for ni in checked.db.server().c_children_network_interface(server) {
-        let iface_name = checked.db.network_interface().c_if_name(*ni);
+        let iface_name = if checked.db.network_interface().c_if_vlan(*ni) < 0 {
+           Cow::from(checked.db.network_interface().c_if_name(*ni))
+        } else { Cow::from(format!("vlan{}", checked.db.network_interface().c_if_vlan(*ni))) };
         let is_subinterface = iface_name.contains(":");
         if is_subinterface || is_coprocessor {
             // we configure subinterfaces but don't expect them to be there on first run

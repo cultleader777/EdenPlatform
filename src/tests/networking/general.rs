@@ -598,6 +598,42 @@ INCLUDE LUA {
 }
 
 #[test]
+fn test_ipv6_public_address_doesnt_end_with_1() {
+    assert_eq!(
+        PlatformValidationError::PublicIpV6AddressDoesNotEndWithOne {
+            server_name: "server1".to_string(),
+            ipv6_address: "2a03:2880:f32e:3:face:b00c:0:25de".to_string(),
+        },
+        assert_platform_validation_error_wcustom_data(
+            r#"
+DATA EXCLUSIVE network {
+    internet, "0.0.0.0/0";
+    lan, "10.0.0.0/8";
+}
+
+DATA server(hostname, ssh_interface, public_ipv6_address) {
+    server1, eth0, '2a03:2880:f32e:3:face:b00c:0:25de' WITH network_interface {
+        eth1, internet, 1.1.1.10;
+        eth0, lan, 10.17.10.10;
+    };
+}
+
+INCLUDE LUA {
+  function standard_24_disk_setup_test(hostname)
+    data('server_disk', { hostname = hostname, disk_id = "vda"})
+    for i = string.byte('b'), string.byte('z') do
+      data('server_disk', { hostname = hostname, disk_id = "vd" .. string.char(i) })
+    end
+  end
+
+  standard_24_disk_setup_test('server1')
+}
+"#,
+        ),
+    );
+}
+
+#[test]
 fn test_lan_but_public_ip() {
     let err = assert_platform_validation_error_wcustom_data(
         r#"

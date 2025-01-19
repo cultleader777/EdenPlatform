@@ -16,7 +16,7 @@ in
         "https://cache.nixos.org/"
       ];
       trusted-public-keys = [
-        "epl-nix-cache:knUE4VbRh9LazjdBw2qsBAMPgtyf5OI7cAVqF1hLuyw="
+        "epl-nix-cache:W9BBOh3S33CuuDIvYZHGC9MdVkJKLOZGDp5MVzdC01o="
       ];
 
     };
@@ -34,7 +34,7 @@ in
       home = "/home/admin";
       extraGroups = [ "docker" "wheel" "epl-prov" ];
       openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIONUZdMtNbaNBA+F2IS18RAcVToqkvGVDw4/3nFvE9TR epl-root-ssh-key"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFbis+BzEk38EuddzQHZiFVsw8ATqnLYO0eFcWm/5xRG epl-root-ssh-key"
       "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC3AkuDzzPrMaDav0kN7PIoaBU1Vtw1TfkHxWzPMrleocCltYl8TljwCqEJtmizx5DGKbXFQg31mRVswzuAq2vP2RFdPHQxfl5nJnWsQkelvpPO/Q3LUdtrm19zAgbbDL+AtIg3/lif6/2qNiWCSTfaUpjM7WOPszBNmMRGz/UBZTYc7COTt+I3lK8f6sBn5YyD796LBw6tsNpqfqF9NTAsLT8/PqrXeTpdxFe375gMxeIpNWeE5exMGJKgqnZCcOMOoKMJy61+wdEAYzDFNgIX7ZFvpBYQPf/rTs7LWgtyTSw3fqvMDnfwAf7oIF8rZRwYdVnqTGCWA2h3f4lOf6BERIPkKEK7/DGjmekKnXJrRiLSfcgRjri3VuGBxrJ+Va/Dn6e7o7CdzdJ+fkw7KxTFKuf17Z2r3ZFi1xOduIxXW8/QY6zhq2A11e+HsMe/oaBh3bRcpdMFmW5mqQjGm05xvxArSCAARBKkHjywGs6mRLN2PjNPYdzlI2J8nF6bmSk= henlo"
 
       ];
@@ -62,38 +62,38 @@ in
 
     security.pki.certificates = [
       ''-----BEGIN CERTIFICATE-----
-MIIB0zCCAXmgAwIBAgIUFXKgm49joHEO2/JgwMTGkqxYucswCgYIKoZIzj0EAwIw
-ETEPMA0GA1UEAxMGQ0EgS2V5MB4XDTIzMTIxNzA2MTAwMFoXDTQwMTIxMjA2MTAw
-MFowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABK7zoU22emDngas6AZKLfnq3
-1PgLNpNOkY2972BxKfdsdHXslUatwjEV0D66bzvL1qvi7M1o5h1aHMv1fq8soxej
+MIIB0jCCAXmgAwIBAgIUOVRp67uSGyFiPhDJyG1+3nd6CyowCgYIKoZIzj0EAwIw
+ETEPMA0GA1UEAxMGQ0EgS2V5MB4XDTI0MTExMzE1NTYwMFoXDTQxMTEwOTE1NTYw
+MFowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABGGCe7WgTyl6ok60R9o0hrVm
+M6dBVSrR273adqNFU8m26DktoGic95ZAHpcu6oGTb/oXvE82OZ3UmN7UH/ReQfKj
 gb8wgbwwDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEF
-BQcDAjAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBQY7DF/fuqV2uraikN0w7zZdDoD
-VTAfBgNVHSMEGDAWgBT8ui2xHlr0+GQMkGXxm7Y6ZSVGOzA9BgNVHREBAf8EMzAx
+BQcDAjAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBT/GJqNPoMFur0EEMiTbFJNTyVt
+TTAfBgNVHSMEGDAWgBT2TfyVisALQfqguf1vM8vgAM+8tzA9BgNVHREBAf8EMzAx
 gg1lcGwtaW5mcmEubmV0gg8qLmVwbC1pbmZyYS5uZXSCCWxvY2FsaG9zdIcEfwAA
-ATAKBggqhkjOPQQDAgNIADBFAiEAhvuw0GpetbyMgepkcZZV0rTT2uQ/iyKXHuDF
-gdlBjG4CIG1L4SCFCw7rIRNcFfsfLskAwb7K7SqftCeQHJ9Z3Qec
+ATAKBggqhkjOPQQDAgNHADBEAiBkC77f7lhdLvpU40V59XkUYs05nuIaWzMAOKFp
+jGsqWgIgeLqKUom004H+l92CrSB4ZPlWAfUB6L+t9yemSH5V/3Y=
 -----END CERTIFICATE-----
 ''
       ''-----BEGIN CERTIFICATE-----
-MIIBYzCCAQqgAwIBAgIUcwf2Wx0BAcab9GKxA/3NBEqkYLgwCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjMxMjE3MDYxMDAwWhcNNDAxMjEyMDYxMDAw
-WjAQMQ4wDAYDVQQDEwVub21hZDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABLVj
-Pe+gqLwyF3DQMRAabqVvVBJ8+BhSHpF5F9ps9x8pO9oym8WUsMEDDQy5MWOqryIY
-kcm2w6yeFqQtI2wkGy6jQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTAD
-AQH/MB0GA1UdDgQWBBQZUCUg2M10b1hICyW+TrTBDwZpBjAKBggqhkjOPQQDAgNH
-ADBEAiAsPC7WS/zkA2vtfdQsEkENH9qeLOIAqLdoCbi+N+9ktAIgYcMpR0b5tfQr
-yfNQWyGeMzoFRZ8sgpeOXVWXki2Cqmw=
+MIIBZDCCAQqgAwIBAgIUZQsXaNv36QnkwJ1GOgMadgUIEVowCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjQxMTEzMTU1NjAwWhcNNDExMTA5MTU1NjAw
+WjAQMQ4wDAYDVQQDEwVub21hZDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABNIz
+FpB3q+GpZHzrH4tOcOX+fRGI3thIMXIpDikibedU73aIpujCCQLBbJn+c4HIvumm
+83muuihA40ieiKRIbdijQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTAD
+AQH/MB0GA1UdDgQWBBT+jXj08/ibrpdTJPrdOm9pyHceoTAKBggqhkjOPQQDAgNI
+ADBFAiEA2GyEg/eg2Dn1OkAxqOTzK5l1DH4qDz4IhHvQb7Q30IcCIGCYILlXPBVd
+4wiYWPBXMft1ENdgWWjCK5uQOo1NfqfA
 -----END CERTIFICATE-----
 ''
       ''-----BEGIN CERTIFICATE-----
-MIIBZDCCAQqgAwIBAgIUKJGRPQ0w0nLzoNYftEqb9Qqk7AwwCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFdmF1bHQwHhcNMjMxMjE3MDYxMDAwWhcNNDAxMjEyMDYxMDAw
-WjAQMQ4wDAYDVQQDEwV2YXVsdDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABI0r
-mro4rc4aaNwfFajPMuDVsfsoHuOw4K1FF4524iZ5Yfw4mlOU0PDWMjTjNHAUQhdU
-JETmg35q6Tn5imq5v82jQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTAD
-AQH/MB0GA1UdDgQWBBSfhC32z/CuhNhrc5hGF2wVJrLDFjAKBggqhkjOPQQDAgNI
-ADBFAiEAo+RsRay1tItvzyeJDfDb2gja7DVsL/cXCzJb6gn6B6UCIAZ+O5ZoouUS
-EinlUnb7MGKl0z5/dCH8pzSnisY3Amto
+MIIBZTCCAQqgAwIBAgIUFx7nNX8GaKl1b75hby6DOwzdujMwCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFdmF1bHQwHhcNMjQxMTEzMTU1NjAwWhcNNDExMTA5MTU1NjAw
+WjAQMQ4wDAYDVQQDEwV2YXVsdDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABK6a
+IshvWc5dXp4iHolpWhToFQUmsY9Tci/XgciqWr4flR1qqFh1jtqpd1ZWJTFc1KFY
+UACK1f2r47NyledWrzKjQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTAD
+AQH/MB0GA1UdDgQWBBRcinhG7Fb0K3zRQuWZsUtwX2iAWzAKBggqhkjOPQQDAgNJ
+ADBGAiEA3RkbJvx55+k05Arnrp+/unmA6N7hbTKcOqTH+Nah8yACIQDeDwxd569z
+FKD1ediXQ707FbNxf0vBI+58D0dyWUN7RQ==
 -----END CERTIFICATE-----
 ''
     ];
@@ -873,13 +873,13 @@ done
         ];
         extraConfig = ''
           trust-anchors {
-  epl-infra.net. initial-key 257 3 15 "3V0DydHMIEmN+PDJZxVEOHHU1QPVKkIxS6Y2iPyaHuQ=";
-  us-west.epl-infra.net. initial-key 257 3 15 "k5nxYOGcYIC66fP80Z7nVeVWmZQGaJvlCQGncoKvLyM=";
-  10.in-addr.arpa. initial-key 257 3 15 "EDcnSNMxM8jFNAzwt7sdpd2osA90HOAOw3OobPEe9VM=";
-  17.10.in-addr.arpa. initial-key 257 3 15 "azn82AbZk0vfsYtNcKTofCYwfBqjmlWeLEtKqVHxwk8=";
-  18.10.in-addr.arpa. initial-key 257 3 15 "Xf1YznaHMJkisSXa6QunCmivRgtYxPylLhpOs3uBtwE=";
-  19.10.in-addr.arpa. initial-key 257 3 15 "20BS8hmIKY1gzYl7RHPoNTcB1luZ2Yay88E/PT9l6vY=";
-  in-addr.arpa. initial-key 257 3 15 "pFGF/hEQu2aUEkeLvjCqKF7meN68e/b1hSMFmec7+7o=";
+  epl-infra.net. initial-key 257 3 15 "cEnK6luP7tcwXWMHy8LSuy7LJbN2cg527QymP8tYzyU=";
+  us-west.epl-infra.net. initial-key 257 3 15 "E89hMzBmYjGCw/COGh39yXprrfzDbqsWNWYpajvzTwM=";
+  10.in-addr.arpa. initial-key 257 3 15 "/9VNyAR/OCaafL3Yrpra1C4FM54FpAy514yxABi6+qo=";
+  17.10.in-addr.arpa. initial-key 257 3 15 "fSn3WSw+rvl/snYdXqbO+33N43Kdrpy4rXlKBm8/IlE=";
+  18.10.in-addr.arpa. initial-key 257 3 15 "/OS7qDr60vCC7/Y2Zn2KJeqAAyOFfPtVodRRhlAhxzU=";
+  19.10.in-addr.arpa. initial-key 257 3 15 "w/mFoOy4B8rm/BWhe99z/DUy1205Q76PxHWAegWT/uo=";
+  in-addr.arpa. initial-key 257 3 15 "dqKIja/yAVZ7/QpRWPpPoEXn0+UtTECL/DbkL15md00=";
 };
 
 
@@ -1243,9 +1243,9 @@ wg set "wg0" private-key "/run/keys/epl-wireguard-key" listen-port "51820"
 ip link set up dev "wg0"
 
 # peers
-wg set wg0 peer "DyMxArxtervvFETX/B0o5DFW0hw9FxQAMQ8zVdW/xWs=" allowed-ips "172.21.7.254/32"
+wg set wg0 peer "siicT83i7PoJLy1Xo/t5QVLIdk4u+iu9YIIh++YK0Ts=" allowed-ips "172.21.7.254/32"
 
-wg set wg0 peer "6zcv2TP74mzwko4I4GsoGS87ZnTo0gKfyBpBMggQM1M=" allowed-ips "172.21.7.14/32,10.19.0.0/16" endpoint "34.212.47.215:51820"
+wg set wg0 peer "ilZx3xtxFQSk3SRP0Ew1mrY8Fdp5XXG3hP8zG9idbXc=" allowed-ips "172.21.7.14/32,10.19.0.0/16" endpoint "34.212.47.215:51820"
 
     '';
 
@@ -1347,7 +1347,7 @@ wg set wg0 peer "6zcv2TP74mzwko4I4GsoGS87ZnTo0gKfyBpBMggQM1M=" allowed-ips "172.
           ip ospf cost 500
           ip ospf hello-interval 1
           ip ospf dead-interval 3
-          ip ospf message-digest-key 12 md5 ZQc9QPGe7JGWDK6f
+          ip ospf message-digest-key 12 md5 0zfLIkGGsqRGu2GG
           ip ospf authentication message-digest
           ip ospf network non-broadcast
       '';
@@ -1381,13 +1381,13 @@ wg set wg0 peer "6zcv2TP74mzwko4I4GsoGS87ZnTo0gKfyBpBMggQM1M=" allowed-ips "172.
             network 10.18.0.0/16
           exit-address-family
           neighbor 10.18.0.11 remote-as 64530
-          neighbor 10.18.0.11 password wGDTbDZl4mBrLgVDNaM0vbUj4xGEX3thSBRVwxgZbJ
+          neighbor 10.18.0.11 password 5GtjphImQld0EfmdzZMpcxNVcYiQFvYUzHR2OPW3fg
           neighbor 10.18.0.11 bfd
           neighbor 172.21.7.10 remote-as 64529
-          neighbor 172.21.7.10 password 6CU8kT4y2NR0KHmBogQPwW1d42zXYq9xZa1aN9mlGX
+          neighbor 172.21.7.10 password pcZY9sta2hbGFl4wojRewN73Mlo6tC1Xcn47qO9ybO
           neighbor 172.21.7.10 bfd
           neighbor 172.21.7.14 remote-as 64531
-          neighbor 172.21.7.14 password xhfDhWT286D0NF73DM75yAbG3xHpLxko1ECge1omts
+          neighbor 172.21.7.14 password b7GfdEeBEALUbhmVY9A1IetEqRAa5DwQX2D5MuzPqq
           neighbor 172.21.7.14 bfd
           address-family ipv4 unicast
             network 10.18.0.0/16

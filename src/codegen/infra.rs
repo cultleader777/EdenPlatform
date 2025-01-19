@@ -18,7 +18,32 @@ pub fn configure_server_ip_interfaces(db: &CheckedDB, server: TableRowPointerSer
     let dc = db.db.server().c_dc(server);
     let dc_net = db.sync_res.network.networking_answers.dcs.get(&dc).unwrap();
     let explicit_internet_ip = !dc_net.params.are_public_ips_hidden;
+    let vlan_ifs = db.db.server().c_children_network_interface(server).iter().filter(|ni| {
+        db.db.network_interface().c_if_vlan(**ni) > 0
+    }).collect::<Vec<_>>();
+
+    for vlan_if in &vlan_ifs {
+        let if_name = db.db.network_interface().c_if_name(**vlan_if);
+        let parent_if_name = if_name.split(".").next()
+            .expect("We should have verified earlier that interface is named this way");
+        let vlan_id = db.db.network_interface().c_if_vlan(**vlan_if);
+        let prefix = db.db.network_interface().c_if_prefix(**vlan_if);
+        let address = db.db.network_interface().c_if_ip(**vlan_if);
+        write!(res, r#"
+    networking.vlans.vlan{vlan_id} = {{ id = {vlan_id}; interface = "{parent_if_name}"; }};
+    networking.interfaces.vlan{vlan_id}.ipv4.addresses = [
+      {{ address = "{address}";
+         prefixLength = {prefix}; }}
+    ];
+"#).unwrap();
+    }
+
     for ni in db.db.server().c_children_network_interface(server) {
+        // skip VLANs
+        if db.db.network_interface().c_if_vlan(*ni) > 0 {
+            continue;
+        }
+
         let net_name = db.db.network().c_network_name(db.db.network_interface().c_if_network(*ni));
         let is_internet = net_name == "internet";
         // Only configure dcrouter network for now because dhcp disabled due to duplicate ips

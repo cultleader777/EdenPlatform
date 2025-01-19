@@ -666,7 +666,7 @@ pub fn pick_disk_id_policy(db: &Database, dc: TableRowPointerDatacenter) -> Disk
     match policy.as_str() {
         "auto" => {
             // only bm dcs require disk ids specified
-            if implementation == "bm_simple" {
+            if implementation == "bm_simple" || implementation == "hetzner" {
                 DiskIdsPolicy::ByDiskSerial
             } else {
                 DiskIdsPolicy::ByDevName

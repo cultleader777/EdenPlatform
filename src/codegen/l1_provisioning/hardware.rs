@@ -1,4 +1,4 @@
-use crate::{codegen::{nixplan::{NixAllServerPlans, NixServerPlan}, makefile::vms_exist}, static_analysis::{CheckedDB, networking::first_three_octets, get_global_settings}};
+use crate::{codegen::{nixplan::{NixAllServerPlans, NixServerPlan}, makefile::vms_exist, l1_provisioning::routing::get_hetnzer_internal_dc_vlan_ip}, static_analysis::{CheckedDB, networking::first_three_octets, get_global_settings}, database::TableRowPointerServer};
 
 pub fn provision_spec_hardware(db: &CheckedDB, plans: &mut NixAllServerPlans) {
     let zfs_args_qemu = zfs_args_qemu();
@@ -10,6 +10,8 @@ pub fn provision_spec_hardware(db: &CheckedDB, plans: &mut NixAllServerPlans) {
         let dc = db.db.server().c_dc(server);
         let dc_net = db.sync_res.network.networking_answers.dcs.get(&dc).unwrap();
         let dc_routers = dc_net.all_routers_set();
+        let plan = plans.fetch_plan(server);
+        plan.add_custom_nix_block("# NIX REGION custom_hardware START".to_string());
 
         let add_internet_lan_iface_default_gateway = |plans: &mut NixAllServerPlans| {
             let plan = plans.fetch_plan(server);
@@ -56,6 +58,11 @@ pub fn provision_spec_hardware(db: &CheckedDB, plans: &mut NixAllServerPlans) {
             "manual" => {
                 // think of what to do here
             },
+            "hetzner" => {
+                let plan = plans.fetch_plan(server);
+                add_default_internet_route(db, plan, server);
+                hetzner_hardware_config(db, plan, server);
+            }
             "bm_simple" => {
                 // add gateway ip
                 let plan = plans.fetch_plan(server);
@@ -126,17 +133,7 @@ pub fn provision_spec_hardware(db: &CheckedDB, plans: &mut NixAllServerPlans) {
             "coprocessor" => {
                 let plan = plans.fetch_plan(server);
 
-                if let Some(internet_iface) = db.projections.internet_network_iface.get(&server) {
-                    let internet_iface_name = db.db.network_interface().c_if_name(*internet_iface);
-                    let internet_ip = db.db.network_interface().c_if_ip(*internet_iface);
-                    let internet_cidr = db.db.network_interface().c_if_prefix(*internet_iface);
-                    let net: ipnet::Ipv4Net = format!("{internet_ip}/{internet_cidr}").parse().unwrap();
-                    let first_internet_gw = net.hosts().next().unwrap();
-                    plan.add_interface_route(
-                        internet_iface_name,
-                        format!(r#"{{ address = "0.0.0.0"; prefixLength = 0; via = "{first_internet_gw}"; }}"#)
-                    );
-                }
+                add_default_internet_route(db, plan, server);
 
                 if !vms_exist {
                     auto_hardware_config(plan, false);
@@ -198,17 +195,8 @@ pub fn provision_spec_hardware(db: &CheckedDB, plans: &mut NixAllServerPlans) {
                         );
                     }
                 }
-                if let Some(internet_iface) = db.projections.internet_network_iface.get(&server) {
-                    let internet_iface_name = db.db.network_interface().c_if_name(*internet_iface);
-                    let internet_ip = db.db.network_interface().c_if_ip(*internet_iface);
-                    let internet_cidr = db.db.network_interface().c_if_prefix(*internet_iface);
-                    let net: ipnet::Ipv4Net = format!("{internet_ip}/{internet_cidr}").parse().unwrap();
-                    let first_internet_gw = net.hosts().next().unwrap();
-                    plan.add_interface_route(
-                        internet_iface_name,
-                        format!(r#"{{ address = "0.0.0.0"; prefixLength = 0; via = "{first_internet_gw}"; }}"#)
-                    );
-                }
+
+                add_default_internet_route(db, plan, server);
 
                 // without these virsh console doesnt work to debug
                 let serial_params = r#"
@@ -248,6 +236,9 @@ pub fn provision_spec_hardware(db: &CheckedDB, plans: &mut NixAllServerPlans) {
                 panic!("Unexpected datacenter implementation: {other}")
             }
         }
+
+        let plan = plans.fetch_plan(server);
+        plan.add_custom_nix_block("# NIX REGION custom_hardware END".to_string());
     }
 }
 
@@ -279,7 +270,7 @@ fn auto_hardware_config(plan: &mut NixServerPlan, efi_enabled: bool) {
     efiSupport = false;
     efiInstallAsRemovable = false;
     mirroredBoots = [
-      {{ devices = [ "nodev"]; path = "/boot"; }}
+      { devices = [ "nodev" ]; path = "/boot"; }
     ];
   };
 "#
@@ -296,6 +287,85 @@ fn auto_hardware_config(plan: &mut NixServerPlan, efi_enabled: bool) {
 
 {zfs_args_bm}
 "#));
+}
+
+fn hetzner_hardware_config(db: &CheckedDB, plan: &mut NixServerPlan, server: TableRowPointerServer) {
+    plan.add_pre_l1_provisioning_shell_hook("nixos-generate-config --show-hardware-config --no-filesystems | grep -v -e ' networking.' -e ' # ' > /etc/nixos/hardware-configuration.nix".to_string());
+    let root_disk = db.db.server_disk().c_disk_id(db.db.server().c_root_disk(server));
+    let zfs_args_bm = zfs_args_bm();
+
+    plan.add_custom_nix_block(format!(r#"
+  imports = [ ./hardware-configuration.nix ];
+  networking.usePredictableInterfaceNames = false;
+
+  boot.loader.grub = {{
+    enable = true;
+    zfsSupport = true;
+    efiSupport = false;
+    efiInstallAsRemovable = false;
+  }};
+  boot.loader.grub.devices = [
+    "/dev/disk/by-id/{root_disk}"
+  ];
+
+{zfs_args_bm}
+"#));
+
+    if db.db.server().c_public_ipv6_address(server) != "" {
+        let address = db.db.server().c_public_ipv6_address(server);
+        let prefix = db.db.server().c_public_ipv6_address_prefix(server);
+        let internet_iface = db.projections.internet_network_iface.get(&server).unwrap();
+        let internet_iface_name = db.db.network_interface().c_if_name(*internet_iface);
+
+        plan.add_custom_nix_block(format!(r#"
+    networking.interfaces.eth0.ipv6.addresses = [
+      {{ address = "{address}";
+         prefixLength = {prefix}; }}
+    ];
+
+    networking.defaultGateway6 = {{
+      address = "fe80::1";
+      interface = "{internet_iface_name}";
+    }};
+"#));
+    }
+
+    // provision VLAN for inter hetzner DC communication
+    if db.db.server().c_is_vpn_gateway(server) {
+        let gobal_conf = get_global_settings(&db.db);
+        let vlan_id = gobal_conf.hetzner_inter_dc_vlan_id;
+        assert!(vlan_id >= 4000, "that's only what hetzner allows, should be caught earlier");
+
+        let internet_iface = db.projections.internet_network_iface.get(&server).unwrap();
+        let internet_iface_name = db.db.network_interface().c_if_name(*internet_iface);
+        let vpn_iface = db.projections.vpn_network_iface.get(&server).unwrap();
+        let vpn_ip = db.db.network_interface().c_if_ip(*vpn_iface);
+        // use VPN address last two octets but replace start with 172.42
+        let iface_ip = get_hetnzer_internal_dc_vlan_ip(vpn_ip);
+
+        plan.add_custom_nix_block(format!(r#"
+    networking.vlans.vlan{vlan_id} = {{ id = {vlan_id}; interface = "{internet_iface_name}"; }};
+    networking.interfaces.vlan{vlan_id}.ipv4.addresses = [
+      {{ address = "{iface_ip}";
+         prefixLength = 16; }}
+    ];
+"#));
+    }
+}
+
+// try first host address in the subnet
+fn add_default_internet_route(db: &CheckedDB, plan: &mut NixServerPlan, server: TableRowPointerServer) {
+    if let Some(internet_iface) = db.projections.internet_network_iface.get(&server) {
+        let internet_iface_name = db.db.network_interface().c_if_name(*internet_iface);
+        let internet_ip = db.db.network_interface().c_if_ip(*internet_iface);
+        let internet_cidr = db.db.network_interface().c_if_prefix(*internet_iface);
+        let net: ipnet::Ipv4Net = format!("{internet_ip}/{internet_cidr}").parse().unwrap();
+        let first_internet_gw = net.hosts().next().unwrap();
+        plan.add_interface_route(
+            internet_iface_name,
+            format!(r#"{{ address = "0.0.0.0"; prefixLength = 0; via = "{first_internet_gw}"; }}"#)
+        );
+    }
 }
 
 pub fn zfs_args_qemu() -> &'static str {

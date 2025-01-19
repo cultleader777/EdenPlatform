@@ -1006,7 +1006,10 @@ markers/{target}/{region_name}:
                     *res += "\t $$( echo \" SELECT 'l1-provision-ww_' || hostname FROM servers_for_slow_l1_provision WHERE hostname = '";
                     *res += checked.db.server().c_hostname(*server);
                     *res += "' \" | sqlite3 infra-state.sqlite )\n";
-                    let network_iface = checked.projections.consul_network_iface.value(*server);
+                    let network_iface =
+                        checked.projections.internet_network_iface.get(server)
+                        // go through VPN if internet unavailable
+                        .unwrap_or_else(|| checked.projections.consul_network_iface.value(*server));
                     let fqdn = checked.projections.server_fqdns.value(*server);
                     let ip = checked.db.network_interface().c_if_ip(*network_iface);
                     *res += "\t$(LOAD_SHELL_LIB) maybe_unseal_vault ";

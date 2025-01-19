@@ -82,9 +82,9 @@ cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
     "enable_token_persistence": true,
     "enabled": true,
     "tokens": {
-      "agent": "aa9c049d-56ab-4a63-87a1-71e38983315f",
-      "default": "ce9be2ca-5865-4eb3-9bb0-2bcace5d9262",
-      "initial_management": "e667d3e2-75cf-4938-b854-9f4a574a9c49"
+      "agent": "0665799a-0b6f-4cd3-8057-d59263b47e41",
+      "default": "993b059e-bd3a-44a2-928e-e0e1334a6886",
+      "initial_management": "a1635fca-d628-4200-a97b-3831efc52d88"
     }
   },
   "addresses": {
@@ -111,7 +111,7 @@ cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
   "domain": "consul",
   "enable_local_script_checks": false,
   "enable_script_checks": false,
-  "encrypt": "h9wq4SR+F45G2pCi0urIW16sdkjlpxmb3tLN1RO/qJU=",
+  "encrypt": "lBAN12Hwsv/VFoH/uSHTuPfodHrV9dX8CBqVM6V2H/Q=",
   "encrypt_verify_incoming": true,
   "encrypt_verify_outgoing": true,
   "limits": {
@@ -214,7 +214,7 @@ consul {
     ca_file = ""
     cert_file = ""
     key_file = ""
-    token = "c04780fa-40d9-4220-bfe3-74bc53ee3024"
+    token = "cb2032d5-a499-4d18-9290-bdaa4bacb366"
     # The service name to register the server and client with Consul.
     server_service_name = "nomad-servers"
     client_service_name = "nomad-clients"
@@ -247,23 +247,6 @@ tls {
     rpc_upgrade_mode = false
     verify_server_hostname = "true"
     verify_https_client = "false"
-}
-
-
-vault {
-    enabled = true
-    address = "https://vault.service.consul:8200"
-    allow_unauthenticated = false
-    create_from_role = "nomad-cluster"
-    task_token_ttl = ""
-    ca_file = "/run/keys/vault-ca.crt"
-    ca_path = ""
-    cert_file = ""
-    key_file = ""
-    tls_server_name = ""
-    tls_skip_verify = false
-    namespace = ""
-
 }
 
 client {
@@ -459,7 +442,7 @@ service_registration "consul" {
   service = "vault"
   service_tags = ""
   service_address = "10.18.0.10"
-  token = "43a9c688-f364-406a-8173-5ab26225531a"
+  token = "90c23fd6-2d12-4297-97ab-61d80f68ad8e"
 }
 
 ui = true
@@ -866,7 +849,7 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 
 # NIX REGION secret_value_l1-fast-prov-decryption-key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
-o5HAvBZMjtoNEB4ZcqJI8I0ZjLHMBvJCx87thFm0g6A=
+WTqFFlpGlQVp1MxbFtnslKfVZxVcen4mD+zKj9yeSKM=
 LilBoiPeepLikesBenzTruck
 
 # NIX REGION secret_value_l1-fast-prov-decryption-key END
@@ -881,7 +864,7 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 
 # NIX REGION secret_value_l1-fast-prov-admin-pub-key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
-4Zo8C0m7rHAbKvQK9bq9x2qAwEwwqMKOzyYAEulKz28=
+MMxjB/3U1icOa+ixgZpQJjDiZQBToGLcTx856LHR43s=
 LilBoiPeepLikesBenzTruck
 
 # NIX REGION secret_value_l1-fast-prov-admin-pub-key END
@@ -897,9 +880,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_public_tls_key.pem START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIC4IVC96CJMs58Jv9UQMMtvdkic3Ivlzzx6AZiOTIo6qoAoGCCqGSM49
-AwEHoUQDQgAErvOhTbZ6YOeBqzoBkot+erfU+As2k06Rjb3vYHEp92x0deyVRq3C
-MRXQPrpvO8vWq+LszWjmHVocy/V+ryyjFw==
+MHcCAQEEIBEyRzHybBUKUdvn7xW1OJD0AOdsx4tw+/dUM1AKjy4soAoGCCqGSM49
+AwEHoUQDQgAEYYJ7taBPKXqiTrRH2jSGtWYzp0FVKtHbvdp2o0VTybboOS2gaJz3
+lkAely7qgZNv+he8TzY5ndSY3tQf9F5B8g==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -916,16 +899,16 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_public_tls_cert.pem START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIIB0zCCAXmgAwIBAgIUFXKgm49joHEO2/JgwMTGkqxYucswCgYIKoZIzj0EAwIw
-ETEPMA0GA1UEAxMGQ0EgS2V5MB4XDTIzMTIxNzA2MTAwMFoXDTQwMTIxMjA2MTAw
-MFowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABK7zoU22emDngas6AZKLfnq3
-1PgLNpNOkY2972BxKfdsdHXslUatwjEV0D66bzvL1qvi7M1o5h1aHMv1fq8soxej
+MIIB0jCCAXmgAwIBAgIUOVRp67uSGyFiPhDJyG1+3nd6CyowCgYIKoZIzj0EAwIw
+ETEPMA0GA1UEAxMGQ0EgS2V5MB4XDTI0MTExMzE1NTYwMFoXDTQxMTEwOTE1NTYw
+MFowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABGGCe7WgTyl6ok60R9o0hrVm
+M6dBVSrR273adqNFU8m26DktoGic95ZAHpcu6oGTb/oXvE82OZ3UmN7UH/ReQfKj
 gb8wgbwwDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEF
-BQcDAjAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBQY7DF/fuqV2uraikN0w7zZdDoD
-VTAfBgNVHSMEGDAWgBT8ui2xHlr0+GQMkGXxm7Y6ZSVGOzA9BgNVHREBAf8EMzAx
+BQcDAjAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBT/GJqNPoMFur0EEMiTbFJNTyVt
+TTAfBgNVHSMEGDAWgBT2TfyVisALQfqguf1vM8vgAM+8tzA9BgNVHREBAf8EMzAx
 gg1lcGwtaW5mcmEubmV0gg8qLmVwbC1pbmZyYS5uZXSCCWxvY2FsaG9zdIcEfwAA
-ATAKBggqhkjOPQQDAgNIADBFAiEAhvuw0GpetbyMgepkcZZV0rTT2uQ/iyKXHuDF
-gdlBjG4CIG1L4SCFCw7rIRNcFfsfLskAwb7K7SqftCeQHJ9Z3Qec
+ATAKBggqhkjOPQQDAgNHADBEAiBkC77f7lhdLvpU40V59XkUYs05nuIaWzMAOKFp
+jGsqWgIgeLqKUom004H+l92CrSB4ZPlWAfUB6L+t9yemSH5V/3Y=
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -942,22 +925,22 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_consul-tls-ca-cert.pem START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIIC7jCCApSgAwIBAgIRAJoVxci0dDJpuCcdtLCxhxowCgYIKoZIzj0EAwIwgbkx
+MIIC7TCCApSgAwIBAgIRAPHQlnY4UkK9q/62hD4T0ZEwCgYIKoZIzj0EAwIwgbkx
 CzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNU2FuIEZyYW5jaXNj
 bzEaMBgGA1UECRMRMTAxIFNlY29uZCBTdHJlZXQxDjAMBgNVBBETBTk0MTA1MRcw
 FQYDVQQKEw5IYXNoaUNvcnAgSW5jLjFAMD4GA1UEAxM3Q29uc3VsIEFnZW50IENB
-IDIwNDgxNDE2MTEyMTA3ODQ3MzI3MDc0NTc1MjA4ODgzNjQwOTExNDAeFw0yMzEy
-MTcwNjE0NTFaFw00MDEyMTIwNjE0NTFaMIG5MQswCQYDVQQGEwJVUzELMAkGA1UE
+IDMyMTQyNjk5NjQ1ODUzNDMwMTU5MjUyNzAzOTU2MjE4NjQ3Nzk2OTAeFw0yNDEx
+MTMxNjAwNDZaFw00MTExMDkxNjAwNDZaMIG5MQswCQYDVQQGEwJVUzELMAkGA1UE
 CBMCQ0ExFjAUBgNVBAcTDVNhbiBGcmFuY2lzY28xGjAYBgNVBAkTETEwMSBTZWNv
 bmQgU3RyZWV0MQ4wDAYDVQQREwU5NDEwNTEXMBUGA1UEChMOSGFzaGlDb3JwIElu
-Yy4xQDA+BgNVBAMTN0NvbnN1bCBBZ2VudCBDQSAyMDQ4MTQxNjExMjEwNzg0NzMy
-NzA3NDU3NTIwODg4MzY0MDkxMTQwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQ6
-i3rpK6UAXSHpyWCHs6CjQ9uCqN6BNBDXEwYerWLiG9dFxbYWl5iVeta0UpbvUKIc
-xMyguOkQiCN+BwEvWcn8o3sweTAOBgNVHQ8BAf8EBAMCAYYwDwYDVR0TAQH/BAUw
-AwEB/zApBgNVHQ4EIgQgiXDTwKJ4uBcjHX5M24vShXjO5COxj5pICd62722i23Uw
-KwYDVR0jBCQwIoAgiXDTwKJ4uBcjHX5M24vShXjO5COxj5pICd62722i23UwCgYI
-KoZIzj0EAwIDSAAwRQIhAKbbgbzuoHRyMbn5zmx4x8REnZ0y47y1i05nZ4JvYEP5
-AiAcfEUWJBvT7DYtLdCiXQucFHJsdltZ0P7yhBDYjaipmw==
+Yy4xQDA+BgNVBAMTN0NvbnN1bCBBZ2VudCBDQSAzMjE0MjY5OTY0NTg1MzQzMDE1
+OTI1MjcwMzk1NjIxODY0Nzc5NjkwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAATM
+uquHEwL+my2rYgyJd/BRgEBk6USbelBRkwFCVzQmCF+MkybtcC0ExrKWvxT8nf/A
+cO0hh74PhbwpfuhNzZ4Do3sweTAOBgNVHQ8BAf8EBAMCAYYwDwYDVR0TAQH/BAUw
+AwEB/zApBgNVHQ4EIgQgkFAxl4OuEjAwf8I/VsnHI+fEsrlBBBoT4c8u+nIP4rIw
+KwYDVR0jBCQwIoAgkFAxl4OuEjAwf8I/VsnHI+fEsrlBBBoT4c8u+nIP4rIwCgYI
+KoZIzj0EAwIDRwAwRAIgaQsVvN+ANmSeH4IScpDO2/CnYqfnPnOVgFlmJQ9gGBgC
+IAPsOXnKOelVuSdjqmTQHJvUlEvIDtdQQrpBnRD8ZxxS
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -975,7 +958,7 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 
 # NIX REGION secret_value_consul-agent-token.txt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
-aa9c049d-56ab-4a63-87a1-71e38983315f
+0665799a-0b6f-4cd3-8057-d59263b47e41
 LilBoiPeepLikesBenzTruck
 
 # NIX REGION secret_value_consul-agent-token.txt END
@@ -991,21 +974,21 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_consul-tls-server-cert.pem START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIICxDCCAmugAwIBAgIRANEjJV2SvmL6dWmW3KneUKgwCgYIKoZIzj0EAwIwgbkx
-CzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNU2FuIEZyYW5jaXNj
-bzEaMBgGA1UECRMRMTAxIFNlY29uZCBTdHJlZXQxDjAMBgNVBBETBTk0MTA1MRcw
-FQYDVQQKEw5IYXNoaUNvcnAgSW5jLjFAMD4GA1UEAxM3Q29uc3VsIEFnZW50IENB
-IDIwNDgxNDE2MTEyMTA3ODQ3MzI3MDc0NTc1MjA4ODgzNjQwOTExNDAeFw0yMzEy
-MTcwNjE0NTJaFw0yNDEyMTYwNjE0NTJaMCAxHjAcBgNVBAMTFXNlcnZlci51cy13
-ZXN0LmNvbnN1bDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABNYrT4BJtCp6e28x
-gAg3RVFMp1Kbqeg7rFSFfryH9k6qr5ZC8WkiJmtd3LCNqIuzgymOWSrhkIt5I8wR
-AXej7DajgeswgegwDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMB
-BggrBgEFBQcDAjAMBgNVHRMBAf8EAjAAMCkGA1UdDgQiBCCRqdcc7STcSI62tB3e
-v2K0J4/80hrALl4HGDnB9UkRmTArBgNVHSMEJDAigCCJcNPAoni4FyMdfkzbi9KF
-eM7kI7GPmkgJ3rbvbaLbdTBRBgNVHREESjBIgh5zZXJ2ZXItYy5zZXJ2ZXIudXMt
-d2VzdC5jb25zdWyCFXNlcnZlci51cy13ZXN0LmNvbnN1bIIJbG9jYWxob3N0hwR/
-AAABMAoGCCqGSM49BAMCA0cAMEQCIGcqULdpO29HpSSMf435e9dexKHb2eCU79/5
-t7PCAOtDAiACMakSLW6zN0fN1ySTuEJ1z3oPhiek7xHhEwzkcdvRUA==
+MIICxDCCAmqgAwIBAgIQby0Aaa8FO+iSyupFiQQwpTAKBggqhkjOPQQDAjCBuTEL
+MAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1TYW4gRnJhbmNpc2Nv
+MRowGAYDVQQJExExMDEgU2Vjb25kIFN0cmVldDEOMAwGA1UEERMFOTQxMDUxFzAV
+BgNVBAoTDkhhc2hpQ29ycCBJbmMuMUAwPgYDVQQDEzdDb25zdWwgQWdlbnQgQ0Eg
+MzIxNDI2OTk2NDU4NTM0MzAxNTkyNTI3MDM5NTYyMTg2NDc3OTY5MB4XDTI0MTEx
+MzE2MDA0NloXDTI1MTExMzE2MDA0NlowIDEeMBwGA1UEAxMVc2VydmVyLnVzLXdl
+c3QuY29uc3VsMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE4euZ06aelQ/df2R/
+9XZogGKouduw4w7Lb8+8U/bfrNZaXoCFi638H7c9VDFmRgYibteygM1WH+5dI+QC
+HijfNqOB6zCB6DAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEG
+CCsGAQUFBwMCMAwGA1UdEwEB/wQCMAAwKQYDVR0OBCIEIOvTU4GuCnK8YFwS7CV9
+vIjYgxoiJRgMPOvundt6AHkxMCsGA1UdIwQkMCKAIJBQMZeDrhIwMH/CP1bJxyPn
+xLK5QQQaE+HPLvpyD+KyMFEGA1UdEQRKMEiCHnNlcnZlci1jLnNlcnZlci51cy13
+ZXN0LmNvbnN1bIIVc2VydmVyLnVzLXdlc3QuY29uc3Vsgglsb2NhbGhvc3SHBH8A
+AAEwCgYIKoZIzj0EAwIDSAAwRQIhAKX3/lBTWzZ06UxVdm0Ykh5/6DnpijrKJWZ2
+JHYPzIPvAiA+e2l//Ao2bQ2KS5wRBtuLxM9jif+Qm1gZp7/qDUb2Ug==
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -1024,9 +1007,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_consul-tls-server-pkey.pem START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIMVN90RbnZLo9Sq1fRn4yHgpYrAcOiTTxLuSVK7GWgk5oAoGCCqGSM49
-AwEHoUQDQgAE1itPgEm0Knp7bzGACDdFUUynUpup6DusVIV+vIf2TqqvlkLxaSIm
-a13csI2oi7ODKY5ZKuGQi3kjzBEBd6PsNg==
+MHcCAQEEIH8f17HOtV6LVtHbj9cjDeEaapNtguXtYh18szEDDAMdoAoGCCqGSM49
+AwEHoUQDQgAE4euZ06aelQ/df2R/9XZogGKouduw4w7Lb8+8U/bfrNZaXoCFi638
+H7c9VDFmRgYibteygM1WH+5dI+QCHijfNg==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -1044,7 +1027,7 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 
 # NIX REGION secret_value_consul-management-token.txt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
-e667d3e2-75cf-4938-b854-9f4a574a9c49
+a1635fca-d628-4200-a97b-3831efc52d88
 LilBoiPeepLikesBenzTruck
 
 # NIX REGION secret_value_consul-management-token.txt END
@@ -1059,7 +1042,7 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 
 # NIX REGION secret_value_consul-default-token.txt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
-ce9be2ca-5865-4eb3-9bb0-2bcace5d9262
+993b059e-bd3a-44a2-928e-e0e1334a6886
 LilBoiPeepLikesBenzTruck
 
 # NIX REGION secret_value_consul-default-token.txt END
@@ -1074,7 +1057,7 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 
 # NIX REGION secret_value_consul-fast-l1-token.txt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
-cbe7fc30-1393-4bf8-b718-a22f306f1bd3
+5b7ead8e-5f29-437e-b533-3b7173fd2887
 LilBoiPeepLikesBenzTruck
 
 # NIX REGION secret_value_consul-fast-l1-token.txt END
@@ -1089,7 +1072,7 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 
 # NIX REGION secret_value_consul-vrrp-token-dc1.txt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
-09cf448a-7737-4e9f-a0bc-3b85d2b5bfda
+296cf2b1-c9f4-4021-aaa7-b1c1c247c58b
 LilBoiPeepLikesBenzTruck
 
 # NIX REGION secret_value_consul-vrrp-token-dc1.txt END
@@ -1104,7 +1087,7 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 
 # NIX REGION secret_value_consul-vrrp-token-dc2.txt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
-8609c2f9-d67f-4d67-b361-bbded98bd0a4
+3671ce90-8054-4649-9e30-955485289b8a
 LilBoiPeepLikesBenzTruck
 
 # NIX REGION secret_value_consul-vrrp-token-dc2.txt END
@@ -1119,7 +1102,7 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 
 # NIX REGION secret_value_consul-vrrp-token-dc3.txt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
-124abcb0-230f-4793-a6f2-4d07a06ce810
+0591e4d0-b02f-4df0-9ca6-83d2bae9a571
 LilBoiPeepLikesBenzTruck
 
 # NIX REGION secret_value_consul-vrrp-token-dc3.txt END
@@ -1134,7 +1117,7 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 
 # NIX REGION secret_value_nomad-server-consul-acl-token.txt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
-906dfc6b-9138-41ca-a37d-6ca899ce6861
+d28ab4b4-160a-4ace-aada-48bce760070c
 LilBoiPeepLikesBenzTruck
 
 # NIX REGION secret_value_nomad-server-consul-acl-token.txt END
@@ -1149,7 +1132,7 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 
 # NIX REGION secret_value_nomad-client-consul-acl-token.txt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
-c04780fa-40d9-4220-bfe3-74bc53ee3024
+cb2032d5-a499-4d18-9290-bdaa4bacb366
 LilBoiPeepLikesBenzTruck
 
 # NIX REGION secret_value_nomad-client-consul-acl-token.txt END
@@ -1165,14 +1148,14 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-ca.crt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIIBYzCCAQqgAwIBAgIUcwf2Wx0BAcab9GKxA/3NBEqkYLgwCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjMxMjE3MDYxMDAwWhcNNDAxMjEyMDYxMDAw
-WjAQMQ4wDAYDVQQDEwVub21hZDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABLVj
-Pe+gqLwyF3DQMRAabqVvVBJ8+BhSHpF5F9ps9x8pO9oym8WUsMEDDQy5MWOqryIY
-kcm2w6yeFqQtI2wkGy6jQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTAD
-AQH/MB0GA1UdDgQWBBQZUCUg2M10b1hICyW+TrTBDwZpBjAKBggqhkjOPQQDAgNH
-ADBEAiAsPC7WS/zkA2vtfdQsEkENH9qeLOIAqLdoCbi+N+9ktAIgYcMpR0b5tfQr
-yfNQWyGeMzoFRZ8sgpeOXVWXki2Cqmw=
+MIIBZDCCAQqgAwIBAgIUZQsXaNv36QnkwJ1GOgMadgUIEVowCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjQxMTEzMTU1NjAwWhcNNDExMTA5MTU1NjAw
+WjAQMQ4wDAYDVQQDEwVub21hZDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABNIz
+FpB3q+GpZHzrH4tOcOX+fRGI3thIMXIpDikibedU73aIpujCCQLBbJn+c4HIvumm
+83muuihA40ieiKRIbdijQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTAD
+AQH/MB0GA1UdDgQWBBT+jXj08/ibrpdTJPrdOm9pyHceoTAKBggqhkjOPQQDAgNI
+ADBFAiEA2GyEg/eg2Dn1OkAxqOTzK5l1DH4qDz4IhHvQb7Q30IcCIGCYILlXPBVd
+4wiYWPBXMft1ENdgWWjCK5uQOo1NfqfA
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -1189,16 +1172,16 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-client.crt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIIByTCCAW6gAwIBAgIUVy6pBeFL0brYMIn699CNGCZsHHswCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjMxMjE3MDYxMDAwWhcNMjQxMjE2MDYxMDAw
-WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEqynoZZr29DGRHQr2AtmX+QxV
-n9t6ohgWGYS/O2muj8H6OMWhhazXdI58suz7OPyyaTXTa2LAjzvSmE0I3wYoQaOB
+MIIByDCCAW6gAwIBAgIUHsCcloPE2YUJcE4t+fqpa21LfNcwCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjQxMTEzMTU1NjAwWhcNMjUxMTEzMTU1NjAw
+WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAERoeaUPbeUMnQSL+s3mr0dnhn
+NJJFEUuq2OXZnUGqMbjgXyxjNB7+V0/xTSinWwvLO3UKe2c0ijwxQycH73i8T6OB
 tTCBsjAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUF
-BwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFBi11rACTQk3RxSyZgY7mu2DnIvO
-MB8GA1UdIwQYMBaAFBlQJSDYzXRvWEgLJb5OtMEPBmkGMDMGA1UdEQEB/wQpMCeC
+BwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFJXB6waOz+FX0daqi0qD1jEKSR6T
+MB8GA1UdIwQYMBaAFP6NePTz+Juul1Mk+t06b2nIdx6hMDMGA1UdEQEB/wQpMCeC
 FGNsaWVudC51cy13ZXN0Lm5vbWFkgglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0E
-AwIDSQAwRgIhAICprW8BT50Ve42OSxtrrgIukM+QDKSspciG+Owgt4nkAiEAzmO0
-FCtlKhlBJUOi2IpcN/rVkEdVXVQMCIkQTrx/GhE=
+AwIDSAAwRQIgLk/0rVlcNpLXsp5yFY4DF0BRrohni13LCXInyXDhThACIQDji7YT
+hk57KpxKjqvmNjftJX3AfTmF6u3gqxBHSta0/w==
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -1215,9 +1198,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-client.key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIEu00vyEr5PNNBI0EzOcawOaTuHqH5Ad+qLITmsbPdZMoAoGCCqGSM49
-AwEHoUQDQgAEqynoZZr29DGRHQr2AtmX+QxVn9t6ohgWGYS/O2muj8H6OMWhhazX
-dI58suz7OPyyaTXTa2LAjzvSmE0I3wYoQQ==
+MHcCAQEEIG0j2LoiFFwLYQibGytMV+pmCF3s6lYxknfnb2mdvyoCoAoGCCqGSM49
+AwEHoUQDQgAERoeaUPbeUMnQSL+s3mr0dnhnNJJFEUuq2OXZnUGqMbjgXyxjNB7+
+V0/xTSinWwvLO3UKe2c0ijwxQycH73i8Tw==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -1234,14 +1217,14 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_vault-ca.crt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIIBZDCCAQqgAwIBAgIUKJGRPQ0w0nLzoNYftEqb9Qqk7AwwCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFdmF1bHQwHhcNMjMxMjE3MDYxMDAwWhcNNDAxMjEyMDYxMDAw
-WjAQMQ4wDAYDVQQDEwV2YXVsdDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABI0r
-mro4rc4aaNwfFajPMuDVsfsoHuOw4K1FF4524iZ5Yfw4mlOU0PDWMjTjNHAUQhdU
-JETmg35q6Tn5imq5v82jQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTAD
-AQH/MB0GA1UdDgQWBBSfhC32z/CuhNhrc5hGF2wVJrLDFjAKBggqhkjOPQQDAgNI
-ADBFAiEAo+RsRay1tItvzyeJDfDb2gja7DVsL/cXCzJb6gn6B6UCIAZ+O5ZoouUS
-EinlUnb7MGKl0z5/dCH8pzSnisY3Amto
+MIIBZTCCAQqgAwIBAgIUFx7nNX8GaKl1b75hby6DOwzdujMwCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFdmF1bHQwHhcNMjQxMTEzMTU1NjAwWhcNNDExMTA5MTU1NjAw
+WjAQMQ4wDAYDVQQDEwV2YXVsdDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABK6a
+IshvWc5dXp4iHolpWhToFQUmsY9Tci/XgciqWr4flR1qqFh1jtqpd1ZWJTFc1KFY
+UACK1f2r47NyledWrzKjQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTAD
+AQH/MB0GA1UdDgQWBBRcinhG7Fb0K3zRQuWZsUtwX2iAWzAKBggqhkjOPQQDAgNJ
+ADBGAiEA3RkbJvx55+k05Arnrp+/unmA6N7hbTKcOqTH+Nah8yACIQDeDwxd569z
+FKD1ediXQ707FbNxf0vBI+58D0dyWUN7RQ==
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -1258,7 +1241,7 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 
 # NIX REGION secret_value_vault-service-consul-acl-token.txt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
-43a9c688-f364-406a-8173-5ab26225531a
+90c23fd6-2d12-4297-97ab-61d80f68ad8e
 LilBoiPeepLikesBenzTruck
 
 # NIX REGION secret_value_vault-service-consul-acl-token.txt END
@@ -1274,19 +1257,19 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_vault-instance.crt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIICQzCCAemgAwIBAgIUWR1jJzla61r0ZyDvNgOrVNlmdi8wCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFdmF1bHQwHhcNMjMxMjE3MDYxMDAwWhcNMjQxMjE2MDYxMDAw
-WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE43ub1sV7sn/GiW3+3mohqACN
-wvlxbV5I9tBOt2kIG16UuRjUwZnc/+3AggiKKU0RCriueT8yfk7VU5trkK2/XKOC
+MIICQjCCAemgAwIBAgIUcUfTIom0pZOGwIHOsLgJ1CJk0xgwCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFdmF1bHQwHhcNMjQxMTEzMTU1NjAwWhcNMjUxMTEzMTU1NjAw
+WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAETPkDN0n8j4ireCCes1d651ET
+/iAowj75XYdlNbbZRSR2jXqiYWSyLY84ehWaBYr3KgMK+HRulLVM15yUKxRYa6OC
 AS8wggErMA4GA1UdDwEB/wQEAwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYB
-BQUHAwIwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQUR3IekYXzR6VAii00f/GNWOun
-cwYwHwYDVR0jBBgwFoAUn4Qt9s/wroTYa3OYRhdsFSaywxYwgasGA1UdEQEB/wSB
+BQUHAwIwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQUFSlD3GkCUyatVSCa33rCz6zE
+VYwwHwYDVR0jBBgwFoAUXIp4RuxW9Ct80ULlmbFLcF9ogFswgasGA1UdEQEB/wSB
 oDCBnYIec2VydmVyLWMudXMtd2VzdC5lcGwtaW5mcmEubmV0ghR2YXVsdC5zZXJ2
 aWNlLmNvbnN1bIIWKi52YXVsdC5zZXJ2aWNlLmNvbnN1bIIcdmF1bHQuc2Vydmlj
 ZS51cy13ZXN0LmNvbnN1bIIeKi52YXVsdC5zZXJ2aWNlLnVzLXdlc3QuY29uc3Vs
-gglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0EAwIDSAAwRQIhAPP3EeKfsA7jLPYM
-L8GytF0Wx7TWm6PlGajOynRMpH3DAiAE8GtrzMCq69LI8wFKX1387V1lbtsK8WZM
-ZJ+CholBOQ==
+gglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0EAwIDRwAwRAIgFoFTOaM1NQRt0opW
+ksgIKrm0G8P68pSxzH7s6FZJ7/8CIAdkN8ieT3By5i0hktDrDM9Ga3rej+TKL/NQ
+VLKo9kKI
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -1305,9 +1288,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_vault-instance.key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIJBe1C7AxNBd2wmQ4+ois61IGHDEQdOGRa19bwzZE73AoAoGCCqGSM49
-AwEHoUQDQgAE43ub1sV7sn/GiW3+3mohqACNwvlxbV5I9tBOt2kIG16UuRjUwZnc
-/+3AggiKKU0RCriueT8yfk7VU5trkK2/XA==
+MHcCAQEEIH12HUCM3Mode81sVnT1tjLtj5hVsGgTXJPfBuotaxoVoAoGCCqGSM49
+AwEHoUQDQgAETPkDN0n8j4ireCCes1d651ET/iAowj75XYdlNbbZRSR2jXqiYWSy
+LY84ehWaBYr3KgMK+HRulLVM15yUKxRYaw==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -1325,7 +1308,7 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 
 # NIX REGION secret_value_epl-wireguard-key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
-uExVzaeHcaC59oSWDWaJSo1XU0UaZn0fXU4jLW8IIXM=
+mMlRtxQ4Ipy8HsKrMYhtlmKXNNRLSPpk+Qn9QZDkpnM=
 LilBoiPeepLikesBenzTruck
 
 # NIX REGION secret_value_epl-wireguard-key END
@@ -1340,7 +1323,7 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 
 # NIX REGION secret_value_consul-vrrp-token.txt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
-8609c2f9-d67f-4d67-b361-bbded98bd0a4
+3671ce90-8054-4649-9e30-955485289b8a
 LilBoiPeepLikesBenzTruck
 
 # NIX REGION secret_value_consul-vrrp-token.txt END
@@ -1452,14 +1435,14 @@ function provision_zfs_dataset() {
 }
 mkdir -m 700 -p /srv/volumes
 zpool import -af
-provision_zfs_dataset rpool consul /var/lib/consul 4k on no 7j3yRiRPfUXhQjfhmcWXTMQyVtv8ZvGeYkAGNcXRU5
+provision_zfs_dataset rpool consul /var/lib/consul 4k on no DCPqjrivanbV6Otyhy6guN1GkZfeTeJffMc6JPLhJ9
 provision_zfs_dataset rpool docker /var/lib/docker 128k on no
-provision_zfs_dataset rpool minio-docker-c /srv/volumes/minio-docker-c 1M on yes 7rqEXn6Ejt8F2oLP1lDS2YWfgESeGKZclMOaq4f7c8
-provision_zfs_dataset rpool mon-am /srv/volumes/mon-am 4k on yes aC2APiwIhOmWZVm6dyU9ixFtAkad3i6DOrJYXFCAkY
-provision_zfs_dataset rpool mon-default /srv/volumes/mon-default 4k on yes wCOPnMWr9AqQngfmksf95wF3JU57wQNMMNT1iBodA4
-provision_zfs_dataset rpool nats1 /srv/volumes/nats1 4k on yes 0kKJwnMlfjRl5oKy2fQ5K4uMcYw89xpH4pGTK5Qe5n
-provision_zfs_dataset rpool pgtest1 /srv/volumes/pgtest1 4k on yes PTGT3IJEqrrIY93xbP0571Xbhe9ouv3zYKpraXbWh1
-provision_zfs_dataset rpool vault /var/lib/vault 4k on no 2MXyS5Qn24ZHT1uiXPrn3u6CF9VRXCqW7ddji6PjCq
+provision_zfs_dataset rpool minio-docker-c /srv/volumes/minio-docker-c 1M on yes a4hkO7al8GoG8xxQKbJMOfINIa4LGTvVmA6tgiTwU5
+provision_zfs_dataset rpool mon-am /srv/volumes/mon-am 4k on yes Pnm1yCmeYmNa1u1yC6AnSVlRo9vsQ58DqkZaXd0Z3Z
+provision_zfs_dataset rpool mon-default /srv/volumes/mon-default 4k on yes MaEyBD5eK9I6CbzA0UdPzceF0dv1sfSDMdZ4rPE884
+provision_zfs_dataset rpool nats1 /srv/volumes/nats1 4k on yes 9GluUQDutYneeuluP9EWtaIgK0cBiEfnuJNF7OxwoA
+provision_zfs_dataset rpool pgtest1 /srv/volumes/pgtest1 4k on yes 4WgFF1TiieZVck43pDcFgRiJyUMZDzFxkJvk4QLVOQ
+provision_zfs_dataset rpool vault /var/lib/vault 4k on no sUl9q0RqEfgQM5mx91GUNWoYqAJWhvg5Wn1FcyCa6k
 
 mkdir -p /etc/nixos
 pushd /etc/nixos
@@ -1490,7 +1473,7 @@ in
         "https://cache.nixos.org/"
       ];
       trusted-public-keys = [
-        "epl-nix-cache:knUE4VbRh9LazjdBw2qsBAMPgtyf5OI7cAVqF1hLuyw="
+        "epl-nix-cache:W9BBOh3S33CuuDIvYZHGC9MdVkJKLOZGDp5MVzdC01o="
       ];
 
     };
@@ -1508,7 +1491,7 @@ in
       home = "/home/admin";
       extraGroups = [ "docker" "wheel" "epl-prov" ];
       openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIONUZdMtNbaNBA+F2IS18RAcVToqkvGVDw4/3nFvE9TR epl-root-ssh-key"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFbis+BzEk38EuddzQHZiFVsw8ATqnLYO0eFcWm/5xRG epl-root-ssh-key"
       "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC3AkuDzzPrMaDav0kN7PIoaBU1Vtw1TfkHxWzPMrleocCltYl8TljwCqEJtmizx5DGKbXFQg31mRVswzuAq2vP2RFdPHQxfl5nJnWsQkelvpPO/Q3LUdtrm19zAgbbDL+AtIg3/lif6/2qNiWCSTfaUpjM7WOPszBNmMRGz/UBZTYc7COTt+I3lK8f6sBn5YyD796LBw6tsNpqfqF9NTAsLT8/PqrXeTpdxFe375gMxeIpNWeE5exMGJKgqnZCcOMOoKMJy61+wdEAYzDFNgIX7ZFvpBYQPf/rTs7LWgtyTSw3fqvMDnfwAf7oIF8rZRwYdVnqTGCWA2h3f4lOf6BERIPkKEK7/DGjmekKnXJrRiLSfcgRjri3VuGBxrJ+Va/Dn6e7o7CdzdJ+fkw7KxTFKuf17Z2r3ZFi1xOduIxXW8/QY6zhq2A11e+HsMe/oaBh3bRcpdMFmW5mqQjGm05xvxArSCAARBKkHjywGs6mRLN2PjNPYdzlI2J8nF6bmSk= henlo"
 
       ];
@@ -1536,38 +1519,38 @@ in
 
     security.pki.certificates = [
       ''-----BEGIN CERTIFICATE-----
-MIIB0zCCAXmgAwIBAgIUFXKgm49joHEO2/JgwMTGkqxYucswCgYIKoZIzj0EAwIw
-ETEPMA0GA1UEAxMGQ0EgS2V5MB4XDTIzMTIxNzA2MTAwMFoXDTQwMTIxMjA2MTAw
-MFowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABK7zoU22emDngas6AZKLfnq3
-1PgLNpNOkY2972BxKfdsdHXslUatwjEV0D66bzvL1qvi7M1o5h1aHMv1fq8soxej
+MIIB0jCCAXmgAwIBAgIUOVRp67uSGyFiPhDJyG1+3nd6CyowCgYIKoZIzj0EAwIw
+ETEPMA0GA1UEAxMGQ0EgS2V5MB4XDTI0MTExMzE1NTYwMFoXDTQxMTEwOTE1NTYw
+MFowADBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABGGCe7WgTyl6ok60R9o0hrVm
+M6dBVSrR273adqNFU8m26DktoGic95ZAHpcu6oGTb/oXvE82OZ3UmN7UH/ReQfKj
 gb8wgbwwDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEF
-BQcDAjAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBQY7DF/fuqV2uraikN0w7zZdDoD
-VTAfBgNVHSMEGDAWgBT8ui2xHlr0+GQMkGXxm7Y6ZSVGOzA9BgNVHREBAf8EMzAx
+BQcDAjAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBT/GJqNPoMFur0EEMiTbFJNTyVt
+TTAfBgNVHSMEGDAWgBT2TfyVisALQfqguf1vM8vgAM+8tzA9BgNVHREBAf8EMzAx
 gg1lcGwtaW5mcmEubmV0gg8qLmVwbC1pbmZyYS5uZXSCCWxvY2FsaG9zdIcEfwAA
-ATAKBggqhkjOPQQDAgNIADBFAiEAhvuw0GpetbyMgepkcZZV0rTT2uQ/iyKXHuDF
-gdlBjG4CIG1L4SCFCw7rIRNcFfsfLskAwb7K7SqftCeQHJ9Z3Qec
+ATAKBggqhkjOPQQDAgNHADBEAiBkC77f7lhdLvpU40V59XkUYs05nuIaWzMAOKFp
+jGsqWgIgeLqKUom004H+l92CrSB4ZPlWAfUB6L+t9yemSH5V/3Y=
 -----END CERTIFICATE-----
 ''
       ''-----BEGIN CERTIFICATE-----
-MIIBYzCCAQqgAwIBAgIUcwf2Wx0BAcab9GKxA/3NBEqkYLgwCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjMxMjE3MDYxMDAwWhcNNDAxMjEyMDYxMDAw
-WjAQMQ4wDAYDVQQDEwVub21hZDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABLVj
-Pe+gqLwyF3DQMRAabqVvVBJ8+BhSHpF5F9ps9x8pO9oym8WUsMEDDQy5MWOqryIY
-kcm2w6yeFqQtI2wkGy6jQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTAD
-AQH/MB0GA1UdDgQWBBQZUCUg2M10b1hICyW+TrTBDwZpBjAKBggqhkjOPQQDAgNH
-ADBEAiAsPC7WS/zkA2vtfdQsEkENH9qeLOIAqLdoCbi+N+9ktAIgYcMpR0b5tfQr
-yfNQWyGeMzoFRZ8sgpeOXVWXki2Cqmw=
+MIIBZDCCAQqgAwIBAgIUZQsXaNv36QnkwJ1GOgMadgUIEVowCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjQxMTEzMTU1NjAwWhcNNDExMTA5MTU1NjAw
+WjAQMQ4wDAYDVQQDEwVub21hZDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABNIz
+FpB3q+GpZHzrH4tOcOX+fRGI3thIMXIpDikibedU73aIpujCCQLBbJn+c4HIvumm
+83muuihA40ieiKRIbdijQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTAD
+AQH/MB0GA1UdDgQWBBT+jXj08/ibrpdTJPrdOm9pyHceoTAKBggqhkjOPQQDAgNI
+ADBFAiEA2GyEg/eg2Dn1OkAxqOTzK5l1DH4qDz4IhHvQb7Q30IcCIGCYILlXPBVd
+4wiYWPBXMft1ENdgWWjCK5uQOo1NfqfA
 -----END CERTIFICATE-----
 ''
       ''-----BEGIN CERTIFICATE-----
-MIIBZDCCAQqgAwIBAgIUKJGRPQ0w0nLzoNYftEqb9Qqk7AwwCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFdmF1bHQwHhcNMjMxMjE3MDYxMDAwWhcNNDAxMjEyMDYxMDAw
-WjAQMQ4wDAYDVQQDEwV2YXVsdDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABI0r
-mro4rc4aaNwfFajPMuDVsfsoHuOw4K1FF4524iZ5Yfw4mlOU0PDWMjTjNHAUQhdU
-JETmg35q6Tn5imq5v82jQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTAD
-AQH/MB0GA1UdDgQWBBSfhC32z/CuhNhrc5hGF2wVJrLDFjAKBggqhkjOPQQDAgNI
-ADBFAiEAo+RsRay1tItvzyeJDfDb2gja7DVsL/cXCzJb6gn6B6UCIAZ+O5ZoouUS
-EinlUnb7MGKl0z5/dCH8pzSnisY3Amto
+MIIBZTCCAQqgAwIBAgIUFx7nNX8GaKl1b75hby6DOwzdujMwCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFdmF1bHQwHhcNMjQxMTEzMTU1NjAwWhcNNDExMTA5MTU1NjAw
+WjAQMQ4wDAYDVQQDEwV2YXVsdDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABK6a
+IshvWc5dXp4iHolpWhToFQUmsY9Tci/XgciqWr4flR1qqFh1jtqpd1ZWJTFc1KFY
+UACK1f2r47NyledWrzKjQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTAD
+AQH/MB0GA1UdDgQWBBRcinhG7Fb0K3zRQuWZsUtwX2iAWzAKBggqhkjOPQQDAgNJ
+ADBGAiEA3RkbJvx55+k05Arnrp+/unmA6N7hbTKcOqTH+Nah8yACIQDeDwxd569z
+FKD1ediXQ707FbNxf0vBI+58D0dyWUN7RQ==
 -----END CERTIFICATE-----
 ''
     ];
@@ -2347,13 +2330,13 @@ done
         ];
         extraConfig = ''
           trust-anchors {
-  epl-infra.net. initial-key 257 3 15 "3V0DydHMIEmN+PDJZxVEOHHU1QPVKkIxS6Y2iPyaHuQ=";
-  us-west.epl-infra.net. initial-key 257 3 15 "k5nxYOGcYIC66fP80Z7nVeVWmZQGaJvlCQGncoKvLyM=";
-  10.in-addr.arpa. initial-key 257 3 15 "EDcnSNMxM8jFNAzwt7sdpd2osA90HOAOw3OobPEe9VM=";
-  17.10.in-addr.arpa. initial-key 257 3 15 "azn82AbZk0vfsYtNcKTofCYwfBqjmlWeLEtKqVHxwk8=";
-  18.10.in-addr.arpa. initial-key 257 3 15 "Xf1YznaHMJkisSXa6QunCmivRgtYxPylLhpOs3uBtwE=";
-  19.10.in-addr.arpa. initial-key 257 3 15 "20BS8hmIKY1gzYl7RHPoNTcB1luZ2Yay88E/PT9l6vY=";
-  in-addr.arpa. initial-key 257 3 15 "pFGF/hEQu2aUEkeLvjCqKF7meN68e/b1hSMFmec7+7o=";
+  epl-infra.net. initial-key 257 3 15 "cEnK6luP7tcwXWMHy8LSuy7LJbN2cg527QymP8tYzyU=";
+  us-west.epl-infra.net. initial-key 257 3 15 "E89hMzBmYjGCw/COGh39yXprrfzDbqsWNWYpajvzTwM=";
+  10.in-addr.arpa. initial-key 257 3 15 "/9VNyAR/OCaafL3Yrpra1C4FM54FpAy514yxABi6+qo=";
+  17.10.in-addr.arpa. initial-key 257 3 15 "fSn3WSw+rvl/snYdXqbO+33N43Kdrpy4rXlKBm8/IlE=";
+  18.10.in-addr.arpa. initial-key 257 3 15 "/OS7qDr60vCC7/Y2Zn2KJeqAAyOFfPtVodRRhlAhxzU=";
+  19.10.in-addr.arpa. initial-key 257 3 15 "w/mFoOy4B8rm/BWhe99z/DUy1205Q76PxHWAegWT/uo=";
+  in-addr.arpa. initial-key 257 3 15 "dqKIja/yAVZ7/QpRWPpPoEXn0+UtTECL/DbkL15md00=";
 };
 
 
@@ -2717,9 +2700,9 @@ wg set "wg0" private-key "/run/keys/epl-wireguard-key" listen-port "51820"
 ip link set up dev "wg0"
 
 # peers
-wg set wg0 peer "DyMxArxtervvFETX/B0o5DFW0hw9FxQAMQ8zVdW/xWs=" allowed-ips "172.21.7.254/32"
+wg set wg0 peer "siicT83i7PoJLy1Xo/t5QVLIdk4u+iu9YIIh++YK0Ts=" allowed-ips "172.21.7.254/32"
 
-wg set wg0 peer "6zcv2TP74mzwko4I4GsoGS87ZnTo0gKfyBpBMggQM1M=" allowed-ips "172.21.7.14/32,10.19.0.0/16" endpoint "34.212.47.215:51820"
+wg set wg0 peer "ilZx3xtxFQSk3SRP0Ew1mrY8Fdp5XXG3hP8zG9idbXc=" allowed-ips "172.21.7.14/32,10.19.0.0/16" endpoint "34.212.47.215:51820"
 
     '';
 
@@ -2821,7 +2804,7 @@ wg set wg0 peer "6zcv2TP74mzwko4I4GsoGS87ZnTo0gKfyBpBMggQM1M=" allowed-ips "172.
           ip ospf cost 500
           ip ospf hello-interval 1
           ip ospf dead-interval 3
-          ip ospf message-digest-key 12 md5 ZQc9QPGe7JGWDK6f
+          ip ospf message-digest-key 12 md5 0zfLIkGGsqRGu2GG
           ip ospf authentication message-digest
           ip ospf network non-broadcast
       '';
@@ -2855,13 +2838,13 @@ wg set wg0 peer "6zcv2TP74mzwko4I4GsoGS87ZnTo0gKfyBpBMggQM1M=" allowed-ips "172.
             network 10.18.0.0/16
           exit-address-family
           neighbor 10.18.0.11 remote-as 64530
-          neighbor 10.18.0.11 password wGDTbDZl4mBrLgVDNaM0vbUj4xGEX3thSBRVwxgZbJ
+          neighbor 10.18.0.11 password 5GtjphImQld0EfmdzZMpcxNVcYiQFvYUzHR2OPW3fg
           neighbor 10.18.0.11 bfd
           neighbor 172.21.7.10 remote-as 64529
-          neighbor 172.21.7.10 password 6CU8kT4y2NR0KHmBogQPwW1d42zXYq9xZa1aN9mlGX
+          neighbor 172.21.7.10 password pcZY9sta2hbGFl4wojRewN73Mlo6tC1Xcn47qO9ybO
           neighbor 172.21.7.10 bfd
           neighbor 172.21.7.14 remote-as 64531
-          neighbor 172.21.7.14 password xhfDhWT286D0NF73DM75yAbG3xHpLxko1ECge1omts
+          neighbor 172.21.7.14 password b7GfdEeBEALUbhmVY9A1IetEqRAa5DwQX2D5MuzPqq
           neighbor 172.21.7.14 bfd
           address-family ipv4 unicast
             network 10.18.0.0/16
@@ -3112,7 +3095,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"68dd13d3bc25d5207b0a1e54eb98bf79d2705217716ef6c638c9c812847990e3\",hostname=\"server-c\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"aa728023054cef1b3c03ec04311897e5c8286af550058b7daa12299915c19650\",hostname=\"server-c\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE

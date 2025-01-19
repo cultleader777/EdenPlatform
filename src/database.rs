@@ -752,6 +752,7 @@ pub struct TableRowDatacenter {
     pub implementation_settings: ::std::string::String,
     pub default_server_kind: TableRowPointerServerKind,
     pub disk_ids_policy: ::std::string::String,
+    pub router_subnet_vlan_id: i64,
     pub referrers_server__dc: Vec<TableRowPointerServer>,
 }
 
@@ -913,6 +914,7 @@ pub struct TableRowGlobalSettings {
     pub disable_region_tracing_tests: bool,
     pub disable_region_logging_tests: bool,
     pub disable_vpn_gateway_tests: bool,
+    pub hetzner_inter_dc_vlan_id: i64,
     pub experimental_enable_arm64_support: bool,
     pub update_edl_public_ips_from_terraform: bool,
     pub enable_ipv6: bool,
@@ -1121,6 +1123,7 @@ pub struct TableRowNetworkInterface {
     pub if_network: TableRowPointerNetwork,
     pub if_ip: ::std::string::String,
     pub if_prefix: i64,
+    pub if_vlan: i64,
     pub parent: TableRowPointerServer,
     pub referrers_server__ssh_interface: Vec<TableRowPointerServer>,
 }
@@ -2012,6 +2015,7 @@ pub struct TableDefinitionDatacenter {
     c_implementation_settings: Vec<::std::string::String>,
     c_default_server_kind: Vec<TableRowPointerServerKind>,
     c_disk_ids_policy: Vec<::std::string::String>,
+    c_router_subnet_vlan_id: Vec<i64>,
     c_referrers_server__dc: Vec<Vec<TableRowPointerServer>>,
 }
 
@@ -2173,6 +2177,7 @@ pub struct TableDefinitionGlobalSettings {
     c_disable_region_tracing_tests: Vec<bool>,
     c_disable_region_logging_tests: Vec<bool>,
     c_disable_vpn_gateway_tests: Vec<bool>,
+    c_hetzner_inter_dc_vlan_id: Vec<i64>,
     c_experimental_enable_arm64_support: Vec<bool>,
     c_update_edl_public_ips_from_terraform: Vec<bool>,
     c_enable_ipv6: Vec<bool>,
@@ -2381,6 +2386,7 @@ pub struct TableDefinitionNetworkInterface {
     c_if_network: Vec<TableRowPointerNetwork>,
     c_if_ip: Vec<::std::string::String>,
     c_if_prefix: Vec<i64>,
+    c_if_vlan: Vec<i64>,
     c_parent: Vec<TableRowPointerServer>,
     c_referrers_server__ssh_interface: Vec<Vec<TableRowPointerServer>>,
 }
@@ -4570,6 +4576,7 @@ impl Database {
         let datacenter_implementation_settings: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
         let datacenter_default_server_kind: Vec<TableRowPointerServerKind> = ::bincode::deserialize_from(&mut cursor)?;
         let datacenter_disk_ids_policy: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let datacenter_router_subnet_vlan_id: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let datacenter_referrers_server__dc: Vec<Vec<TableRowPointerServer>> = ::bincode::deserialize_from(&mut cursor)?;
 
         let datacenter_len = datacenter_referrers_server__dc.len();
@@ -4582,6 +4589,7 @@ impl Database {
         assert_eq!(datacenter_len, datacenter_implementation_settings.len());
         assert_eq!(datacenter_len, datacenter_default_server_kind.len());
         assert_eq!(datacenter_len, datacenter_disk_ids_policy.len());
+        assert_eq!(datacenter_len, datacenter_router_subnet_vlan_id.len());
 
         let mut rows_datacenter: Vec<TableRowDatacenter> = Vec::with_capacity(datacenter_len);
         #[allow(clippy::needless_range_loop)]
@@ -4595,6 +4603,7 @@ impl Database {
                 implementation_settings: datacenter_implementation_settings[row].clone(),
                 default_server_kind: datacenter_default_server_kind[row],
                 disk_ids_policy: datacenter_disk_ids_policy[row].clone(),
+                router_subnet_vlan_id: datacenter_router_subnet_vlan_id[row],
                 referrers_server__dc: datacenter_referrers_server__dc[row].clone(),
             });
         }
@@ -5003,6 +5012,7 @@ impl Database {
         let global_settings_disable_region_tracing_tests: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let global_settings_disable_region_logging_tests: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let global_settings_disable_vpn_gateway_tests: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
+        let global_settings_hetzner_inter_dc_vlan_id: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let global_settings_experimental_enable_arm64_support: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let global_settings_update_edl_public_ips_from_terraform: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let global_settings_enable_ipv6: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
@@ -5029,6 +5039,7 @@ impl Database {
         assert_eq!(global_settings_len, global_settings_disable_region_tracing_tests.len());
         assert_eq!(global_settings_len, global_settings_disable_region_logging_tests.len());
         assert_eq!(global_settings_len, global_settings_disable_vpn_gateway_tests.len());
+        assert_eq!(global_settings_len, global_settings_hetzner_inter_dc_vlan_id.len());
         assert_eq!(global_settings_len, global_settings_experimental_enable_arm64_support.len());
         assert_eq!(global_settings_len, global_settings_update_edl_public_ips_from_terraform.len());
         assert_eq!(global_settings_len, global_settings_enable_ipv6.len());
@@ -5056,6 +5067,7 @@ impl Database {
                 disable_region_tracing_tests: global_settings_disable_region_tracing_tests[row],
                 disable_region_logging_tests: global_settings_disable_region_logging_tests[row],
                 disable_vpn_gateway_tests: global_settings_disable_vpn_gateway_tests[row],
+                hetzner_inter_dc_vlan_id: global_settings_hetzner_inter_dc_vlan_id[row],
                 experimental_enable_arm64_support: global_settings_experimental_enable_arm64_support[row],
                 update_edl_public_ips_from_terraform: global_settings_update_edl_public_ips_from_terraform[row],
                 enable_ipv6: global_settings_enable_ipv6[row],
@@ -5623,6 +5635,7 @@ impl Database {
         let network_interface_if_network: Vec<TableRowPointerNetwork> = ::bincode::deserialize_from(&mut cursor)?;
         let network_interface_if_ip: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
         let network_interface_if_prefix: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
+        let network_interface_if_vlan: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let network_interface_parent: Vec<TableRowPointerServer> = ::bincode::deserialize_from(&mut cursor)?;
         let network_interface_referrers_server__ssh_interface: Vec<Vec<TableRowPointerServer>> = ::bincode::deserialize_from(&mut cursor)?;
 
@@ -5632,6 +5645,7 @@ impl Database {
         assert_eq!(network_interface_len, network_interface_if_network.len());
         assert_eq!(network_interface_len, network_interface_if_ip.len());
         assert_eq!(network_interface_len, network_interface_if_prefix.len());
+        assert_eq!(network_interface_len, network_interface_if_vlan.len());
         assert_eq!(network_interface_len, network_interface_parent.len());
 
         let mut rows_network_interface: Vec<TableRowNetworkInterface> = Vec::with_capacity(network_interface_len);
@@ -5642,6 +5656,7 @@ impl Database {
                 if_network: network_interface_if_network[row],
                 if_ip: network_interface_if_ip[row].clone(),
                 if_prefix: network_interface_if_prefix[row],
+                if_vlan: network_interface_if_vlan[row],
                 parent: network_interface_parent[row],
                 referrers_server__ssh_interface: network_interface_referrers_server__ssh_interface[row].clone(),
             });
@@ -7385,6 +7400,7 @@ impl Database {
                 c_implementation_settings: datacenter_implementation_settings,
                 c_default_server_kind: datacenter_default_server_kind,
                 c_disk_ids_policy: datacenter_disk_ids_policy,
+                c_router_subnet_vlan_id: datacenter_router_subnet_vlan_id,
                 c_referrers_server__dc: datacenter_referrers_server__dc,
             },
             disk_kind: TableDefinitionDiskKind {
@@ -7532,6 +7548,7 @@ impl Database {
                 c_disable_region_tracing_tests: global_settings_disable_region_tracing_tests,
                 c_disable_region_logging_tests: global_settings_disable_region_logging_tests,
                 c_disable_vpn_gateway_tests: global_settings_disable_vpn_gateway_tests,
+                c_hetzner_inter_dc_vlan_id: global_settings_hetzner_inter_dc_vlan_id,
                 c_experimental_enable_arm64_support: global_settings_experimental_enable_arm64_support,
                 c_update_edl_public_ips_from_terraform: global_settings_update_edl_public_ips_from_terraform,
                 c_enable_ipv6: global_settings_enable_ipv6,
@@ -7723,6 +7740,7 @@ impl Database {
                 c_if_network: network_interface_if_network,
                 c_if_ip: network_interface_if_ip,
                 c_if_prefix: network_interface_if_prefix,
+                c_if_vlan: network_interface_if_vlan,
                 c_parent: network_interface_parent,
                 c_referrers_server__ssh_interface: network_interface_referrers_server__ssh_interface,
             },
@@ -9794,6 +9812,10 @@ impl TableDefinitionDatacenter {
         &self.c_disk_ids_policy[ptr.0]
     }
 
+    pub fn c_router_subnet_vlan_id(&self, ptr: TableRowPointerDatacenter) -> i64 {
+        self.c_router_subnet_vlan_id[ptr.0]
+    }
+
     pub fn c_referrers_server__dc(&self, ptr: TableRowPointerDatacenter) -> &[TableRowPointerServer] {
         &self.c_referrers_server__dc[ptr.0]
     }
@@ -10450,6 +10472,10 @@ impl TableDefinitionGlobalSettings {
 
     pub fn c_disable_vpn_gateway_tests(&self, ptr: TableRowPointerGlobalSettings) -> bool {
         self.c_disable_vpn_gateway_tests[ptr.0]
+    }
+
+    pub fn c_hetzner_inter_dc_vlan_id(&self, ptr: TableRowPointerGlobalSettings) -> i64 {
+        self.c_hetzner_inter_dc_vlan_id[ptr.0]
     }
 
     pub fn c_experimental_enable_arm64_support(&self, ptr: TableRowPointerGlobalSettings) -> bool {
@@ -11299,6 +11325,10 @@ impl TableDefinitionNetworkInterface {
 
     pub fn c_if_prefix(&self, ptr: TableRowPointerNetworkInterface) -> i64 {
         self.c_if_prefix[ptr.0]
+    }
+
+    pub fn c_if_vlan(&self, ptr: TableRowPointerNetworkInterface) -> i64 {
+        self.c_if_vlan[ptr.0]
     }
 
     pub fn c_parent(&self, ptr: TableRowPointerNetworkInterface) -> TableRowPointerServer {

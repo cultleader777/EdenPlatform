@@ -1,5 +1,5 @@
 use self::coprocessor_dc::CoprocessorRegionData;
-use super::{errors::PlatformValidationError, projections::Projection, server_runtime::{IntegrationTest, ServerRuntime}, L1Projections};
+use super::{errors::PlatformValidationError, projections::Projection, server_runtime::{IntegrationTest, ServerRuntime}, L1Projections, get_global_settings};
 use crate::database::{Database, TableRowPointerNetworkInterface, TableRowPointerServer, TableRowPointerNetwork, TableRowPointerDatacenter, TableRowPointerRegion, TableRowPointerLokiCluster, TableRowPointerMonitoringCluster, TableRowPointerMinioBucket, TableRowPointerServerZfsDataset, TableRowPointerServerXfsVolume, TableRowPointerTempoCluster, TableRowPointerBackendApplicationDeployment, TableRowPointerBackendApplicationS3Bucket};
 use convert_case::Casing;
 use ipnet::Ipv4Net;
@@ -75,6 +75,7 @@ pub struct DcParameters {
     pub can_have_more_than_one_subnet: bool,
     // disks
     pub disk_id_transform: Option<String>,
+    pub interfaces_need_vlan: bool,
 }
 
 pub struct NetworkingAnswers {
@@ -351,6 +352,18 @@ fn ipv6_analysis(db: &crate::database::Database) ->
                               .map(|ni| {
                                   db.network().c_network_name(db.network_interface().c_if_network(*ni)).clone()
                               }).collect(),
+                    }
+                );
+            }
+
+            // we pick only one address for the interface
+            // to leave the rest in the server for VMs
+            // or anything else
+            if !ipv6_addr.ends_with(":1") {
+                return Err(
+                    PlatformValidationError::PublicIpV6AddressDoesNotEndWithOne {
+                        server_name: db.server().c_hostname(server).clone(),
+                        ipv6_address: ipv6_addr.clone(),
                     }
                 );
             }
@@ -794,6 +807,7 @@ fn check_for_servers_belonging_to_dc_cidrs(
     db: &Database,
     wireguard_across_dc_needed: bool
 ) -> Result<(), PlatformValidationError> {
+    let global_settings = get_global_settings(db);
     let find_net = |name| {
         db.network()
           .rows_iter()
@@ -832,6 +846,12 @@ fn check_for_servers_belonging_to_dc_cidrs(
                     },
                 )?;
 
+        let mut subnet_vlan_ids: BTreeMap<&str, i64> = BTreeMap::new();
+        // hetzner uses this, if someone needs more we
+        // can extend later
+        let min_vlan = 4000;
+        let max_vlan = 4091;
+
         // 1. DONE lan cidr must be /16
         // 2. DONE lan cidr must belong to the lan network
         // 3. DONE dc lan cidrs must be unique
@@ -868,6 +888,7 @@ fn check_for_servers_belonging_to_dc_cidrs(
             for server in db.datacenter().c_referrers_server__dc(dc) {
                 for net_if in db.server().c_children_network_interface(*server) {
                     let if_network = db.network_interface().c_if_network(*net_if);
+                    let vlan_id = db.network_interface().c_if_vlan(*net_if);
                     let cidr = db.network_interface().c_if_prefix(*net_if);
                     if if_network == *lan {
                         if !is_coproc_dc {
@@ -893,6 +914,131 @@ fn check_for_servers_belonging_to_dc_cidrs(
                                     datacenter_implementation: dc_impl.clone(),
                                 });
                             }
+                        }
+
+                        if dc_params.interfaces_need_vlan {
+                            if vlan_id == -1 {
+                                return Err(PlatformValidationError::VlanIdForInterfaceIsNotSet {
+                                    server_name: db.server().c_hostname(*server).clone(),
+                                    interface_name: db.network_interface().c_if_name(*net_if).clone(),
+                                    interface_ip: db.network_interface().c_if_ip(*net_if).clone(),
+                                    interface_vlan: vlan_id,
+                                    interface_network: "lan".to_string(),
+                                    datacenter_implementation: dc_impl.clone(),
+                                });
+                            }
+
+                            if vlan_id < min_vlan || vlan_id > max_vlan {
+                                return Err(PlatformValidationError::VlanIdForInterfaceIsInInvalidRange {
+                                    server_name: db.server().c_hostname(*server).clone(),
+                                    interface_name: db.network_interface().c_if_name(*net_if).clone(),
+                                    interface_ip: db.network_interface().c_if_ip(*net_if).clone(),
+                                    interface_vlan: vlan_id,
+                                    interface_network: "lan".to_string(),
+                                    min_vlan,
+                                    max_vlan,
+                                    datacenter_implementation: dc_impl.clone(),
+                                });
+                            }
+
+                            if let Some(subnet_vlan_id) = subnet_vlan_ids.get(subnet_val.as_str()) {
+                                if *subnet_vlan_id != vlan_id {
+                                    return Err(PlatformValidationError::VlanSubnetHasDifferentIds {
+                                        server_name: db.server().c_hostname(*server).clone(),
+                                        interface_name: db.network_interface().c_if_name(*net_if).clone(),
+                                        interface_ip: db.network_interface().c_if_ip(*net_if).clone(),
+                                        interface_vlan: vlan_id,
+                                        interface_network: "lan".to_string(),
+                                        prev_vlan_id: *subnet_vlan_id,
+                                        current_vlan_id: vlan_id,
+                                        datacenter_implementation: dc_impl.clone(),
+                                    });
+                                }
+                            } else {
+                                assert!(
+                                    subnet_vlan_ids.insert(subnet_val.as_str(), vlan_id).is_none(),
+                                    "vlan id shouldn't exist yet"
+                                );
+                            }
+
+                            let if_name = db.network_interface().c_if_name(*net_if);
+                            let if_spl = if_name.split('.').collect::<Vec<_>>();
+
+                            if if_spl.len() != 2 {
+                                return Err(PlatformValidationError::VlanInvalidInterfaceName {
+                                    server_name: db.server().c_hostname(*server).clone(),
+                                    interface_name: db.network_interface().c_if_name(*net_if).clone(),
+                                    interface_ip: db.network_interface().c_if_ip(*net_if).clone(),
+                                    interface_network: "lan".to_string(),
+                                    vlan_id,
+                                    example_valid_interface_name: format!("eth0.{}", vlan_id),
+                                    datacenter_implementation: dc_impl.clone(),
+                                });
+                            }
+
+                            let if_vlan_id = if_spl[1].parse::<i64>().map_err(|e| {
+                                PlatformValidationError::VlanInterfaceNameIdIsNotANumber {
+                                    server_name: db.server().c_hostname(*server).clone(),
+                                    interface_name: db.network_interface().c_if_name(*net_if).clone(),
+                                    interface_ip: db.network_interface().c_if_ip(*net_if).clone(),
+                                    interface_vlan: vlan_id,
+                                    interface_network: "lan".to_string(),
+                                    parsing_error: e.to_string(),
+                                    example_valid_interface_name: format!("eth0.{}", vlan_id),
+                                    datacenter_implementation: dc_impl.clone(),
+                                }
+                            })?;
+
+                            if if_vlan_id != vlan_id {
+                                return Err(PlatformValidationError::VlanInterfaceNameIdMismatchToVlanId {
+                                    server_name: db.server().c_hostname(*server).clone(),
+                                    interface_name: db.network_interface().c_if_name(*net_if).clone(),
+                                    interface_ip: db.network_interface().c_if_ip(*net_if).clone(),
+                                    interface_vlan: vlan_id,
+                                    interface_network: "lan".to_string(),
+                                    interface_name_vlan_id: if_vlan_id,
+                                    example_valid_interface_name: format!("eth0.{}", vlan_id),
+                                    datacenter_implementation: dc_impl.clone(),
+                                });
+                            }
+
+                            let if_to_find = &if_spl[0];
+
+                            // find vlan config which is attached to the interface
+                            let mut found_if =
+                                db.server().c_children_network_interface(*server).iter()
+                                    .filter(|other_if| {
+                                        *other_if != net_if &&
+                                            db.network_interface().c_if_name(**other_if) == *if_to_find
+                                    });
+
+                            if found_if.next().is_none() {
+                                return Err(PlatformValidationError::VlanCantFindVlanParentNetworkInterface {
+                                    server_name: db.server().c_hostname(*server).clone(),
+                                    interface_name: db.network_interface().c_if_name(*net_if).clone(),
+                                    interface_ip: db.network_interface().c_if_ip(*net_if).clone(),
+                                    interface_vlan: vlan_id,
+                                    interface_network: "lan".to_string(),
+                                    interfaces_on_server:
+                                        db.server().c_children_network_interface(*server).iter()
+                                            .filter_map(|i| {
+                                                if i != net_if { Some(db.network_interface().c_if_name(*i).clone()) }
+                                                else { None }
+                                            })
+                                            .collect(),
+                                    example_valid_interface_name: format!("eth0.{}", vlan_id),
+                                    datacenter_implementation: dc_impl.clone(),
+                                });
+                            }
+                        } else if vlan_id != -1 {
+                            return Err(PlatformValidationError::VlanDisabledInDcImplementationButSpecified {
+                                server_name: db.server().c_hostname(*server).clone(),
+                                interface_name: db.network_interface().c_if_name(*net_if).clone(),
+                                interface_ip: db.network_interface().c_if_ip(*net_if).clone(),
+                                interface_vlan: vlan_id,
+                                interface_network: "lan".to_string(),
+                                datacenter_implementation: dc_impl.clone(),
+                            });
                         }
 
                         let ip = std::net::Ipv4Addr::from_str(
@@ -945,16 +1091,68 @@ fn check_for_servers_belonging_to_dc_cidrs(
             }
         }
 
-        let params = get_dc_parameters(&db.datacenter().c_implementation(dc));
-        if dc_subnets.len() > 1 && !params.can_have_more_than_one_subnet {
-            return Err(PlatformValidationError::DatacenterImplementationDoesntAllowMoreThanOneSubnet {
-                dc: db.datacenter().c_dc_name(dc).clone(),
-                subnet_count: dc_subnets.len(),
-                max_subnets: 1,
-            });
+        if dc_subnets.len() > 1 {
+            if !dc_params.can_have_more_than_one_subnet {
+                return Err(PlatformValidationError::DatacenterImplementationDoesntAllowMoreThanOneSubnet {
+                    dc: db.datacenter().c_dc_name(dc).clone(),
+                    subnet_count: dc_subnets.len(),
+                    max_subnets: 1,
+                });
+            }
         }
 
-        let is_subnet_routing_needed = is_subnet_routing_needed(dc_subnets.len(), &params, wireguard_across_dc_needed);
+        let router_subnet_vlan_id = db.datacenter().c_router_subnet_vlan_id(dc);
+
+        if dc_params.interfaces_need_vlan {
+            if router_subnet_vlan_id == -1 {
+                return Err(PlatformValidationError::VlanSubnetRouterVlanIdUnspecified {
+                    subnet_count: dc_subnets.len(),
+                    vlan_id: router_subnet_vlan_id,
+                    datacenter_implementation: dc_impl.clone(),
+                });
+            }
+
+            if router_subnet_vlan_id < min_vlan || router_subnet_vlan_id > max_vlan {
+                return Err(PlatformValidationError::VlanIdForRouterSubnetIsInInvalidRange {
+                    min_vlan,
+                    max_vlan,
+                    router_subnet_vlan_id,
+                    datacenter_implementation: dc_impl.clone(),
+                });
+            }
+
+            // hetzner inter dc vlan id must never clash with other subnets
+            let is_hetzner = "hetzner" == dc_impl;
+            for (subnet, vlan_id) in subnet_vlan_ids.iter() {
+                if is_hetzner && *vlan_id == global_settings.hetzner_inter_dc_vlan_id {
+                    return Err(PlatformValidationError::HetznerInterDcVlanIdClashesWithSubnetVlanIds {
+                        interface_vlan: *vlan_id,
+                        hetzner_inter_dc_vlan_id: global_settings.hetzner_inter_dc_vlan_id,
+                        datacenter_implementation: dc_impl.clone(),
+                    });
+                }
+
+                if *vlan_id == router_subnet_vlan_id {
+                    return Err(PlatformValidationError::VlanSubnetRouterVlanIdClashesWithSubnetVlanId {
+                        subnet_count: dc_subnets.len(),
+                        router_subnet_vlan_id,
+                        subnet_vlan_id: *vlan_id,
+                        subnet: subnet.to_string(),
+                        datacenter_implementation: dc_impl.clone(),
+                    });
+                }
+            }
+        } else {
+            if router_subnet_vlan_id != -1 {
+                return Err(PlatformValidationError::VlanSubnetRouterVlanIdSpecifiedButNotUsed {
+                    subnet_count: dc_subnets.len(),
+                    vlan_id: router_subnet_vlan_id,
+                    datacenter_implementation: dc_impl.clone(),
+                });
+            }
+        }
+
+        let is_subnet_routing_needed = is_subnet_routing_needed(dc_subnets.len(), &dc_params, wireguard_across_dc_needed);
         if let Some((dcrouter, _)) = dcrouter.as_ref() {
             for server in db.datacenter().c_referrers_server__dc(dc) {
                 let is_router = db.server().c_is_router(*server)
@@ -2552,6 +2750,7 @@ pub fn get_dc_parameters(input: &str) -> DcParameters {
             provides_admin_vpn_access: true,
             use_l3_hop_for_vpn_gateways: false,
             can_have_more_than_one_subnet: true,
+            interfaces_need_vlan: false,
             disk_id_transform: None,
         },
         "gcloud" => DcParameters {
@@ -2564,6 +2763,7 @@ pub fn get_dc_parameters(input: &str) -> DcParameters {
             can_have_more_than_one_subnet: true,
             // I wish google cloud garbage didn't exist and supported l2 traffic
             use_l3_hop_for_vpn_gateways: true,
+            interfaces_need_vlan: false,
             // google cloud faggots
             disk_id_transform: Some("/dev/disk/by-id/google-DISK_ID".to_string()),
         },
@@ -2577,6 +2777,7 @@ pub fn get_dc_parameters(input: &str) -> DcParameters {
             provides_admin_vpn_access: false,
             use_l3_hop_for_vpn_gateways: false,
             can_have_more_than_one_subnet: true,
+            interfaces_need_vlan: false,
             disk_id_transform: None,
         },
         // we assume here we are using bare metals
@@ -2589,6 +2790,7 @@ pub fn get_dc_parameters(input: &str) -> DcParameters {
             provides_admin_vpn_access: true,
             use_l3_hop_for_vpn_gateways: false,
             can_have_more_than_one_subnet: true,
+            interfaces_need_vlan: false,
             disk_id_transform: None,
         },
         "coprocessor" => DcParameters {
@@ -2600,6 +2802,7 @@ pub fn get_dc_parameters(input: &str) -> DcParameters {
             provides_admin_vpn_access: false,
             use_l3_hop_for_vpn_gateways: false,
             can_have_more_than_one_subnet: true,
+            interfaces_need_vlan: false,
             disk_id_transform: None,
         },
         "bm_simple" => DcParameters {
@@ -2611,6 +2814,21 @@ pub fn get_dc_parameters(input: &str) -> DcParameters {
             provides_admin_vpn_access: false,
             use_l3_hop_for_vpn_gateways: false,
             can_have_more_than_one_subnet: false,
+            interfaces_need_vlan: false,
+            disk_id_transform: None,
+        },
+        "hetzner" => DcParameters {
+            is_epl_responsible_for_inter_subnet_routing: true,
+            is_epl_responsible_for_internal_node_internet: false,
+            // it is kind of by hetzner provider vlan, but we do the wiring
+            // so its kind of by us
+            is_same_dcimpl_connection_managed_by_provider: false,
+            are_floating_ips_available_in_subnets: true,
+            are_public_ips_hidden: false,
+            provides_admin_vpn_access: true,
+            use_l3_hop_for_vpn_gateways: false,
+            can_have_more_than_one_subnet: true,
+            interfaces_need_vlan: true,
             disk_id_transform: None,
         },
         _ => panic!("Unknown dc {input}")

@@ -34,7 +34,11 @@ pub fn generate_rust_frontend_app(
     let src_dir = dir.create_directory("src");
     src_dir.create_file("main.rs", rust_frontend_main_rs());
     src_dir.create_file("generated.rs", rust_frontend_generated_part(checked, app));
-    src_dir.create_file_if_not_exists("implementation.rs", implementation_frontend_mock_rs());
+    src_dir.create_file_if_not_exists_condition(
+        "implementation.rs", implementation_frontend_mock_rs(),
+        // if directory exists user is creating dir structure of modules, don't clobber
+        crate::codegen::SpecialFileCreationCondition::DontCreateIfDirectoryExists("implementation".to_string())
+    );
     dir.create_file(
         "Cargo.toml",
         super::rust_cargo_toml(edition.as_str(), checked, comp_env),

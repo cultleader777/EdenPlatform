@@ -1,4 +1,4 @@
-use std::{fmt::Write, collections::{HashSet, HashMap, BTreeMap}, str::FromStr};
+use std::{fmt::Write, collections::{HashSet, HashMap, BTreeMap}, str::FromStr, borrow::Cow};
 use ipnet::Ipv4Net;
 
 use crate::{static_analysis::{CheckedDB, networking::{CrossDcConnectivity, first_three_octets}}, codegen::{nixplan::{NixAllServerPlans, custom_user_secret_key, root_secret_config, mk_nix_region, NixServerPlan}, secrets::{SecretsStorage, SecretValue}}, database::{TableRowPointerDatacenter, TableRowPointerServer}};
@@ -59,6 +59,8 @@ fn provision_routers(db: &CheckedDB, plans: &mut NixAllServerPlans, secrets: &mu
         let bgp_asn = dc_bgp_as_number(dc_cidr);
         let dc_ip = db.db.datacenter().c_network_cidr(dc).replace("/16", "");
         let dc_name = db.db.datacenter().c_dc_name(dc);
+        let dc_impl = db.db.datacenter().c_implementation(dc);
+        let is_source_hetzner = dc_impl == "hetzner";
         let dc_routing_pwd = secrets.fetch_secret(format!("ospf_dc_{dc_name}_key"), crate::codegen::secrets::SecretKind::OspfPassword);
         let dc_routing_key = dc_routing_pwd.value();
         let gre_neighbors: Option<GreNeighbors> =
@@ -74,7 +76,13 @@ fn provision_routers(db: &CheckedDB, plans: &mut NixAllServerPlans, secrets: &mu
                 let plan = plans.fetch_plan(srv);
 
                 let lan_iface = ri.lan_iface;
-                let lan_iface_name = db.db.network_interface().c_if_name(lan_iface);
+                let lan_vlan_id = db.db.network_interface().c_if_vlan(lan_iface);
+                let lan_iface_name =
+                    if lan_vlan_id < 0 {
+                        db.db.network_interface().c_if_name(lan_iface).clone()
+                    } else {
+                        format!("vlan{lan_vlan_id}")
+                    };
                 let lan_iface_ip = db.db.network_interface().c_if_ip(lan_iface);
                 let has_internet = db.projections.internet_network_iface.get(&srv).is_some();
                 let mut bfd_cfg = String::new();
@@ -244,14 +252,21 @@ fn provision_routers(db: &CheckedDB, plans: &mut NixAllServerPlans, secrets: &mu
                 if let Some(vpn_gws) = db.projections.vpn_p2p_links.get(&srv) {
                     for vpn_gw in vpn_gws {
                         let vpn_srv = db.db.network_interface().c_parent(vpn_gw.vpn_interface);
+                        let dst_dc = db.db.server().c_dc(vpn_srv);
+                        let is_hetzner_connection = is_source_hetzner &&
+                            db.db.datacenter().c_implementation(dst_dc) == "hetzner";
                         let neighbor_lan_ip =
                             db.db.network_interface().c_if_ip(
                                 *db.projections.consul_network_iface.value(vpn_srv)
                             );
-                        let neighbor_ip = db.db.network_interface().c_if_ip(vpn_gw.vpn_interface);
                         let neighbor_bgp_asn = dc_bgp_as_number(&neighbor_lan_ip);
                         let bgp_pass = bgp_peering_pwd(vpn_srv, srv);
-                        if neighbors.insert(neighbor_ip.clone()) {
+                        let mut neighbor_ip = Cow::from(db.db.network_interface().c_if_ip(vpn_gw.vpn_interface));
+                        if is_hetzner_connection {
+                            neighbor_ip = Cow::from(get_hetnzer_internal_dc_vlan_ip(&neighbor_ip));
+                        };
+
+                        if neighbors.insert(neighbor_ip.to_string()) {
                             write!(&mut bgp_cfg, r#"
           neighbor {neighbor_ip} remote-as {neighbor_bgp_asn}
           neighbor {neighbor_ip} password {bgp_pass}
@@ -570,6 +585,16 @@ vrrp_instance vpnRouter {{
     }
 
     inter_dc_bootstrap_routes
+}
+
+pub fn get_hetnzer_internal_dc_vlan_ip(vpn_ip: &str) -> String {
+    let vpn_splits = vpn_ip.split(".").collect::<Vec<_>>();
+    format!("172.42.{}.{}", vpn_splits[2], vpn_splits[3])
+}
+
+#[test]
+fn test_hetzner_internal_dc_ip_transform() {
+    assert_eq!(get_hetnzer_internal_dc_vlan_ip("172.21.3.4"), "172.42.3.4");
 }
 
 fn provision_coprocessor_routing(db: &CheckedDB, plans: &mut NixAllServerPlans, secrets: &mut SecretsStorage) {

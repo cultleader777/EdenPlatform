@@ -128,7 +128,7 @@ EOL
         destination = "local/admin_htpasswd_file"
         perms = "644"
         data = <<EOL
-admin:$2a$12$2WlQuooJRelezlZRPHPcMeWfpFjW9ib1woC0VOQ292BW8y6xh2DJC
+admin:$2a$12$xTp83AyavqOSanycZQHvqurHE1f5bwHEX.zLrw0nS0N2iP8chj/1y
 EOL
       }
 

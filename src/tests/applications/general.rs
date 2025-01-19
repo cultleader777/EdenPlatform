@@ -1249,7 +1249,7 @@ DATA STRUCT backend_application_deployment_ingress {
 }
 
 DATA server(hostname, ssh_interface, public_ipv6_address, is_consul_master, is_nomad_master, is_vault_instance, is_dns_master, is_dns_slave, is_ingress, is_vpn_gateway) {
-  server-a, eth0, '2a03:2880:f32e:3:face:b00c:0:25de', true, true, false, true, false, true, true WITH server_disk(disk_id) {
+  server-a, eth0, '2a03:2880:f32e:3:face:b00c:0:1', true, true, false, true, false, true, true WITH server_disk(disk_id) {
     'vda';
   } WITH network_interface {
     eth0, lan, 10.17.0.10;

@@ -616,14 +616,18 @@ client {
     let consul_iface = db.projections.consul_network_iface.value(server);
     let private_ip = db.db.network_interface().c_if_ip(*consul_iface);
 
-    res += db.db.network_interface().c_if_name(*consul_iface);
+    if db.db.network_interface().c_if_vlan(*consul_iface) < 0 {
+        res += db.db.network_interface().c_if_name(*consul_iface);
+    } else {
+        write!(&mut res, "vlan{}", db.db.network_interface().c_if_vlan(*consul_iface)).unwrap();
+    }
 
     res += r#""
 
   meta = {
 "#;
 
-    res += &format!("    \"private_ip\" = \"{private_ip}\"\n");
+    write!(&mut res, "    \"private_ip\" = \"{private_ip}\"\n").unwrap();
 
     if db.db.server().c_run_unassigned_workloads(server) {
         res += "    \"run_unassigned_workloads\" = \"1\"\n";

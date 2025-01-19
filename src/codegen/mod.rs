@@ -28,6 +28,7 @@ pub struct File {
     if_not_exists: bool,
     always_overwrite: bool,
     permissions: &'static str,
+    condition: Option<SpecialFileCreationCondition>,
 }
 
 pub struct Directory {
@@ -56,23 +57,31 @@ lazy_static! {
     static ref FILE_DIR_REGEX: Regex = Regex::new("^[A-Za-z0-9_\\.-]+$").unwrap();
 }
 
+pub enum SpecialFileCreationCondition {
+    DontCreateIfDirectoryExists(String)
+}
+
 impl Directory {
     fn create_file(&mut self, name: &str, contents: String) {
-        self.create_file_custom(name, contents.into_bytes(), false, "644", false);
+        self.create_file_custom(name, contents.into_bytes(), false, "644", false, None);
     }
 
     /// Yeah function name is ugly but its explicit in what it does
     #[allow(dead_code)]
     fn create_file_binary_always_overwrite(&mut self, name: &str, contents: Vec<u8>) {
-        self.create_file_custom(name, contents, false, "644", true);
+        self.create_file_custom(name, contents, false, "644", true, None);
     }
 
     fn create_executable_file(&mut self, name: &str, contents: String) {
-        self.create_file_custom(name, contents.into_bytes(), false, "755", false);
+        self.create_file_custom(name, contents.into_bytes(), false, "755", false, None);
     }
 
     fn create_file_if_not_exists(&mut self, name: &str, contents: String) {
-        self.create_file_custom(name, contents.into_bytes(), true, "644", false);
+        self.create_file_custom(name, contents.into_bytes(), true, "644", false, None);
+    }
+
+    fn create_file_if_not_exists_condition(&mut self, name: &str, contents: String, cond: SpecialFileCreationCondition) {
+        self.create_file_custom(name, contents.into_bytes(), true, "644", false, Some(cond));
     }
 
     fn create_file_custom(
@@ -82,6 +91,7 @@ impl Directory {
         if_not_exists: bool,
         permissions: &'static str,
         always_overwrite: bool,
+        condition: Option<SpecialFileCreationCondition>,
     ) {
         assert!(
             FILE_DIR_REGEX.is_match(name),
@@ -97,6 +107,7 @@ impl Directory {
             if_not_exists,
             always_overwrite,
             permissions,
+            condition,
         });
     }
 
@@ -225,9 +236,30 @@ pub fn write_outputs_to_disk(target_dir: &str, plan: &CodegenPlan) {
 
 fn write_outputs_to_disk_recur(path: &Path, dir: &Directory) {
     for file in &dir.files {
-        let path = std::path::Path::join(path, &file.name);
+        let file_path = std::path::Path::join(path, &file.name);
+        if let Some(cond) = &file.condition {
+            match cond {
+                SpecialFileCreationCondition::DontCreateIfDirectoryExists(dir_name) => {
+                    let check_path = std::path::Path::join(path, dir_name.as_str());
+                    match std::fs::metadata(check_path) {
+                        Ok(data) => {
+                            if data.is_dir() {
+                                // skip, condition satisfied
+                                break;
+                            }
+                        }
+                        Err(e) => {
+                            if e.kind() != std::io::ErrorKind::NotFound {
+                                panic!("error checking if dir exists: {}", e);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         write_file_if_not_changed(
-            path.as_path(),
+            file_path.as_path(),
             &file.contents,
             file.if_not_exists,
             file.permissions,
@@ -515,6 +547,7 @@ fn generate_machines(
         false,
         "600",
         false,
+        None,
     );
     aux_dir.create_file(
         "root_ssh_key.pub",
@@ -538,7 +571,7 @@ fn generate_machines(
     integration_tests::generate_integration_test_dir(checked, integration_test_dir);
 
     let vpn_conf = generate_admin_vpn_config(checked, &secrets.wg_secrets);
-    rd.create_file_custom("admin-wg.conf", vpn_conf.into_bytes(), false, "600", false);
+    rd.create_file_custom("admin-wg.conf", vpn_conf.into_bytes(), false, "600", false, None);
 
     l1_outputs
 }

@@ -1,5 +1,5 @@
 use std::fmt::Write;
-use crate::{static_analysis::{CheckedDB, get_global_settings}, codegen::{nixplan::{NixAllServerPlans, mk_nix_region}, CodegenSecrets}, database::TableRowPointerServer};
+use crate::{static_analysis::{CheckedDB, get_global_settings}, codegen::{nixplan::{NixAllServerPlans, mk_nix_region}, CodegenSecrets}, database::{TableRowPointerServer, TableRowGlobalSettings}};
 
 use super::{routing::create_nftables_table_service, fast_l1::provision_fast_l1_provisioning};
 
@@ -8,13 +8,19 @@ pub fn provision_generic_every_server(
     plans: &mut NixAllServerPlans,
     cgen_secrets: &CodegenSecrets
 ) {
-    for server in db.db.server().rows_iter() {
-        provision_kernel_sysctl_settings(plans, server);
-        provision_directories(plans, server);
-        provision_server_packages(plans, server);
-        provision_server_firewall(db, plans, server);
-        provision_server_shell(db, plans, server);
-        provision_fast_l1_provisioning(db, plans, server, cgen_secrets);
+    let global_settings = get_global_settings(&db.db);
+    for dc in db.db.datacenter().rows_iter() {
+        // ugly bug will work for now
+        let is_hetzner = db.db.datacenter().c_implementation(dc) == "hetzner";
+        for server in db.db.datacenter().c_referrers_server__dc(dc) {
+            let server = *server;
+            provision_kernel_sysctl_settings(plans, server);
+            provision_directories(plans, server);
+            provision_server_packages(plans, server);
+            provision_server_firewall(db, plans, server, is_hetzner, &global_settings);
+            provision_server_shell(db, plans, server);
+            provision_fast_l1_provisioning(db, plans, server, cgen_secrets);
+        }
     }
 }
 
@@ -85,7 +91,7 @@ fn provision_server_shell(db: &CheckedDB, plans: &mut NixAllServerPlans, server:
 "#));
 }
 
-fn provision_server_firewall(db: &CheckedDB, plans: &mut NixAllServerPlans, server: TableRowPointerServer) {
+fn provision_server_firewall(db: &CheckedDB, plans: &mut NixAllServerPlans, server: TableRowPointerServer, is_hetzner: bool, global_settings: &TableRowGlobalSettings) {
     let plan = plans.fetch_plan(server);
     let hostname = db.db.server().c_hostname(server);
     let is_router = db.db.server().c_is_vpn_gateway(server) || db.db.server().c_is_router(server);
@@ -100,13 +106,18 @@ fn provision_server_firewall(db: &CheckedDB, plans: &mut NixAllServerPlans, serv
   networking.firewall.checkReversePath = {check_reverse_path};
   networking.firewall.trustedInterfaces = [
 "#);
-    let mut internet_iface = "";
+    let mut internet_iface = "".to_string();
     let mut has_wireguard = false;
     let mut internet_if_tables = String::new();
     for ni in db.db.server().c_children_network_interface(server) {
         let network = db.db.network_interface().c_if_network(*ni);
         let network_name = db.db.network().c_network_name(network);
-        let iface_name = db.db.network_interface().c_if_name(*ni);
+        let iface_name =
+            if db.db.network_interface().c_if_vlan(*ni) < 0 {
+                db.db.network_interface().c_if_name(*ni).clone()
+            } else {
+                format!("vlan{}", db.db.network_interface().c_if_vlan(*ni))
+            };
         let iface_name = if iface_name.contains(":") {
             iface_name.split(":").next().unwrap()
         } else { iface_name.as_str() };
@@ -126,9 +137,16 @@ fn provision_server_firewall(db: &CheckedDB, plans: &mut NixAllServerPlans, serv
             "vpn" => {
                 trust_iface();
                 has_wireguard = true;
+
+                // trust inter dc hetzner vlan
+                if is_hetzner {
+                    write!(&mut firewall_rules_for_server, r#"
+    "vlan{}"
+"#, global_settings.hetzner_inter_dc_vlan_id).unwrap();
+                }
             }
             "internet" => {
-                internet_iface = iface_name;
+                internet_iface = iface_name.to_string();
 
                 write!(&mut internet_if_tables, r#"
        chain EPL_INTERNET_FIREWALL {{

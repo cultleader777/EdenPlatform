@@ -17,20 +17,6 @@ do
   sleep 1
 done
 
-jq ".dashboard.id = null | .overwrite = true" grafana-dashboard/cadvisor.json > grafana-dashboard/cadvisor.json.fixed
-while ! curl -f -u admin:$ADMIN_PASSWORD -XPOST -H 'Content-Type: application/json' --data @grafana-dashboard/cadvisor.json.fixed http://epl-grafana-main-us-west.service.consul:3000/api/dashboards/db
-do
-  echo Can\'t upload grafana dashboard grafana-dashboard/cadvisor.json from first time, trying again after second...
-  sleep 1
-done
-
-jq ".dashboard.id = null | .overwrite = true" grafana-dashboard/zfs-performance.json > grafana-dashboard/zfs-performance.json.fixed
-while ! curl -f -u admin:$ADMIN_PASSWORD -XPOST -H 'Content-Type: application/json' --data @grafana-dashboard/zfs-performance.json.fixed http://epl-grafana-main-us-west.service.consul:3000/api/dashboards/db
-do
-  echo Can\'t upload grafana dashboard grafana-dashboard/zfs-performance.json from first time, trying again after second...
-  sleep 1
-done
-
 jq ".dashboard.id = null | .overwrite = true" grafana-dashboard/loki.json > grafana-dashboard/loki.json.fixed
 while ! curl -f -u admin:$ADMIN_PASSWORD -XPOST -H 'Content-Type: application/json' --data @grafana-dashboard/loki.json.fixed http://epl-grafana-main-us-west.service.consul:3000/api/dashboards/db
 do
@@ -42,5 +28,19 @@ jq ".dashboard.id = null | .overwrite = true" grafana-dashboard/zfs-disk-space.j
 while ! curl -f -u admin:$ADMIN_PASSWORD -XPOST -H 'Content-Type: application/json' --data @grafana-dashboard/zfs-disk-space.json.fixed http://epl-grafana-main-us-west.service.consul:3000/api/dashboards/db
 do
   echo Can\'t upload grafana dashboard grafana-dashboard/zfs-disk-space.json from first time, trying again after second...
+  sleep 1
+done
+
+jq ".dashboard.id = null | .overwrite = true" grafana-dashboard/zfs-performance.json > grafana-dashboard/zfs-performance.json.fixed
+while ! curl -f -u admin:$ADMIN_PASSWORD -XPOST -H 'Content-Type: application/json' --data @grafana-dashboard/zfs-performance.json.fixed http://epl-grafana-main-us-west.service.consul:3000/api/dashboards/db
+do
+  echo Can\'t upload grafana dashboard grafana-dashboard/zfs-performance.json from first time, trying again after second...
+  sleep 1
+done
+
+jq ".dashboard.id = null | .overwrite = true" grafana-dashboard/cadvisor.json > grafana-dashboard/cadvisor.json.fixed
+while ! curl -f -u admin:$ADMIN_PASSWORD -XPOST -H 'Content-Type: application/json' --data @grafana-dashboard/cadvisor.json.fixed http://epl-grafana-main-us-west.service.consul:3000/api/dashboards/db
+do
+  echo Can\'t upload grafana dashboard grafana-dashboard/cadvisor.json from first time, trying again after second...
   sleep 1
 done

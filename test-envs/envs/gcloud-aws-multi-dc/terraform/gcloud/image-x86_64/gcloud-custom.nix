@@ -46,7 +46,7 @@
     home = "/home/admin";
     extraGroups = [ "wheel" ];
     openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIONUZdMtNbaNBA+F2IS18RAcVToqkvGVDw4/3nFvE9TR epl-root-ssh-key"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFbis+BzEk38EuddzQHZiFVsw8ATqnLYO0eFcWm/5xRG epl-root-ssh-key"
     ];
   };
 

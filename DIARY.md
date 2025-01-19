@@ -5448,3 +5448,32 @@ remedy: `systemctl restart vault.service` and unseal again
 ```
 core.cluster-listener: no TLS config found for ALPN: ALPN=["raft_storage_v1"]
 ```
+
+* 2024-11-13
+
+DONE: check if implementation directory exists and don't write example file then
+TODO: add all generated files to git if they're not binary
+DONE: add victoria metrics retention, now it is 2 years hardcoded
+
+* 2025-01-09
+
+DONE: vlan in hetzner should just use same internet interface, with `_vlan` prefix?
+DONE: check that network interface ends with vlan id
+DONE: check that interface with vlan is attached to another interface
+
+
+zpool host id issue fix
+```
+zpool set multihost=on rpool
+zpool set multihost=off rpool
+zpool status rpool
+```
+DONE: fix vlan issue for nomad startup
+
+Draining nomad masters procedure:
+- reconfigure different masters
+- apply l1 provisioning
+- call 'nomad system gc' with bootstrap token`to fix the state
+
+TODO: acme certs interfere with first time dns master setup, chicken and egg problem, now we need manual disabling of auto certs
+DONE: make sure you pick one address from IpV6 prefix during compile time

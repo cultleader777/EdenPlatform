@@ -310,7 +310,7 @@ loadGrafanaDashboards(SOURCE_DIR .. '/grafana-dashboards')
 
 VALID_REGION_AVAILABILITY_MODES = arrIntoSet('single_dc', 'multi_dc')
 
-VALID_DC_IMPLEMENTATIONS = arrIntoSet('manual', 'aws', 'gcloud', 'testvms', 'coprocessor', 'bm_simple')
+VALID_DC_IMPLEMENTATIONS = arrIntoSet('manual', 'aws', 'gcloud', 'testvms', 'coprocessor', 'bm_simple', 'hetzner')
 
 VALID_ARCHITECTURES = arrIntoSet('x86_64', 'arm64')
 

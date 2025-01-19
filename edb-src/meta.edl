@@ -20,6 +20,7 @@ TABLE global_settings {
   disable_region_tracing_tests BOOL DEFAULT false,
   disable_region_logging_tests BOOL DEFAULT false,
   disable_vpn_gateway_tests BOOL DEFAULT false,
+  hetzner_inter_dc_vlan_id INT DEFAULT 4077,
   experimental_enable_arm64_support BOOL DEFAULT false,
   update_edl_public_ips_from_terraform BOOL DEFAULT true,
   // in case ipv6 subnets clash in AWS you have option

@@ -52,3 +52,9 @@ Say, node with lan ip of 10.17.0.10 has another ip gre ip address with added 128
 Simple DC network, assumes only one /24 subnet with a single switch.
 Router gateway ip should be specified.
 Modeled after simple home networks which have a home router and a switch.
+
+### hetzner
+
+This is Hetzner robot, not hetzner cloud. We assume servers get one interface with public ip address, we also use this interface for linux native vlan setup, make sure you expose appropriate firewall rules for hetzner robot. Namely, 53 for DNS, 22 for SSH, 80 for HTTP, 443 for HTTPS and 51820 for wireguard.
+
+You'll need to create vswitches in hetzner manually, and make sure they match inside eden platform data where you specify `if_vlan` on interfaces.
