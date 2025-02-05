@@ -5477,3 +5477,26 @@ Draining nomad masters procedure:
 
 TODO: acme certs interfere with first time dns master setup, chicken and egg problem, now we need manual disabling of auto certs
 DONE: make sure you pick one address from IpV6 prefix during compile time
+
+TODO: external load balancer running only one instance, grafana forwarding bullshat behind VPN?
+
+DONE: compute projection of available blackbox deployment resources
+DONE: compile time errors and static analysis checks for blackbox deployment resource
+DONE: actual codegen to deliver the secrets to the blackbox deployment
+TODO: postgres default read only user and password
+DONE: write tests for new errors regarding blackbox deployment variables
+
+TODO: NixOS upgrade 24.11
+TODO: Add monitoring for expected job group counts/running job group couns
+TODO: How to deploy, push source ir build locally with nix?
+TODO: figure out location paths and stuff on the morrow
+DONE: DNS for load balancer names
+TODO: bind reload didn't work for the zones, oopsie, findout by tweaking bind records
+TODO: patroni new version error https://github.com/prometheus-community/postgres_exporter/issues/1060
+TODO: fix min instances for blackbox service bug, we have enough instances but it is not registered that that many servers have it
+TODO: universal provision doesn't include server that exposes the hashes
+TODO: bind isn't restarted when adding new certificate tld?
+DONE: dns sec enabled but unsupported by upstream TLD
+TODO: make dnssec root zone validation as part of universal provisioning
+TODO: bound stateful job with stateless task has no server locks error
+TODO: Arbitrary DNS records for domains

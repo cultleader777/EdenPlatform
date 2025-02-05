@@ -1878,7 +1878,6 @@ async fn with_test_dataset_inserted(
 
         for (row_idx, row) in rows.iter().enumerate() {
             let is_last_row = row_idx == rows.len() - 1;
-            let wait_async_insert = if is_last_row { 1 } else { 0 };
             let mut inserter = format!("INSERT INTO {table}(");
             let keys: Vec<_> = row.iter().map(|(rk, _)| { rk.as_str() }).collect();
             let values_joined: String = row.iter().map(|(_, rv)| { rv.as_str() }).collect::<Vec<_>>().join(", ");
@@ -2078,7 +2077,7 @@ async fn with_test_dataset_inserted(
             }
 
             inserter += &keys.join(",");
-            write!(&mut inserter, ") SETTINGS async_insert=1, wait_for_async_insert={wait_async_insert} VALUES ").unwrap();
+            write!(&mut inserter, ") VALUES ").unwrap();
             inserter += &values_buf;
 
             client.query(&inserter).execute().await.map_err(|e| {

@@ -1663,7 +1663,7 @@ exec ${pkgs.consul}/bin/consul watch -type=key -key=epl-interdc-routes/dc1/10.17
 
        enable = true;
      };
-
+# NIX REGION custom_hardware START
     imports = [ "${modulesPath}/virtualisation/google-compute-image.nix" ];
 
 
@@ -1700,7 +1700,7 @@ exec ${pkgs.consul}/bin/consul watch -type=key -key=epl-interdc-routes/dc1/10.17
 
 
     networking.usePredictableInterfaceNames = false;
-
+# NIX REGION custom_hardware END
     users.users.named.extraGroups = ["keys"];
     services.bind =
     {
@@ -2268,7 +2268,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"efa1b9b2fa1e09f14db0608d8a5785fefb136a689c5f503c18ea3d8de0de28dc\",hostname=\"server-g\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"e411f60f702d929dc8f71e760c5c64106f8ff0d550dfa92aefc9c23dea5b9300\",hostname=\"server-g\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE

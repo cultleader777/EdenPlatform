@@ -3,6 +3,10 @@ job "bb-moonbeam-dev" {
   namespace = "apps"
   region = "us-west"
   datacenters = ["dc1"]
+
+  vault {
+    policies = ["epl-bb-depl-moonbeam-dev"]
+  }
   update {
     auto_revert = false
     max_parallel = 1
@@ -70,6 +74,9 @@ job "bb-moonbeam-dev" {
         memory = 512
         memory_max = 640
       }
+      env {
+        TEST_RAW_VALUE = "hello"
+      }
       config {
         image = "moonbeamfoundation/moonbeam@sha256:099e885c4601c8f7ba4408492f2df142920a794baf019cf71cf3a3a16810f504"
         network_mode = "host"
@@ -90,6 +97,16 @@ job "bb-moonbeam-dev" {
       volume_mount {
         volume = "v_1"
         destination = "/data"
+      }
+
+      template {
+        destination = "secrets/epl-env-secrets.env"
+        perms = "644"
+        env = true
+        data = <<EOL
+TEST_POSTGRESQL=postgresql://bbtest:{{ with secret "epl/data/bb-depl/moonbeam-dev" }}{{ .Data.data.env_var_test_postgresql }}{{ end }}@epl-pg-testdb.service.consul:5433/bbtest
+TEST_MINIO=s3://bb-depl-moonbeam-dev:{{ with secret "epl/data/bb-depl/moonbeam-dev" }}{{ .Data.data.env_var_test_minio }}{{ end }}@epl-minio-global.service.consul:9002/bb-app1
+EOL
       }
     }
   }

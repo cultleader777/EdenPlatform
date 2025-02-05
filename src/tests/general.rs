@@ -28,7 +28,6 @@ DEFAULTS {
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
     server_disk.disk_kind default-ssd,
-    region.tld epl-infra.net,
     server.nixpkgs_environment default_nixpkgs,
     rust_compilation_environment.nixpkgs_environment default_nixpkgs,
     frontend_application_deployment.region us-west,
@@ -82,7 +81,6 @@ DEFAULTS {
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
     server_disk.disk_kind default-ssd,
-    region.tld epl-infra.net,
     server.nixpkgs_environment default_nixpkgs,
     rust_compilation_environment.nixpkgs_environment default_nixpkgs,
     frontend_application_deployment.region us-west,
@@ -112,14 +110,21 @@ DATA STRUCT server_kind {
     architecture: x86_64,
 }
 
+
+DATA STRUCT tld {
+    domain: epl-infra.net,
+}
+
 DATA STRUCT global_settings [
     {
       project_name: some,
       admin_email: admin@epl-infra.net,
+      admin_tld: epl-infra.net,
     },
     {
       project_name: project,
       admin_email: admin@epl-infra.net,
+      admin_tld: epl-infra.net,
     },
 ]
 "#,
@@ -147,7 +152,6 @@ DEFAULTS {
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
     server_disk.disk_kind default-ssd,
-    region.tld epl-infra.net,
     server.nixpkgs_environment default_nixpkgs,
     rust_compilation_environment.nixpkgs_environment default_nixpkgs,
     frontend_application_deployment.region us-west,
@@ -177,10 +181,15 @@ DATA STRUCT server_kind {
     architecture: x86_64,
 }
 
+DATA STRUCT tld {
+    domain: epl-infra.net,
+}
+
 DATA STRUCT global_settings [
     {
       project_name: '',
       admin_email: admin@epl-infra.net,
+      admin_tld: epl-infra.net,
     },
 ]
 "#,
@@ -210,7 +219,6 @@ DEFAULTS {
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
     server_disk.disk_kind default-ssd,
-    region.tld epl-infra.net,
     server.nixpkgs_environment default_nixpkgs,
     rust_compilation_environment.nixpkgs_environment default_nixpkgs,
     frontend_application_deployment.region us-west,
@@ -240,10 +248,15 @@ DATA STRUCT server_kind {
     architecture: x86_64,
 }
 
+DATA STRUCT tld {
+    domain: epl-infra.net,
+}
+
 DATA STRUCT global_settings [
     {
       project_name: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,
       admin_email: admin@epl-infra.net,
+      admin_tld: epl-infra.net,
     },
 ]
 "#,
@@ -271,7 +284,6 @@ DEFAULTS {
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
     server_disk.disk_kind default-ssd,
-    region.tld epl-infra.net,
     server.nixpkgs_environment default_nixpkgs,
     rust_compilation_environment.nixpkgs_environment default_nixpkgs,
     frontend_application_deployment.region us-west,
@@ -301,10 +313,15 @@ DATA STRUCT server_kind {
     architecture: x86_64,
 }
 
+DATA STRUCT tld {
+    domain: epl-infra.net,
+}
+
 DATA STRUCT global_settings [
     {
       project_name: Ayo,
       admin_email: admin@epl-infra.net,
+      admin_tld: epl-infra.net,
     },
 ]
 "#,
@@ -488,6 +505,7 @@ fn test_arm64_servers_enabled_with_global_flag() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,

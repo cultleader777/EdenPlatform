@@ -2030,7 +2030,7 @@ done
 
        enable = true;
      };
-
+# NIX REGION custom_hardware START
     imports = [ "${modulesPath}/virtualisation/amazon-image.nix" ];
 
 
@@ -2065,7 +2065,7 @@ done
 
 
     networking.usePredictableInterfaceNames = false;
-
+# NIX REGION custom_hardware END
     users.users.named.extraGroups = ["keys"];
     services.bind =
     {
@@ -2794,7 +2794,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"b09d8b975bd573a0dad0ecee82cc849f9837b621b11e01196ad767b007b8df78\",hostname=\"server-f\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"4a08b4edd4b012c367a154e5d04cc5cde22cc8ea4c945f937af97a5f54e91617\",hostname=\"server-f\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE

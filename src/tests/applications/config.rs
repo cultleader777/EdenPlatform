@@ -19,6 +19,7 @@ fn test_application_config_invalid_format() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -158,6 +159,7 @@ fn test_application_config_defined_multiple_times() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -303,6 +305,7 @@ fn test_application_config_undefined() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -450,6 +453,7 @@ fn test_application_config_defined_doesnt_exist() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -595,6 +599,7 @@ fn test_application_doesnt_have_any_configs() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -734,6 +739,7 @@ fn test_application_config_cant_specify_regex_for_bool() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -877,6 +883,7 @@ fn test_application_config_invalid_regex_check() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -1019,6 +1026,7 @@ fn test_application_config_cant_have_min_value() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -1162,6 +1170,7 @@ fn test_application_config_cant_parse_min_value() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -1304,6 +1313,7 @@ fn test_application_config_cant_have_max_value() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -1447,6 +1457,7 @@ fn test_application_config_cant_parse_max_value() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -1590,6 +1601,7 @@ fn test_application_config_min_int_bigger_than_max() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -1734,6 +1746,7 @@ fn test_application_config_min_float_bigger_than_max() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -1878,6 +1891,7 @@ fn test_application_config_min_string_bigger_than_max() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -2022,6 +2036,7 @@ fn test_application_config_invalid_default_value() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -2166,6 +2181,7 @@ fn test_application_config_cant_parse() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -2312,6 +2328,7 @@ fn test_application_config_float_more_than_min_value() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -2459,6 +2476,7 @@ fn test_application_config_float_less_than_max_value() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -2607,6 +2625,7 @@ fn test_application_config_float_precision_loss() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -2755,6 +2774,7 @@ fn test_application_config_regex_fail() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -2902,6 +2922,7 @@ fn test_application_config_int_more_than_min_value() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -3049,6 +3070,7 @@ fn test_application_config_int_less_than_max_value() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -3197,6 +3219,7 @@ fn test_application_config_string_less_than_min_value() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -3345,6 +3368,7 @@ fn test_application_config_string_more_than_max_value() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,

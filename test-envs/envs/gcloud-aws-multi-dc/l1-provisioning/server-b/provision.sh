@@ -2024,7 +2024,7 @@ done
 
        enable = true;
      };
-
+# NIX REGION custom_hardware START
     imports = [ "${modulesPath}/virtualisation/google-compute-image.nix" ];
 
 
@@ -2061,7 +2061,7 @@ done
 
 
     networking.usePredictableInterfaceNames = false;
-
+# NIX REGION custom_hardware END
     users.users.named.extraGroups = ["keys"];
     services.bind =
     {
@@ -2845,7 +2845,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"937dc1811f8185ce75e4497a0f9e3b27fa0f58ad7be4a684f596ef9024c8113c\",hostname=\"server-b\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"5ce8126595d5bf3e9149315ce2a12ba0439467b9b7b454ad49344efa65d5c6a6\",hostname=\"server-b\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE

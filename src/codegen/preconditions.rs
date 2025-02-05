@@ -165,14 +165,13 @@ function check_zfs_root() {
     ROOT_ZPOOL=rpool
     ZPOOL_STATUS=$( zpool status -P $ROOT_ZPOOL )
     ROOT_DISK_DEV_COUNT=$( echo "$ZPOOL_STATUS" | grep '/dev/' | wc -l )
-    if [ "$ROOT_DISK_DEV_COUNT" != "1" ]
+    if [ "$ROOT_DISK_DEV_COUNT" -lt "1" ]
     then
-        echo "Expected only single disk to be in root zpool, found $ROOT_DISK_DEV_COUNT"
+        echo "Expected at least one disk to be in root zpool, found $ROOT_DISK_DEV_COUNT"
         zpool status -P $ROOT_ZPOOL
         exit 7
     fi
 
-    ROOT_ZPOOL='rpool'
     ROOT_DISK=$( echo "$ZPOOL_STATUS" |\
        grep '/dev/' |\
        awk '{print $1}' |\
@@ -180,9 +179,11 @@ function check_zfs_root() {
        xargs readlink -f |\
        xargs lsblk -no pkname |\
        sort | uniq | sed '/^$/d' ) # remove dupes and empty lines, lsblk returns three rows?
-    DEREFFED_ROOT_DISK=$( dereference_disk_link $ROOT_DISK )
+    # root zpool might be mirrored, hence we need to worry about multiple disks
+    export -f dereference_disk_link
+    DEREFFED_ROOT_DISK=$( echo "$ROOT_DISK" | xargs -I{} sh -c 'dereference_disk_link {}' )
     DEREFFED_ZFS_ROOT_DISK=$( dereference_disk_link $ZFS_ROOT_DISK_ID )
-    if [ "$DEREFFED_ROOT_DISK" != "$DEREFFED_ZFS_ROOT_DISK" ]
+    if ! echo "$DEREFFED_ROOT_DISK" | grep -F "$DEREFFED_ZFS_ROOT_DISK" &> /dev/null
     then
         echo "Unexpected root disk id for root zpool of $ROOT_ZPOOL, expected [$ZFS_ROOT_DISK_ID] actual [$ROOT_DISK]"
         zpool status -P $ROOT_ZPOOL

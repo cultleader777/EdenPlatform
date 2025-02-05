@@ -169,7 +169,7 @@ pub fn deploy_postgres_instances(
             );
 
             to_add_pg_access.push((
-                PgAccessKind::Unmanaged(*pg_schema),
+                PgAccessKind::UnmanagedRw(*pg_schema),
                 PostgresDbCredentials {
                     db_host: consul_service.service_fqdn(),
                     db_master_port: db

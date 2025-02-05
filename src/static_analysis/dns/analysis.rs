@@ -1,6 +1,6 @@
 use std::collections::{BTreeSet, BTreeMap, HashMap};
 
-use crate::{database::{TableRowPointerServer, Database, TableRowPointerRegion}, static_analysis::networking::check_servers_regional_distribution};
+use crate::{database::{TableRowPointerServer, Database, TableRowPointerRegion}, static_analysis::{networking::check_servers_regional_distribution, get_global_settings}};
 
 use super::super::{PlatformValidationError, projections::Projection, CheckedDB};
 
@@ -119,7 +119,7 @@ pub fn dns_checks(db: &Database, server_fqdns: &Projection<TableRowPointerServer
         certs_needed: false,
     };
 
-    let settings = super::super::get_global_settings(db);
+    let settings = get_global_settings(db);
     if settings.disable_dns_quorum_tests {
         return Ok(res);
     }
@@ -149,7 +149,7 @@ pub fn dns_checks(db: &Database, server_fqdns: &Projection<TableRowPointerServer
     }
 
     for region in db.region().rows_iter() {
-        let tld = db.tld().c_domain(db.region().c_tld(region));
+        let tld = db.tld().c_domain(settings.admin_tld);
         let fqdn = format!("{}.{}.", db.region().c_region_name(region), tld);
         if let Some(clash_source_table) = all_ingresses_subdomains.get(&fqdn) {
             return Err(PlatformValidationError::DnsRegionNameAndIngressSubdomainFqdnClash {
@@ -308,10 +308,11 @@ pub fn dns_checks(db: &Database, server_fqdns: &Projection<TableRowPointerServer
 }
 
 pub fn server_fqdns(db: &Database) -> Projection<TableRowPointerServer, String> {
+    let settings = get_global_settings(db);
     Projection::create(db.server().rows_iter(), |server| {
         let dc = db.server().c_dc(server);
         let region = db.datacenter().c_region(dc);
-        let tld = db.region().c_tld(region);
+        let tld = settings.admin_tld;
         format!("{}.{}.{}", db.server().c_hostname(server), db.region().c_region_name(region), db.tld().c_domain(tld))
     })
 }

@@ -222,7 +222,6 @@ endif
         maybe_build_epl_executable,
         maybe_depend_epl_exec_build,
         maybe_epl_sources,
-        maybe_epl_exec_build,
         docker_cache_dir,
         docker_cache_cont_name,
     ) = if cfg!(debug_assertions) {
@@ -230,18 +229,17 @@ endif
             "EPL_EXECUTABLE ?= $(realpath $(EPL_PROJECT_DIR)/target/debug/epl)",
             "
 .PHONY: epl-executable
-epl-executable: $(EPL_EXECUTABLE)
+epl-executable:
+	cd $(EPL_PROJECT_DIR) && cargo build
 ",
             " epl-executable",
-            "EPL_SOURCES = $(EPL_PROJECT_DIR)/Cargo.lock $(EPL_PROJECT_DIR)/Cargo.toml $(EPL_PROJECT_DIR)/build.rs $(shell find $(EPL_PROJECT_DIR)/src -type f) $(shell find $(EPL_PROJECT_DIR)/edb-src -type f)",
-            " $(EPL_SOURCES)",
+            "",
             "DOCKER_CACHE_DIR ?= ../../docker-cache",
             "DOCKER_CACHE_CONTAINER_NAME = epl_docker_image_cache",
         )
     } else {
         (
             "EPL_EXECUTABLE ?= epl",
-            "",
             "",
             "",
             "",
@@ -476,9 +474,6 @@ infra-state.sqlite:
 .PHONY: refresh-l1-provisioning-state
 refresh-l1-provisioning-state:
 	$(LOAD_SHELL_LIB) refresh_l1_provisioning_state
-
-$(EPL_EXECUTABLE):{maybe_epl_exec_build}
-	cd $(EPL_PROJECT_DIR) && cargo build
 "#).unwrap();
 }
 

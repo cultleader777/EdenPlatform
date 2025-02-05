@@ -1612,7 +1612,7 @@ done
 
        enable = true;
      };
-
+# NIX REGION custom_hardware START
     imports =
       [ "${modulesPath}/profiles/qemu-guest.nix" ];
 
@@ -1668,7 +1668,7 @@ done
     ";
 
     hardware.cpu.amd.updateMicrocode = lib.mkDefault true;
-
+# NIX REGION custom_hardware END
     users.users.named.extraGroups = ["keys"];
     services.bind =
     {
@@ -2301,7 +2301,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"77c2aab85379862eeb504378dec512daa5043754837a56684b7838ff8a54e6d4\",hostname=\"server-f\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"8a427a71e8c2cf7fb882e19277e116ebe139b9f307c18b3d1a8ab60626224a76\",hostname=\"server-f\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE

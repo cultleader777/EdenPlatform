@@ -695,6 +695,7 @@ fn test_application_deployment_too_few_servers() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -704,7 +705,6 @@ DATA STRUCT global_settings {
 }
 
 DEFAULTS {
-    region.tld epl-infra.net,
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -753,7 +753,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT backend_application_deployment {
@@ -836,6 +835,7 @@ fn test_application_deployment_too_few_ingresses() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -845,7 +845,6 @@ DATA STRUCT global_settings {
 }
 
 DEFAULTS {
-    region.tld epl-infra.net,
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -894,7 +893,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT backend_application_deployment {
@@ -995,6 +993,7 @@ fn test_application_deployment_with_forced_ipv6_has_no_ipv6_ingress() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -1005,7 +1004,6 @@ DATA STRUCT global_settings {
 }
 
 DEFAULTS {
-    region.tld epl-infra.net,
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -1054,7 +1052,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT backend_application_deployment {
@@ -1157,6 +1154,7 @@ fn test_application_deployment_has_too_few_ipv6_ingress() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -1167,7 +1165,6 @@ DATA STRUCT global_settings {
 }
 
 DEFAULTS {
-    region.tld epl-infra.net,
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -1216,7 +1213,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT backend_application_deployment {
@@ -1312,6 +1308,7 @@ fn test_application_deployment_ingress_no_internet() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -1321,7 +1318,6 @@ DATA STRUCT global_settings {
 }
 
 DEFAULTS {
-    region.tld epl-infra.net,
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -1370,7 +1366,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA server(hostname, ssh_interface, is_consul_master, is_nomad_master, is_vault_instance, is_dns_master, is_dns_slave, is_ingress, is_vpn_gateway) {

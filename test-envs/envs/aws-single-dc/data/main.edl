@@ -1,6 +1,7 @@
 DATA STRUCT global_settings {
   project_name: aws-single-dc,
   admin_email: admin@epl-infra.net,
+  admin_tld: epl-infra.net,
   aws_artefacts_s3_bucket_name: negdupnadusk,
 }
 
@@ -24,7 +25,6 @@ DEFAULTS {
   datacenter.implementation aws,
   datacenter.default_server_kind aws.c5n.large,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -54,7 +54,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
     automatic_certificates: false,
   }
 ]

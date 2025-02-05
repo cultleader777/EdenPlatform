@@ -45,10 +45,10 @@ TABLE blackbox_deployment_task_mount {
     server_volume REF FOREIGN CHILD server_volume,
 }
 
-TABLE blackbox_deployment_vault_secret {
-    secret_name TEXT PRIMARY KEY CHILD OF blackbox_deployment_task,
-    target_file_name TEXT DEFAULT '',
-    target_env_var_name TEXT DEFAULT '',
+TABLE blackbox_deployment_env_variable {
+    var_name TEXT PRIMARY KEY CHILD OF blackbox_deployment_task,
+    raw_value TEXT DEFAULT '',
+    value_source TEXT DEFAULT '',
 }
 
 TABLE blackbox_deployment_local_file {
@@ -73,4 +73,14 @@ TABLE blackbox_deployment_service_registration {
 TABLE blackbox_deployment_service_instance {
     service_registration REF blackbox_deployment_service_registration PRIMARY KEY CHILD OF blackbox_deployment_group,
     port REF blackbox_deployment_port,
+}
+
+// TODO: so far only root pages are supported
+// create support for any mountpoint on any page
+TABLE blackbox_deployment_ingress {
+    service REF FOREIGN CHILD blackbox_deployment_service_registration,
+    port INT,
+    subdomain TEXT DEFAULT '',
+    tld REF tld,
+    basic_auth_credentials TEXT DEFAULT '',
 }

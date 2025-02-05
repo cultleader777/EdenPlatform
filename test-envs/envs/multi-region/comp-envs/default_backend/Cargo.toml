@@ -37,3 +37,4 @@ reqwest = { version = "0.12.4", default-features = false, features = ["rustls-tl
 base64 = "0.22.1"
 unescaper = "0.1.4"
 chrono = "0.4.38"
+num256 = "0.5.2"

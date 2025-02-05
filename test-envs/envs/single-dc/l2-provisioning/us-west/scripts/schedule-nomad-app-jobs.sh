@@ -33,4 +33,4 @@ then
 else
   echo Nomad job nomad-jobs/apps_app-test-hello-world.hcl image build failed
 fi
-nomad job run -detach nomad-jobs/apps_bb-moonbeam-dev.hcl
+VAULT_TOKEN=$( cat /run/secdir/epl-job-tokens/epl-bb-depl-moonbeam-dev ) nomad job run -detach nomad-jobs/apps_bb-moonbeam-dev.hcl

@@ -24,6 +24,7 @@ fn test_application_ch_wiring_inserter_table_doesnt_exist() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -119,6 +120,7 @@ fn test_application_ch_wiring_inserter_into_view_table_is_not_allowed() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -211,6 +213,7 @@ fn test_application_ch_wiring_inserter_table_column_type_is_invalid() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -293,6 +296,7 @@ fn test_application_ch_wiring_invalid_format() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -397,6 +401,7 @@ fn test_application_ch_wiring_app_has_no_specific_ch_shard() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -525,6 +530,7 @@ fn test_application_ch_wiring_app_has_no_ch_shards() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -648,6 +654,7 @@ fn test_application_ch_wiring_target_ch_deployment_doesnt_exist() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -777,6 +784,7 @@ fn test_application_ch_wiring_shard_defined_multiple_times() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -946,6 +954,7 @@ fn test_application_ch_wiring_schema_mismatch() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -1136,6 +1145,7 @@ fn test_application_ch_query_not_found_in_schema() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -1309,6 +1319,7 @@ fn test_application_ch_query_defined_twice() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -1497,6 +1508,7 @@ fn test_application_ch_inserter_defined_twice() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -1688,6 +1700,7 @@ fn test_application_ch_mutator_defined_twice() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -1869,6 +1882,7 @@ fn test_application_ch_mutator_doesnt_exist() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,

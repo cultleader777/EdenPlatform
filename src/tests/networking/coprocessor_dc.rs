@@ -11,7 +11,6 @@ fn test_coproc_region_must_have_two_gateways() {
 DATA STRUCT region {
   region_name: us-east,
   availability_mode: single_dc,
-  tld: epl-infra.net,
   has_coprocessor_dc: true,
 }
 
@@ -50,7 +49,6 @@ fn test_coproc_region_dc_has_mpre_than_one_gw() {
 DATA STRUCT region {
   region_name: us-east,
   availability_mode: multi_dc,
-  tld: epl-infra.net,
   has_coprocessor_dc: true,
 }
 
@@ -140,7 +138,6 @@ fn test_non_coproc_region_dc_coproc_gws() {
 DATA STRUCT region {
   region_name: us-east,
   availability_mode: multi_dc,
-  tld: epl-infra.net,
   has_coprocessor_dc: false,
 }
 
@@ -230,7 +227,6 @@ fn test_non_coproc_region_has_coproc_dc() {
 DATA STRUCT region {
   region_name: us-east,
   availability_mode: multi_dc,
-  tld: epl-infra.net,
   has_coprocessor_dc: false,
 }
 
@@ -323,7 +319,6 @@ fn test_coproc_region_dc_has_too_few_gateways() {
 DATA STRUCT region {
   region_name: us-east,
   availability_mode: multi_dc,
-  tld: epl-infra.net,
   has_coprocessor_dc: true,
 }
 
@@ -417,7 +412,6 @@ fn test_coproc_server_is_not_vpn() {
 DATA STRUCT region {
   region_name: us-east,
   availability_mode: single_dc,
-  tld: epl-infra.net,
   has_coprocessor_dc: true,
 }
 
@@ -514,7 +508,6 @@ fn test_coproc_dc_has_coproc_gws() {
 DATA STRUCT region {
   region_name: us-east,
   availability_mode: single_dc,
-  tld: epl-infra.net,
   has_coprocessor_dc: true,
 }
 
@@ -647,7 +640,6 @@ fn test_coproc_region_no_coproc_dc() {
 DATA STRUCT region {
   region_name: us-east,
   availability_mode: single_dc,
-  tld: epl-infra.net,
   has_coprocessor_dc: true,
 }
 
@@ -721,7 +713,6 @@ fn test_coproc_region_more_than_one_coproc_dc() {
 DATA STRUCT region {
   region_name: us-east,
   availability_mode: single_dc,
-  tld: epl-infra.net,
   has_coprocessor_dc: true,
 }
 
@@ -810,7 +801,6 @@ fn test_coproc_forbidden_roles() {
 DATA STRUCT region {
   region_name: us-east,
   availability_mode: single_dc,
-  tld: epl-infra.net,
   has_coprocessor_dc: true,
 }
 
@@ -905,7 +895,6 @@ fn test_coproc_forbidden_vpn_iface_name() {
 DATA STRUCT region {
   region_name: us-east,
   availability_mode: single_dc,
-  tld: epl-infra.net,
   has_coprocessor_dc: true,
 }
 
@@ -1012,7 +1001,6 @@ fn test_coproc_too_few_vpn_interfaces() {
 DATA STRUCT region {
   region_name: us-east,
   availability_mode: single_dc,
-  tld: epl-infra.net,
   has_coprocessor_dc: true,
 }
 

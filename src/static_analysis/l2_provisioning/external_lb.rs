@@ -31,6 +31,7 @@ pub fn deploy_external_lb(
     runtime: &mut ServerRuntime,
     l1proj: &L1Projections,
 ) -> Result<(), PlatformValidationError> {
+    let gs = get_global_settings(db);
     let docker_image_pin = db.region().c_docker_image_external_lb(region);
     let prometheus_lua_module =
         String::from_utf8(include_bytes!("lb_lua_modules/prometheus.lua").to_vec())
@@ -55,16 +56,13 @@ pub fn deploy_external_lb(
         .map(|i| db.tld().c_domain(i).clone())
         .collect::<Vec<_>>()
         .join(" ");
-    let admin_tlds = db
-        .tld()
-        .rows_iter()
-        .filter(|i| db.tld().c_expose_admin(*i))
-        .collect::<Vec<_>>();
 
+    let mut basic_auth_files = Vec::new();
     let site_config_file = generate_lb_site_conf(
-        db, &tlds, &admin_tlds,
+        db, &tlds, gs.admin_tld,
         "/local/admin_htpasswd_file",
         runtime, region,
+        &mut basic_auth_files,
     );
 
     let admin_site = generate_admin_site(runtime);
@@ -76,6 +74,7 @@ pub fn deploy_external_lb(
             "epl-kv/external-elb-conf".to_string(),
             generate_lb_nginx_conf(&site_config_file, "/secrets/prom-server.conf")
         );
+
     let admin_html_config =
         runtime.consul_kv_write(region, "epl-kv/admin-site-html".to_string(), admin_site.clone());
     let region_servers =
@@ -260,6 +259,15 @@ pub fn deploy_external_lb(
             Some(onchange_conf_path.to_string()),
         );
 
+        // TODO: we could unload all basic auth files via one command
+        // from consul key value store so it gets unloaded once
+        // and then we don't need to change the job declaration.
+        //
+        // compile time gzip base64 for the filesystem of files wanted?
+        for (fname, contents) in &basic_auth_files {
+            task.add_secure_config(fname.clone(), contents.clone());
+        }
+
         task.set_entrypoint(vec![start_path]);
     }
 
@@ -356,10 +364,12 @@ fn generate_admin_site(runtime: &ServerRuntime) -> String {
 fn generate_lb_site_conf(
     db: &Database,
     tlds: &str,
-    admin_tlds_slice: &[TableRowPointerTld],
+    admin_tld: TableRowPointerTld,
     admin_htpasswd_file_path: &str,
     runtime: &ServerRuntime,
     region: TableRowPointerRegion,
+    // files where we're asked to make basic auth
+    basic_auth_files: &mut Vec<(String, String)>,
 ) -> String {
     let settings = get_global_settings(db);
 
@@ -401,9 +411,9 @@ server {{
 "#
     );
 
-    for admin_tld in admin_tlds_slice {
-        let certs = if db.tld().c_automatic_certificates(*admin_tld) {
-            let domain = db.tld().c_domain(*admin_tld);
+    { // admin tld
+        let certs = if db.tld().c_automatic_certificates(admin_tld) {
+            let domain = db.tld().c_domain(admin_tld);
             format!(r#"
     ssl_certificate /secrets/tls_cert_{domain}.pem;
     ssl_certificate_key /secrets/tls_key_{domain}.pem;
@@ -414,7 +424,7 @@ server {{
     ssl_certificate_key /etc/ssl/public_tls_key.pem;
 "#.to_string()
         };
-        let admin_tld = db.tld().c_domain(*admin_tld);
+        let admin_tld = db.tld().c_domain(admin_tld);
 
         write!(&mut res,
                r#"
@@ -446,9 +456,6 @@ server {{
     }
 
     for (k, v) in runtime.frontend_lb_routes(region) {
-        // TODO: figure out what to do with multiple TLDS, need better codegen
-        assert!(db.tld().c_expose_admin(*k));
-
         for (subd, rc) in &v.subdomains {
             let certs = if db.tld().c_automatic_certificates(*k) {
                 let domain = db.tld().c_domain(*k);
@@ -538,6 +545,20 @@ server {{
                 }
 
                 res += " {\n";
+
+                if !content.basic_auth.is_empty() {
+                    // no downtime reload screwed
+                    let new_pwd_file = format!("basic_auth_{}.htpasswd", basic_auth_files.len() + 1);
+                    write!(&mut res, r#"
+        auth_basic "Restricted Area";
+        auth_basic_user_file /secrets/{new_pwd_file};
+"#).unwrap();
+                    let mut content = content.basic_auth.clone();
+                    if !content.ends_with("\n") {
+                        content.push('\n');
+                    }
+                    basic_auth_files.push((new_pwd_file, content));
+                }
 
                 match &content.content {
                     crate::static_analysis::server_runtime::RouteContent::InternalUpstream {

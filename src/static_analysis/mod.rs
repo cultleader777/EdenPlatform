@@ -1,7 +1,7 @@
 use std::{sync::Arc, collections::{BTreeMap, HashMap, BTreeSet, HashSet}};
 
 use crate::{database::{Database, TableRowPointerBackendApplication, TableRowPointerPgSchema, TableRowPointerVersionedType, TableRowPointerBackendHttpEndpoint, TableRowPointerHttpMethods, TableRowPointerHttpEndpointDataType, TableRowPointerPgTransaction, TableRowPointerServer, TableRowPointerNetworkInterface, TableRowPointerBackendApplicationPgShard, TableRowPointerBackendApplicationDeployment, TableRowPointerPgDeploymentSchemas, TableRowPointerBackendApplicationNatsStream, TableRowPointerNatsJetstreamStream, TableRowPointerAlertTriggerTest, TableRowPointerNixpkgsVersion, TableRowPointerFrontendPage, TableRowPointerFrontendApplication, TableRowPointerFrontendApplicationUsedEndpoint, TableRowPointerFrontendApplicationDeployment, TableRowPointerBackendApplicationDeploymentIngress, TableRowPointerFrontendApplicationExternalPage, TableRowPointerFrontendApplicationExternalLink, TableRowPointerFrontendApplicationDeploymentIngress, TableRowPointerTld, TableRowPointerLokiCluster, TableRowPointerMonitoringCluster, TableRowPointerRegion, TableRowPointerDatacenter, TableRowGlobalSettings, TableRowPointerServerKind, TableRowPointerServerDisk, TableRowPointerTempoCluster, TableRowPointerBackendApplicationS3Bucket, TableRowPointerMinioBucket, TableRowPointerBackendApplicationConfig, TableRowPointerChSchema, TableRowPointerChDeploymentSchemas, TableRowPointerBackendApplicationChShard, TableRowPointerNomadNamespace}, codegen::rust::{RustVersionedTypeSnippets, GeneratedRustSourceForHttpEndpoint}, prom_metrics_dump::AllClusterSeriesDatabase};
-use self::{databases::{postgres::{EnrichedPgDbData, TransactionStep}, clickhouse::EnrichedChDbData}, bw_compat_types::ComputedType, projections::{Projection, Index, VersionedTypeUsageFlags}, http_endpoints::{CheckedHttpEndpoint, HttpPathTree, PathArgs}, networking::{NetworkAnalysisOutput, ClusterPicker, DcVpnGateways, VpnGateway}, server_runtime::ServerRuntime, applications::{ApplicationPgQueries, ApplicationChQueries}, alerts::{PromtoolTestSuite, AlertTestCompiled}, dns::DnsChecks, dc_impl::{aws::AwsTopology, gcloud::GcloudTopology, bm_simple::BmSimpleDatacenterArguments}, docker_images::run_docker_image_checks, server_labels::LabelDatabase, l2_provisioning::epl_app_ingress::IpsCollection};
+use self::{databases::{postgres::{EnrichedPgDbData, TransactionStep}, clickhouse::EnrichedChDbData}, bw_compat_types::ComputedType, projections::{Projection, Index, VersionedTypeUsageFlags}, http_endpoints::{CheckedHttpEndpoint, HttpPathTree, PathArgs}, networking::{NetworkAnalysisOutput, ClusterPicker, DcVpnGateways, VpnGateway}, server_runtime::ServerRuntime, applications::{ApplicationPgQueries, ApplicationChQueries}, alerts::{PromtoolTestSuite, AlertTestCompiled}, dns::DnsChecks, dc_impl::{aws::AwsTopology, gcloud::GcloudTopology, bm_simple::BmSimpleDatacenterArguments}, docker_images::run_docker_image_checks, server_labels::LabelDatabase, l2_provisioning::{epl_app_ingress::IpsCollection, blackbox_deployments::BlackBoxDeploymentResource}};
 
 pub mod networking;
 pub mod databases;
@@ -27,7 +27,7 @@ impl std::fmt::Display for PlatformValidationError {
         write!(f, "platform validation error: {:?}", self)
     }
 }
- 
+
 impl std::error::Error for PlatformValidationError {}
 pub struct Projections {
     pub versioned_types: Projection<TableRowPointerVersionedType, Vec<ComputedType>>,
@@ -76,6 +76,7 @@ pub struct Projections {
     pub pg_schemas_in_region: Projection<TableRowPointerRegion, HashSet<TableRowPointerPgSchema>>,
     pub ch_schemas_in_region: Projection<TableRowPointerRegion, HashSet<TableRowPointerChSchema>>,
     pub provisioning_server_in_region: Projection<TableRowPointerRegion, Option<TableRowPointerServer>>,
+    pub bb_depl_resources_per_region: Projection<TableRowPointerRegion, BTreeMap<String, BlackBoxDeploymentResource>>,
     pub vpn_gateways: BTreeMap<TableRowPointerDatacenter, DcVpnGateways>,
     pub vpn_p2p_links: BTreeMap<TableRowPointerServer, Vec<VpnGateway>>,
     pub server_kinds: Projection<TableRowPointerServer, TableRowPointerServerKind>,
@@ -135,6 +136,7 @@ pub struct L1Projections<'a> {
     pub label_database: &'a LabelDatabase,
     pub versioned_types: &'a Projection<TableRowPointerVersionedType, Vec<ComputedType>>,
     pub epl_nomad_namespace: TableRowPointerNomadNamespace,
+    pub bb_depl_resources_per_region: &'a Projection<TableRowPointerRegion, BTreeMap<String, BlackBoxDeploymentResource>>,
 }
 
 pub struct CheckedDB {

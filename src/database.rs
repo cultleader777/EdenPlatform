@@ -54,7 +54,13 @@ pub struct TableRowPointerBackendHttpEndpoint(usize);
 pub struct TableRowPointerBlackboxDeployment(usize);
 
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
+pub struct TableRowPointerBlackboxDeploymentEnvVariable(usize);
+
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
 pub struct TableRowPointerBlackboxDeploymentGroup(usize);
+
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
+pub struct TableRowPointerBlackboxDeploymentIngress(usize);
 
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
 pub struct TableRowPointerBlackboxDeploymentLocalFile(usize);
@@ -73,9 +79,6 @@ pub struct TableRowPointerBlackboxDeploymentTask(usize);
 
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
 pub struct TableRowPointerBlackboxDeploymentTaskMount(usize);
-
-#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
-pub struct TableRowPointerBlackboxDeploymentVaultSecret(usize);
 
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
 pub struct TableRowPointerChDeployment(usize);
@@ -525,6 +528,14 @@ pub struct TableRowBlackboxDeployment {
 }
 
 #[derive(Debug)]
+pub struct TableRowBlackboxDeploymentEnvVariable {
+    pub var_name: ::std::string::String,
+    pub raw_value: ::std::string::String,
+    pub value_source: ::std::string::String,
+    pub parent: TableRowPointerBlackboxDeploymentTask,
+}
+
+#[derive(Debug)]
 pub struct TableRowBlackboxDeploymentGroup {
     pub group_name: ::std::string::String,
     pub count: i64,
@@ -534,6 +545,15 @@ pub struct TableRowBlackboxDeploymentGroup {
     pub children_blackbox_deployment_port: Vec<TableRowPointerBlackboxDeploymentPort>,
     pub children_blackbox_deployment_task: Vec<TableRowPointerBlackboxDeploymentTask>,
     pub children_blackbox_deployment_service_instance: Vec<TableRowPointerBlackboxDeploymentServiceInstance>,
+}
+
+#[derive(Debug)]
+pub struct TableRowBlackboxDeploymentIngress {
+    pub service: TableRowPointerBlackboxDeploymentServiceRegistration,
+    pub port: i64,
+    pub subdomain: ::std::string::String,
+    pub tld: TableRowPointerTld,
+    pub basic_auth_credentials: ::std::string::String,
 }
 
 #[derive(Debug)]
@@ -568,6 +588,7 @@ pub struct TableRowBlackboxDeploymentServiceRegistration {
     pub min_instances: i64,
     pub parent: TableRowPointerBlackboxDeployment,
     pub referrers_blackbox_deployment_service_instance__service_registration: Vec<TableRowPointerBlackboxDeploymentServiceInstance>,
+    pub referrers_blackbox_deployment_ingress__service: Vec<TableRowPointerBlackboxDeploymentIngress>,
 }
 
 #[derive(Debug)]
@@ -581,7 +602,7 @@ pub struct TableRowBlackboxDeploymentTask {
     pub args: ::std::string::String,
     pub parent: TableRowPointerBlackboxDeploymentGroup,
     pub children_blackbox_deployment_task_mount: Vec<TableRowPointerBlackboxDeploymentTaskMount>,
-    pub children_blackbox_deployment_vault_secret: Vec<TableRowPointerBlackboxDeploymentVaultSecret>,
+    pub children_blackbox_deployment_env_variable: Vec<TableRowPointerBlackboxDeploymentEnvVariable>,
     pub children_blackbox_deployment_local_file: Vec<TableRowPointerBlackboxDeploymentLocalFile>,
 }
 
@@ -589,14 +610,6 @@ pub struct TableRowBlackboxDeploymentTask {
 pub struct TableRowBlackboxDeploymentTaskMount {
     pub target_path: ::std::string::String,
     pub server_volume: TableRowPointerServerVolume,
-    pub parent: TableRowPointerBlackboxDeploymentTask,
-}
-
-#[derive(Debug)]
-pub struct TableRowBlackboxDeploymentVaultSecret {
-    pub secret_name: ::std::string::String,
-    pub target_file_name: ::std::string::String,
-    pub target_env_var_name: ::std::string::String,
     pub parent: TableRowPointerBlackboxDeploymentTask,
 }
 
@@ -919,6 +932,7 @@ pub struct TableRowGlobalSettings {
     pub update_edl_public_ips_from_terraform: bool,
     pub enable_ipv6: bool,
     pub force_ipv6: bool,
+    pub admin_tld: TableRowPointerTld,
 }
 
 #[derive(Debug)]
@@ -1315,7 +1329,6 @@ pub struct TableRowPgTransaction {
 pub struct TableRowRegion {
     pub region_name: ::std::string::String,
     pub availability_mode: ::std::string::String,
-    pub tld: TableRowPointerTld,
     pub is_dns_master: bool,
     pub is_dns_slave: bool,
     pub has_coprocessor_dc: bool,
@@ -1571,11 +1584,12 @@ pub struct TableRowTempoCluster {
 #[derive(Debug)]
 pub struct TableRowTld {
     pub domain: ::std::string::String,
-    pub expose_admin: bool,
     pub automatic_certificates: bool,
-    pub referrers_region__tld: Vec<TableRowPointerRegion>,
+    pub dnssec_enabled: bool,
+    pub referrers_global_settings__admin_tld: Vec<TableRowPointerGlobalSettings>,
     pub referrers_backend_application_deployment_ingress__tld: Vec<TableRowPointerBackendApplicationDeploymentIngress>,
     pub referrers_frontend_application_deployment_ingress__tld: Vec<TableRowPointerFrontendApplicationDeploymentIngress>,
+    pub referrers_blackbox_deployment_ingress__tld: Vec<TableRowPointerBlackboxDeploymentIngress>,
 }
 
 #[derive(Debug)]
@@ -1787,6 +1801,14 @@ pub struct TableDefinitionBlackboxDeployment {
     c_children_blackbox_deployment_service_registration: Vec<Vec<TableRowPointerBlackboxDeploymentServiceRegistration>>,
 }
 
+pub struct TableDefinitionBlackboxDeploymentEnvVariable {
+    rows: Vec<TableRowBlackboxDeploymentEnvVariable>,
+    c_var_name: Vec<::std::string::String>,
+    c_raw_value: Vec<::std::string::String>,
+    c_value_source: Vec<::std::string::String>,
+    c_parent: Vec<TableRowPointerBlackboxDeploymentTask>,
+}
+
 pub struct TableDefinitionBlackboxDeploymentGroup {
     rows: Vec<TableRowBlackboxDeploymentGroup>,
     c_group_name: Vec<::std::string::String>,
@@ -1797,6 +1819,15 @@ pub struct TableDefinitionBlackboxDeploymentGroup {
     c_children_blackbox_deployment_port: Vec<Vec<TableRowPointerBlackboxDeploymentPort>>,
     c_children_blackbox_deployment_task: Vec<Vec<TableRowPointerBlackboxDeploymentTask>>,
     c_children_blackbox_deployment_service_instance: Vec<Vec<TableRowPointerBlackboxDeploymentServiceInstance>>,
+}
+
+pub struct TableDefinitionBlackboxDeploymentIngress {
+    rows: Vec<TableRowBlackboxDeploymentIngress>,
+    c_service: Vec<TableRowPointerBlackboxDeploymentServiceRegistration>,
+    c_port: Vec<i64>,
+    c_subdomain: Vec<::std::string::String>,
+    c_tld: Vec<TableRowPointerTld>,
+    c_basic_auth_credentials: Vec<::std::string::String>,
 }
 
 pub struct TableDefinitionBlackboxDeploymentLocalFile {
@@ -1831,6 +1862,7 @@ pub struct TableDefinitionBlackboxDeploymentServiceRegistration {
     c_min_instances: Vec<i64>,
     c_parent: Vec<TableRowPointerBlackboxDeployment>,
     c_referrers_blackbox_deployment_service_instance__service_registration: Vec<Vec<TableRowPointerBlackboxDeploymentServiceInstance>>,
+    c_referrers_blackbox_deployment_ingress__service: Vec<Vec<TableRowPointerBlackboxDeploymentIngress>>,
 }
 
 pub struct TableDefinitionBlackboxDeploymentTask {
@@ -1844,7 +1876,7 @@ pub struct TableDefinitionBlackboxDeploymentTask {
     c_args: Vec<::std::string::String>,
     c_parent: Vec<TableRowPointerBlackboxDeploymentGroup>,
     c_children_blackbox_deployment_task_mount: Vec<Vec<TableRowPointerBlackboxDeploymentTaskMount>>,
-    c_children_blackbox_deployment_vault_secret: Vec<Vec<TableRowPointerBlackboxDeploymentVaultSecret>>,
+    c_children_blackbox_deployment_env_variable: Vec<Vec<TableRowPointerBlackboxDeploymentEnvVariable>>,
     c_children_blackbox_deployment_local_file: Vec<Vec<TableRowPointerBlackboxDeploymentLocalFile>>,
 }
 
@@ -1852,14 +1884,6 @@ pub struct TableDefinitionBlackboxDeploymentTaskMount {
     rows: Vec<TableRowBlackboxDeploymentTaskMount>,
     c_target_path: Vec<::std::string::String>,
     c_server_volume: Vec<TableRowPointerServerVolume>,
-    c_parent: Vec<TableRowPointerBlackboxDeploymentTask>,
-}
-
-pub struct TableDefinitionBlackboxDeploymentVaultSecret {
-    rows: Vec<TableRowBlackboxDeploymentVaultSecret>,
-    c_secret_name: Vec<::std::string::String>,
-    c_target_file_name: Vec<::std::string::String>,
-    c_target_env_var_name: Vec<::std::string::String>,
     c_parent: Vec<TableRowPointerBlackboxDeploymentTask>,
 }
 
@@ -2182,6 +2206,7 @@ pub struct TableDefinitionGlobalSettings {
     c_update_edl_public_ips_from_terraform: Vec<bool>,
     c_enable_ipv6: Vec<bool>,
     c_force_ipv6: Vec<bool>,
+    c_admin_tld: Vec<TableRowPointerTld>,
 }
 
 pub struct TableDefinitionGrafana {
@@ -2578,7 +2603,6 @@ pub struct TableDefinitionRegion {
     rows: Vec<TableRowRegion>,
     c_region_name: Vec<::std::string::String>,
     c_availability_mode: Vec<::std::string::String>,
-    c_tld: Vec<TableRowPointerTld>,
     c_is_dns_master: Vec<bool>,
     c_is_dns_slave: Vec<bool>,
     c_has_coprocessor_dc: Vec<bool>,
@@ -2834,11 +2858,12 @@ pub struct TableDefinitionTempoCluster {
 pub struct TableDefinitionTld {
     rows: Vec<TableRowTld>,
     c_domain: Vec<::std::string::String>,
-    c_expose_admin: Vec<bool>,
     c_automatic_certificates: Vec<bool>,
-    c_referrers_region__tld: Vec<Vec<TableRowPointerRegion>>,
+    c_dnssec_enabled: Vec<bool>,
+    c_referrers_global_settings__admin_tld: Vec<Vec<TableRowPointerGlobalSettings>>,
     c_referrers_backend_application_deployment_ingress__tld: Vec<Vec<TableRowPointerBackendApplicationDeploymentIngress>>,
     c_referrers_frontend_application_deployment_ingress__tld: Vec<Vec<TableRowPointerFrontendApplicationDeploymentIngress>>,
+    c_referrers_blackbox_deployment_ingress__tld: Vec<Vec<TableRowPointerBlackboxDeploymentIngress>>,
 }
 
 pub struct TableDefinitionUniqueApplicationNames {
@@ -2901,14 +2926,15 @@ pub struct Database {
     backend_application_s3_bucket: TableDefinitionBackendApplicationS3Bucket,
     backend_http_endpoint: TableDefinitionBackendHttpEndpoint,
     blackbox_deployment: TableDefinitionBlackboxDeployment,
+    blackbox_deployment_env_variable: TableDefinitionBlackboxDeploymentEnvVariable,
     blackbox_deployment_group: TableDefinitionBlackboxDeploymentGroup,
+    blackbox_deployment_ingress: TableDefinitionBlackboxDeploymentIngress,
     blackbox_deployment_local_file: TableDefinitionBlackboxDeploymentLocalFile,
     blackbox_deployment_port: TableDefinitionBlackboxDeploymentPort,
     blackbox_deployment_service_instance: TableDefinitionBlackboxDeploymentServiceInstance,
     blackbox_deployment_service_registration: TableDefinitionBlackboxDeploymentServiceRegistration,
     blackbox_deployment_task: TableDefinitionBlackboxDeploymentTask,
     blackbox_deployment_task_mount: TableDefinitionBlackboxDeploymentTaskMount,
-    blackbox_deployment_vault_secret: TableDefinitionBlackboxDeploymentVaultSecret,
     ch_deployment: TableDefinitionChDeployment,
     ch_deployment_instance: TableDefinitionChDeploymentInstance,
     ch_deployment_schemas: TableDefinitionChDeploymentSchemas,
@@ -3070,8 +3096,16 @@ impl Database {
         &self.blackbox_deployment
     }
 
+    pub fn blackbox_deployment_env_variable(&self) -> &TableDefinitionBlackboxDeploymentEnvVariable {
+        &self.blackbox_deployment_env_variable
+    }
+
     pub fn blackbox_deployment_group(&self) -> &TableDefinitionBlackboxDeploymentGroup {
         &self.blackbox_deployment_group
+    }
+
+    pub fn blackbox_deployment_ingress(&self) -> &TableDefinitionBlackboxDeploymentIngress {
+        &self.blackbox_deployment_ingress
     }
 
     pub fn blackbox_deployment_local_file(&self) -> &TableDefinitionBlackboxDeploymentLocalFile {
@@ -3096,10 +3130,6 @@ impl Database {
 
     pub fn blackbox_deployment_task_mount(&self) -> &TableDefinitionBlackboxDeploymentTaskMount {
         &self.blackbox_deployment_task_mount
-    }
-
-    pub fn blackbox_deployment_vault_secret(&self) -> &TableDefinitionBlackboxDeploymentVaultSecret {
-        &self.blackbox_deployment_vault_secret
     }
 
     pub fn ch_deployment(&self) -> &TableDefinitionChDeployment {
@@ -3956,6 +3986,28 @@ impl Database {
             });
         }
 
+        let blackbox_deployment_env_variable_var_name: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let blackbox_deployment_env_variable_raw_value: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let blackbox_deployment_env_variable_value_source: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let blackbox_deployment_env_variable_parent: Vec<TableRowPointerBlackboxDeploymentTask> = ::bincode::deserialize_from(&mut cursor)?;
+
+        let blackbox_deployment_env_variable_len = blackbox_deployment_env_variable_parent.len();
+
+        assert_eq!(blackbox_deployment_env_variable_len, blackbox_deployment_env_variable_var_name.len());
+        assert_eq!(blackbox_deployment_env_variable_len, blackbox_deployment_env_variable_raw_value.len());
+        assert_eq!(blackbox_deployment_env_variable_len, blackbox_deployment_env_variable_value_source.len());
+
+        let mut rows_blackbox_deployment_env_variable: Vec<TableRowBlackboxDeploymentEnvVariable> = Vec::with_capacity(blackbox_deployment_env_variable_len);
+        #[allow(clippy::needless_range_loop)]
+        for row in 0..blackbox_deployment_env_variable_len {
+            rows_blackbox_deployment_env_variable.push(TableRowBlackboxDeploymentEnvVariable {
+                var_name: blackbox_deployment_env_variable_var_name[row].clone(),
+                raw_value: blackbox_deployment_env_variable_raw_value[row].clone(),
+                value_source: blackbox_deployment_env_variable_value_source[row].clone(),
+                parent: blackbox_deployment_env_variable_parent[row],
+            });
+        }
+
         let blackbox_deployment_group_group_name: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
         let blackbox_deployment_group_count: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let blackbox_deployment_group_workload_architecture: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
@@ -3987,6 +4039,31 @@ impl Database {
                 children_blackbox_deployment_port: blackbox_deployment_group_children_blackbox_deployment_port[row].clone(),
                 children_blackbox_deployment_task: blackbox_deployment_group_children_blackbox_deployment_task[row].clone(),
                 children_blackbox_deployment_service_instance: blackbox_deployment_group_children_blackbox_deployment_service_instance[row].clone(),
+            });
+        }
+
+        let blackbox_deployment_ingress_service: Vec<TableRowPointerBlackboxDeploymentServiceRegistration> = ::bincode::deserialize_from(&mut cursor)?;
+        let blackbox_deployment_ingress_port: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
+        let blackbox_deployment_ingress_subdomain: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let blackbox_deployment_ingress_tld: Vec<TableRowPointerTld> = ::bincode::deserialize_from(&mut cursor)?;
+        let blackbox_deployment_ingress_basic_auth_credentials: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+
+        let blackbox_deployment_ingress_len = blackbox_deployment_ingress_basic_auth_credentials.len();
+
+        assert_eq!(blackbox_deployment_ingress_len, blackbox_deployment_ingress_service.len());
+        assert_eq!(blackbox_deployment_ingress_len, blackbox_deployment_ingress_port.len());
+        assert_eq!(blackbox_deployment_ingress_len, blackbox_deployment_ingress_subdomain.len());
+        assert_eq!(blackbox_deployment_ingress_len, blackbox_deployment_ingress_tld.len());
+
+        let mut rows_blackbox_deployment_ingress: Vec<TableRowBlackboxDeploymentIngress> = Vec::with_capacity(blackbox_deployment_ingress_len);
+        #[allow(clippy::needless_range_loop)]
+        for row in 0..blackbox_deployment_ingress_len {
+            rows_blackbox_deployment_ingress.push(TableRowBlackboxDeploymentIngress {
+                service: blackbox_deployment_ingress_service[row],
+                port: blackbox_deployment_ingress_port[row],
+                subdomain: blackbox_deployment_ingress_subdomain[row].clone(),
+                tld: blackbox_deployment_ingress_tld[row],
+                basic_auth_credentials: blackbox_deployment_ingress_basic_auth_credentials[row].clone(),
             });
         }
 
@@ -4062,14 +4139,16 @@ impl Database {
         let blackbox_deployment_service_registration_min_instances: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let blackbox_deployment_service_registration_parent: Vec<TableRowPointerBlackboxDeployment> = ::bincode::deserialize_from(&mut cursor)?;
         let blackbox_deployment_service_registration_referrers_blackbox_deployment_service_instance__service_registration: Vec<Vec<TableRowPointerBlackboxDeploymentServiceInstance>> = ::bincode::deserialize_from(&mut cursor)?;
+        let blackbox_deployment_service_registration_referrers_blackbox_deployment_ingress__service: Vec<Vec<TableRowPointerBlackboxDeploymentIngress>> = ::bincode::deserialize_from(&mut cursor)?;
 
-        let blackbox_deployment_service_registration_len = blackbox_deployment_service_registration_referrers_blackbox_deployment_service_instance__service_registration.len();
+        let blackbox_deployment_service_registration_len = blackbox_deployment_service_registration_referrers_blackbox_deployment_ingress__service.len();
 
         assert_eq!(blackbox_deployment_service_registration_len, blackbox_deployment_service_registration_service_name.len());
         assert_eq!(blackbox_deployment_service_registration_len, blackbox_deployment_service_registration_scrape_prometheus_metrics.len());
         assert_eq!(blackbox_deployment_service_registration_len, blackbox_deployment_service_registration_prometheus_metrics_path.len());
         assert_eq!(blackbox_deployment_service_registration_len, blackbox_deployment_service_registration_min_instances.len());
         assert_eq!(blackbox_deployment_service_registration_len, blackbox_deployment_service_registration_parent.len());
+        assert_eq!(blackbox_deployment_service_registration_len, blackbox_deployment_service_registration_referrers_blackbox_deployment_service_instance__service_registration.len());
 
         let mut rows_blackbox_deployment_service_registration: Vec<TableRowBlackboxDeploymentServiceRegistration> = Vec::with_capacity(blackbox_deployment_service_registration_len);
         #[allow(clippy::needless_range_loop)]
@@ -4081,6 +4160,7 @@ impl Database {
                 min_instances: blackbox_deployment_service_registration_min_instances[row],
                 parent: blackbox_deployment_service_registration_parent[row],
                 referrers_blackbox_deployment_service_instance__service_registration: blackbox_deployment_service_registration_referrers_blackbox_deployment_service_instance__service_registration[row].clone(),
+                referrers_blackbox_deployment_ingress__service: blackbox_deployment_service_registration_referrers_blackbox_deployment_ingress__service[row].clone(),
             });
         }
 
@@ -4093,7 +4173,7 @@ impl Database {
         let blackbox_deployment_task_args: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
         let blackbox_deployment_task_parent: Vec<TableRowPointerBlackboxDeploymentGroup> = ::bincode::deserialize_from(&mut cursor)?;
         let blackbox_deployment_task_children_blackbox_deployment_task_mount: Vec<Vec<TableRowPointerBlackboxDeploymentTaskMount>> = ::bincode::deserialize_from(&mut cursor)?;
-        let blackbox_deployment_task_children_blackbox_deployment_vault_secret: Vec<Vec<TableRowPointerBlackboxDeploymentVaultSecret>> = ::bincode::deserialize_from(&mut cursor)?;
+        let blackbox_deployment_task_children_blackbox_deployment_env_variable: Vec<Vec<TableRowPointerBlackboxDeploymentEnvVariable>> = ::bincode::deserialize_from(&mut cursor)?;
         let blackbox_deployment_task_children_blackbox_deployment_local_file: Vec<Vec<TableRowPointerBlackboxDeploymentLocalFile>> = ::bincode::deserialize_from(&mut cursor)?;
 
         let blackbox_deployment_task_len = blackbox_deployment_task_children_blackbox_deployment_local_file.len();
@@ -4107,7 +4187,7 @@ impl Database {
         assert_eq!(blackbox_deployment_task_len, blackbox_deployment_task_args.len());
         assert_eq!(blackbox_deployment_task_len, blackbox_deployment_task_parent.len());
         assert_eq!(blackbox_deployment_task_len, blackbox_deployment_task_children_blackbox_deployment_task_mount.len());
-        assert_eq!(blackbox_deployment_task_len, blackbox_deployment_task_children_blackbox_deployment_vault_secret.len());
+        assert_eq!(blackbox_deployment_task_len, blackbox_deployment_task_children_blackbox_deployment_env_variable.len());
 
         let mut rows_blackbox_deployment_task: Vec<TableRowBlackboxDeploymentTask> = Vec::with_capacity(blackbox_deployment_task_len);
         #[allow(clippy::needless_range_loop)]
@@ -4122,7 +4202,7 @@ impl Database {
                 args: blackbox_deployment_task_args[row].clone(),
                 parent: blackbox_deployment_task_parent[row],
                 children_blackbox_deployment_task_mount: blackbox_deployment_task_children_blackbox_deployment_task_mount[row].clone(),
-                children_blackbox_deployment_vault_secret: blackbox_deployment_task_children_blackbox_deployment_vault_secret[row].clone(),
+                children_blackbox_deployment_env_variable: blackbox_deployment_task_children_blackbox_deployment_env_variable[row].clone(),
                 children_blackbox_deployment_local_file: blackbox_deployment_task_children_blackbox_deployment_local_file[row].clone(),
             });
         }
@@ -4143,28 +4223,6 @@ impl Database {
                 target_path: blackbox_deployment_task_mount_target_path[row].clone(),
                 server_volume: blackbox_deployment_task_mount_server_volume[row],
                 parent: blackbox_deployment_task_mount_parent[row],
-            });
-        }
-
-        let blackbox_deployment_vault_secret_secret_name: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
-        let blackbox_deployment_vault_secret_target_file_name: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
-        let blackbox_deployment_vault_secret_target_env_var_name: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
-        let blackbox_deployment_vault_secret_parent: Vec<TableRowPointerBlackboxDeploymentTask> = ::bincode::deserialize_from(&mut cursor)?;
-
-        let blackbox_deployment_vault_secret_len = blackbox_deployment_vault_secret_parent.len();
-
-        assert_eq!(blackbox_deployment_vault_secret_len, blackbox_deployment_vault_secret_secret_name.len());
-        assert_eq!(blackbox_deployment_vault_secret_len, blackbox_deployment_vault_secret_target_file_name.len());
-        assert_eq!(blackbox_deployment_vault_secret_len, blackbox_deployment_vault_secret_target_env_var_name.len());
-
-        let mut rows_blackbox_deployment_vault_secret: Vec<TableRowBlackboxDeploymentVaultSecret> = Vec::with_capacity(blackbox_deployment_vault_secret_len);
-        #[allow(clippy::needless_range_loop)]
-        for row in 0..blackbox_deployment_vault_secret_len {
-            rows_blackbox_deployment_vault_secret.push(TableRowBlackboxDeploymentVaultSecret {
-                secret_name: blackbox_deployment_vault_secret_secret_name[row].clone(),
-                target_file_name: blackbox_deployment_vault_secret_target_file_name[row].clone(),
-                target_env_var_name: blackbox_deployment_vault_secret_target_env_var_name[row].clone(),
-                parent: blackbox_deployment_vault_secret_parent[row],
             });
         }
 
@@ -5017,8 +5075,9 @@ impl Database {
         let global_settings_update_edl_public_ips_from_terraform: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let global_settings_enable_ipv6: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let global_settings_force_ipv6: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
+        let global_settings_admin_tld: Vec<TableRowPointerTld> = ::bincode::deserialize_from(&mut cursor)?;
 
-        let global_settings_len = global_settings_force_ipv6.len();
+        let global_settings_len = global_settings_admin_tld.len();
 
         assert_eq!(global_settings_len, global_settings_project_name.len());
         assert_eq!(global_settings_len, global_settings_docker_registry_port.len());
@@ -5043,6 +5102,7 @@ impl Database {
         assert_eq!(global_settings_len, global_settings_experimental_enable_arm64_support.len());
         assert_eq!(global_settings_len, global_settings_update_edl_public_ips_from_terraform.len());
         assert_eq!(global_settings_len, global_settings_enable_ipv6.len());
+        assert_eq!(global_settings_len, global_settings_force_ipv6.len());
 
         let mut rows_global_settings: Vec<TableRowGlobalSettings> = Vec::with_capacity(global_settings_len);
         #[allow(clippy::needless_range_loop)]
@@ -5072,6 +5132,7 @@ impl Database {
                 update_edl_public_ips_from_terraform: global_settings_update_edl_public_ips_from_terraform[row],
                 enable_ipv6: global_settings_enable_ipv6[row],
                 force_ipv6: global_settings_force_ipv6[row],
+                admin_tld: global_settings_admin_tld[row],
             });
         }
 
@@ -6177,7 +6238,6 @@ impl Database {
 
         let region_region_name: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
         let region_availability_mode: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
-        let region_tld: Vec<TableRowPointerTld> = ::bincode::deserialize_from(&mut cursor)?;
         let region_is_dns_master: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let region_is_dns_slave: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let region_has_coprocessor_dc: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
@@ -6202,7 +6262,6 @@ impl Database {
 
         assert_eq!(region_len, region_region_name.len());
         assert_eq!(region_len, region_availability_mode.len());
-        assert_eq!(region_len, region_tld.len());
         assert_eq!(region_len, region_is_dns_master.len());
         assert_eq!(region_len, region_is_dns_slave.len());
         assert_eq!(region_len, region_has_coprocessor_dc.len());
@@ -6228,7 +6287,6 @@ impl Database {
             rows_region.push(TableRowRegion {
                 region_name: region_region_name[row].clone(),
                 availability_mode: region_availability_mode[row].clone(),
-                tld: region_tld[row],
                 is_dns_master: region_is_dns_master[row],
                 is_dns_slave: region_is_dns_slave[row],
                 has_coprocessor_dc: region_has_coprocessor_dc[row],
@@ -6901,30 +6959,33 @@ impl Database {
         }
 
         let tld_domain: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
-        let tld_expose_admin: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let tld_automatic_certificates: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
-        let tld_referrers_region__tld: Vec<Vec<TableRowPointerRegion>> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_dnssec_enabled: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_referrers_global_settings__admin_tld: Vec<Vec<TableRowPointerGlobalSettings>> = ::bincode::deserialize_from(&mut cursor)?;
         let tld_referrers_backend_application_deployment_ingress__tld: Vec<Vec<TableRowPointerBackendApplicationDeploymentIngress>> = ::bincode::deserialize_from(&mut cursor)?;
         let tld_referrers_frontend_application_deployment_ingress__tld: Vec<Vec<TableRowPointerFrontendApplicationDeploymentIngress>> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_referrers_blackbox_deployment_ingress__tld: Vec<Vec<TableRowPointerBlackboxDeploymentIngress>> = ::bincode::deserialize_from(&mut cursor)?;
 
-        let tld_len = tld_referrers_frontend_application_deployment_ingress__tld.len();
+        let tld_len = tld_referrers_blackbox_deployment_ingress__tld.len();
 
         assert_eq!(tld_len, tld_domain.len());
-        assert_eq!(tld_len, tld_expose_admin.len());
         assert_eq!(tld_len, tld_automatic_certificates.len());
-        assert_eq!(tld_len, tld_referrers_region__tld.len());
+        assert_eq!(tld_len, tld_dnssec_enabled.len());
+        assert_eq!(tld_len, tld_referrers_global_settings__admin_tld.len());
         assert_eq!(tld_len, tld_referrers_backend_application_deployment_ingress__tld.len());
+        assert_eq!(tld_len, tld_referrers_frontend_application_deployment_ingress__tld.len());
 
         let mut rows_tld: Vec<TableRowTld> = Vec::with_capacity(tld_len);
         #[allow(clippy::needless_range_loop)]
         for row in 0..tld_len {
             rows_tld.push(TableRowTld {
                 domain: tld_domain[row].clone(),
-                expose_admin: tld_expose_admin[row],
                 automatic_certificates: tld_automatic_certificates[row],
-                referrers_region__tld: tld_referrers_region__tld[row].clone(),
+                dnssec_enabled: tld_dnssec_enabled[row],
+                referrers_global_settings__admin_tld: tld_referrers_global_settings__admin_tld[row].clone(),
                 referrers_backend_application_deployment_ingress__tld: tld_referrers_backend_application_deployment_ingress__tld[row].clone(),
                 referrers_frontend_application_deployment_ingress__tld: tld_referrers_frontend_application_deployment_ingress__tld[row].clone(),
+                referrers_blackbox_deployment_ingress__tld: tld_referrers_blackbox_deployment_ingress__tld[row].clone(),
             });
         }
 
@@ -7193,6 +7254,13 @@ impl Database {
                 c_children_blackbox_deployment_group: blackbox_deployment_children_blackbox_deployment_group,
                 c_children_blackbox_deployment_service_registration: blackbox_deployment_children_blackbox_deployment_service_registration,
             },
+            blackbox_deployment_env_variable: TableDefinitionBlackboxDeploymentEnvVariable {
+                rows: rows_blackbox_deployment_env_variable,
+                c_var_name: blackbox_deployment_env_variable_var_name,
+                c_raw_value: blackbox_deployment_env_variable_raw_value,
+                c_value_source: blackbox_deployment_env_variable_value_source,
+                c_parent: blackbox_deployment_env_variable_parent,
+            },
             blackbox_deployment_group: TableDefinitionBlackboxDeploymentGroup {
                 rows: rows_blackbox_deployment_group,
                 c_group_name: blackbox_deployment_group_group_name,
@@ -7203,6 +7271,14 @@ impl Database {
                 c_children_blackbox_deployment_port: blackbox_deployment_group_children_blackbox_deployment_port,
                 c_children_blackbox_deployment_task: blackbox_deployment_group_children_blackbox_deployment_task,
                 c_children_blackbox_deployment_service_instance: blackbox_deployment_group_children_blackbox_deployment_service_instance,
+            },
+            blackbox_deployment_ingress: TableDefinitionBlackboxDeploymentIngress {
+                rows: rows_blackbox_deployment_ingress,
+                c_service: blackbox_deployment_ingress_service,
+                c_port: blackbox_deployment_ingress_port,
+                c_subdomain: blackbox_deployment_ingress_subdomain,
+                c_tld: blackbox_deployment_ingress_tld,
+                c_basic_auth_credentials: blackbox_deployment_ingress_basic_auth_credentials,
             },
             blackbox_deployment_local_file: TableDefinitionBlackboxDeploymentLocalFile {
                 rows: rows_blackbox_deployment_local_file,
@@ -7233,6 +7309,7 @@ impl Database {
                 c_min_instances: blackbox_deployment_service_registration_min_instances,
                 c_parent: blackbox_deployment_service_registration_parent,
                 c_referrers_blackbox_deployment_service_instance__service_registration: blackbox_deployment_service_registration_referrers_blackbox_deployment_service_instance__service_registration,
+                c_referrers_blackbox_deployment_ingress__service: blackbox_deployment_service_registration_referrers_blackbox_deployment_ingress__service,
             },
             blackbox_deployment_task: TableDefinitionBlackboxDeploymentTask {
                 rows: rows_blackbox_deployment_task,
@@ -7245,7 +7322,7 @@ impl Database {
                 c_args: blackbox_deployment_task_args,
                 c_parent: blackbox_deployment_task_parent,
                 c_children_blackbox_deployment_task_mount: blackbox_deployment_task_children_blackbox_deployment_task_mount,
-                c_children_blackbox_deployment_vault_secret: blackbox_deployment_task_children_blackbox_deployment_vault_secret,
+                c_children_blackbox_deployment_env_variable: blackbox_deployment_task_children_blackbox_deployment_env_variable,
                 c_children_blackbox_deployment_local_file: blackbox_deployment_task_children_blackbox_deployment_local_file,
             },
             blackbox_deployment_task_mount: TableDefinitionBlackboxDeploymentTaskMount {
@@ -7253,13 +7330,6 @@ impl Database {
                 c_target_path: blackbox_deployment_task_mount_target_path,
                 c_server_volume: blackbox_deployment_task_mount_server_volume,
                 c_parent: blackbox_deployment_task_mount_parent,
-            },
-            blackbox_deployment_vault_secret: TableDefinitionBlackboxDeploymentVaultSecret {
-                rows: rows_blackbox_deployment_vault_secret,
-                c_secret_name: blackbox_deployment_vault_secret_secret_name,
-                c_target_file_name: blackbox_deployment_vault_secret_target_file_name,
-                c_target_env_var_name: blackbox_deployment_vault_secret_target_env_var_name,
-                c_parent: blackbox_deployment_vault_secret_parent,
             },
             ch_deployment: TableDefinitionChDeployment {
                 rows: rows_ch_deployment,
@@ -7553,6 +7623,7 @@ impl Database {
                 c_update_edl_public_ips_from_terraform: global_settings_update_edl_public_ips_from_terraform,
                 c_enable_ipv6: global_settings_enable_ipv6,
                 c_force_ipv6: global_settings_force_ipv6,
+                c_admin_tld: global_settings_admin_tld,
             },
             grafana: TableDefinitionGrafana {
                 rows: rows_grafana,
@@ -7913,7 +7984,6 @@ impl Database {
                 rows: rows_region,
                 c_region_name: region_region_name,
                 c_availability_mode: region_availability_mode,
-                c_tld: region_tld,
                 c_is_dns_master: region_is_dns_master,
                 c_is_dns_slave: region_is_dns_slave,
                 c_has_coprocessor_dc: region_has_coprocessor_dc,
@@ -8146,11 +8216,12 @@ impl Database {
             tld: TableDefinitionTld {
                 rows: rows_tld,
                 c_domain: tld_domain,
-                c_expose_admin: tld_expose_admin,
                 c_automatic_certificates: tld_automatic_certificates,
-                c_referrers_region__tld: tld_referrers_region__tld,
+                c_dnssec_enabled: tld_dnssec_enabled,
+                c_referrers_global_settings__admin_tld: tld_referrers_global_settings__admin_tld,
                 c_referrers_backend_application_deployment_ingress__tld: tld_referrers_backend_application_deployment_ingress__tld,
                 c_referrers_frontend_application_deployment_ingress__tld: tld_referrers_frontend_application_deployment_ingress__tld,
+                c_referrers_blackbox_deployment_ingress__tld: tld_referrers_blackbox_deployment_ingress__tld,
             },
             unique_application_names: TableDefinitionUniqueApplicationNames {
                 rows: rows_unique_application_names,
@@ -8872,6 +8943,39 @@ impl TableDefinitionBlackboxDeployment {
 
 }
 
+impl TableDefinitionBlackboxDeploymentEnvVariable {
+    pub fn len(&self) -> usize {
+        self.rows.len()
+    }
+
+    pub fn rows_iter(&self) -> impl ::std::iter::Iterator<Item = TableRowPointerBlackboxDeploymentEnvVariable> {
+        (0..self.rows.len()).map(|idx| {
+            TableRowPointerBlackboxDeploymentEnvVariable(idx)
+        })
+    }
+
+    pub fn row(&self, ptr: TableRowPointerBlackboxDeploymentEnvVariable) -> &TableRowBlackboxDeploymentEnvVariable {
+        &self.rows[ptr.0]
+    }
+
+    pub fn c_var_name(&self, ptr: TableRowPointerBlackboxDeploymentEnvVariable) -> &::std::string::String {
+        &self.c_var_name[ptr.0]
+    }
+
+    pub fn c_raw_value(&self, ptr: TableRowPointerBlackboxDeploymentEnvVariable) -> &::std::string::String {
+        &self.c_raw_value[ptr.0]
+    }
+
+    pub fn c_value_source(&self, ptr: TableRowPointerBlackboxDeploymentEnvVariable) -> &::std::string::String {
+        &self.c_value_source[ptr.0]
+    }
+
+    pub fn c_parent(&self, ptr: TableRowPointerBlackboxDeploymentEnvVariable) -> TableRowPointerBlackboxDeploymentTask {
+        self.c_parent[ptr.0]
+    }
+
+}
+
 impl TableDefinitionBlackboxDeploymentGroup {
     pub fn len(&self) -> usize {
         self.rows.len()
@@ -8917,6 +9021,43 @@ impl TableDefinitionBlackboxDeploymentGroup {
 
     pub fn c_children_blackbox_deployment_service_instance(&self, ptr: TableRowPointerBlackboxDeploymentGroup) -> &[TableRowPointerBlackboxDeploymentServiceInstance] {
         &self.c_children_blackbox_deployment_service_instance[ptr.0]
+    }
+
+}
+
+impl TableDefinitionBlackboxDeploymentIngress {
+    pub fn len(&self) -> usize {
+        self.rows.len()
+    }
+
+    pub fn rows_iter(&self) -> impl ::std::iter::Iterator<Item = TableRowPointerBlackboxDeploymentIngress> {
+        (0..self.rows.len()).map(|idx| {
+            TableRowPointerBlackboxDeploymentIngress(idx)
+        })
+    }
+
+    pub fn row(&self, ptr: TableRowPointerBlackboxDeploymentIngress) -> &TableRowBlackboxDeploymentIngress {
+        &self.rows[ptr.0]
+    }
+
+    pub fn c_service(&self, ptr: TableRowPointerBlackboxDeploymentIngress) -> TableRowPointerBlackboxDeploymentServiceRegistration {
+        self.c_service[ptr.0]
+    }
+
+    pub fn c_port(&self, ptr: TableRowPointerBlackboxDeploymentIngress) -> i64 {
+        self.c_port[ptr.0]
+    }
+
+    pub fn c_subdomain(&self, ptr: TableRowPointerBlackboxDeploymentIngress) -> &::std::string::String {
+        &self.c_subdomain[ptr.0]
+    }
+
+    pub fn c_tld(&self, ptr: TableRowPointerBlackboxDeploymentIngress) -> TableRowPointerTld {
+        self.c_tld[ptr.0]
+    }
+
+    pub fn c_basic_auth_credentials(&self, ptr: TableRowPointerBlackboxDeploymentIngress) -> &::std::string::String {
+        &self.c_basic_auth_credentials[ptr.0]
     }
 
 }
@@ -9059,6 +9200,10 @@ impl TableDefinitionBlackboxDeploymentServiceRegistration {
         &self.c_referrers_blackbox_deployment_service_instance__service_registration[ptr.0]
     }
 
+    pub fn c_referrers_blackbox_deployment_ingress__service(&self, ptr: TableRowPointerBlackboxDeploymentServiceRegistration) -> &[TableRowPointerBlackboxDeploymentIngress] {
+        &self.c_referrers_blackbox_deployment_ingress__service[ptr.0]
+    }
+
 }
 
 impl TableDefinitionBlackboxDeploymentTask {
@@ -9112,8 +9257,8 @@ impl TableDefinitionBlackboxDeploymentTask {
         &self.c_children_blackbox_deployment_task_mount[ptr.0]
     }
 
-    pub fn c_children_blackbox_deployment_vault_secret(&self, ptr: TableRowPointerBlackboxDeploymentTask) -> &[TableRowPointerBlackboxDeploymentVaultSecret] {
-        &self.c_children_blackbox_deployment_vault_secret[ptr.0]
+    pub fn c_children_blackbox_deployment_env_variable(&self, ptr: TableRowPointerBlackboxDeploymentTask) -> &[TableRowPointerBlackboxDeploymentEnvVariable] {
+        &self.c_children_blackbox_deployment_env_variable[ptr.0]
     }
 
     pub fn c_children_blackbox_deployment_local_file(&self, ptr: TableRowPointerBlackboxDeploymentTask) -> &[TableRowPointerBlackboxDeploymentLocalFile] {
@@ -9146,39 +9291,6 @@ impl TableDefinitionBlackboxDeploymentTaskMount {
     }
 
     pub fn c_parent(&self, ptr: TableRowPointerBlackboxDeploymentTaskMount) -> TableRowPointerBlackboxDeploymentTask {
-        self.c_parent[ptr.0]
-    }
-
-}
-
-impl TableDefinitionBlackboxDeploymentVaultSecret {
-    pub fn len(&self) -> usize {
-        self.rows.len()
-    }
-
-    pub fn rows_iter(&self) -> impl ::std::iter::Iterator<Item = TableRowPointerBlackboxDeploymentVaultSecret> {
-        (0..self.rows.len()).map(|idx| {
-            TableRowPointerBlackboxDeploymentVaultSecret(idx)
-        })
-    }
-
-    pub fn row(&self, ptr: TableRowPointerBlackboxDeploymentVaultSecret) -> &TableRowBlackboxDeploymentVaultSecret {
-        &self.rows[ptr.0]
-    }
-
-    pub fn c_secret_name(&self, ptr: TableRowPointerBlackboxDeploymentVaultSecret) -> &::std::string::String {
-        &self.c_secret_name[ptr.0]
-    }
-
-    pub fn c_target_file_name(&self, ptr: TableRowPointerBlackboxDeploymentVaultSecret) -> &::std::string::String {
-        &self.c_target_file_name[ptr.0]
-    }
-
-    pub fn c_target_env_var_name(&self, ptr: TableRowPointerBlackboxDeploymentVaultSecret) -> &::std::string::String {
-        &self.c_target_env_var_name[ptr.0]
-    }
-
-    pub fn c_parent(&self, ptr: TableRowPointerBlackboxDeploymentVaultSecret) -> TableRowPointerBlackboxDeploymentTask {
         self.c_parent[ptr.0]
     }
 
@@ -10492,6 +10604,10 @@ impl TableDefinitionGlobalSettings {
 
     pub fn c_force_ipv6(&self, ptr: TableRowPointerGlobalSettings) -> bool {
         self.c_force_ipv6[ptr.0]
+    }
+
+    pub fn c_admin_tld(&self, ptr: TableRowPointerGlobalSettings) -> TableRowPointerTld {
+        self.c_admin_tld[ptr.0]
     }
 
 }
@@ -12114,10 +12230,6 @@ impl TableDefinitionRegion {
         &self.c_availability_mode[ptr.0]
     }
 
-    pub fn c_tld(&self, ptr: TableRowPointerRegion) -> TableRowPointerTld {
-        self.c_tld[ptr.0]
-    }
-
     pub fn c_is_dns_master(&self, ptr: TableRowPointerRegion) -> bool {
         self.c_is_dns_master[ptr.0]
     }
@@ -13161,16 +13273,16 @@ impl TableDefinitionTld {
         &self.c_domain[ptr.0]
     }
 
-    pub fn c_expose_admin(&self, ptr: TableRowPointerTld) -> bool {
-        self.c_expose_admin[ptr.0]
-    }
-
     pub fn c_automatic_certificates(&self, ptr: TableRowPointerTld) -> bool {
         self.c_automatic_certificates[ptr.0]
     }
 
-    pub fn c_referrers_region__tld(&self, ptr: TableRowPointerTld) -> &[TableRowPointerRegion] {
-        &self.c_referrers_region__tld[ptr.0]
+    pub fn c_dnssec_enabled(&self, ptr: TableRowPointerTld) -> bool {
+        self.c_dnssec_enabled[ptr.0]
+    }
+
+    pub fn c_referrers_global_settings__admin_tld(&self, ptr: TableRowPointerTld) -> &[TableRowPointerGlobalSettings] {
+        &self.c_referrers_global_settings__admin_tld[ptr.0]
     }
 
     pub fn c_referrers_backend_application_deployment_ingress__tld(&self, ptr: TableRowPointerTld) -> &[TableRowPointerBackendApplicationDeploymentIngress] {
@@ -13179,6 +13291,10 @@ impl TableDefinitionTld {
 
     pub fn c_referrers_frontend_application_deployment_ingress__tld(&self, ptr: TableRowPointerTld) -> &[TableRowPointerFrontendApplicationDeploymentIngress] {
         &self.c_referrers_frontend_application_deployment_ingress__tld[ptr.0]
+    }
+
+    pub fn c_referrers_blackbox_deployment_ingress__tld(&self, ptr: TableRowPointerTld) -> &[TableRowPointerBlackboxDeploymentIngress] {
+        &self.c_referrers_blackbox_deployment_ingress__tld[ptr.0]
     }
 
 }

@@ -306,6 +306,7 @@ fn test_gcloud_server_public_ip_interface_must_have_one_name() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_artefacts_bucket_name: muh-bucket,
     aws_artefacts_s3_bucket_name: muh-bucket,
     disable_consul_quorum_tests: true,
@@ -1102,6 +1103,7 @@ fn test_gcloud_project_name_undefined() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -1231,6 +1233,7 @@ fn test_gcloud_artefacts_bucket_name_undefined() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: test-12345,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
@@ -1363,6 +1366,7 @@ fn test_gcloud_artefacts_bucket_name_too_long() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: test-12345,
     google_cloud_artefacts_bucket_name: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,
     disable_consul_quorum_tests: true,
@@ -1494,6 +1498,7 @@ fn test_gcloud_artefacts_bucket_name_not_kebab_case() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: test-12345,
     google_cloud_artefacts_bucket_name: Aye,
     disable_consul_quorum_tests: true,
@@ -1625,6 +1630,7 @@ fn test_gcloud_not_used_but_project_id_is_defined() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: 12345-abc,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
@@ -1686,6 +1692,7 @@ fn test_gcloud_not_used_but_artefacts_bucket_is_defined() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_artefacts_bucket_name: muh-bucket,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
@@ -1747,6 +1754,7 @@ fn test_gcloud_default_datacenter_server_kind_not_of_gcloud() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: test-12345,
     google_cloud_artefacts_bucket_name: Aye,
     disable_consul_quorum_tests: true,
@@ -1878,6 +1886,7 @@ fn test_gcloud_server_kind_not_of_gcloud() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: test-12345,
     google_cloud_artefacts_bucket_name: Aye,
     disable_consul_quorum_tests: true,
@@ -2008,6 +2017,7 @@ fn test_gcloud_prohibit_custom_instance_types() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: test-12345,
     google_cloud_artefacts_bucket_name: Aye,
     disable_consul_quorum_tests: true,
@@ -2145,6 +2155,7 @@ fn test_gcloud_prohibit_custom_disk_types() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: test-12345,
     google_cloud_artefacts_bucket_name: Aye,
     disable_consul_quorum_tests: true,
@@ -2285,6 +2296,7 @@ fn test_gcloud_all_disks_must_start_with_gcloud() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: test-12345,
     google_cloud_artefacts_bucket_name: Aye,
     disable_consul_quorum_tests: true,
@@ -2412,6 +2424,7 @@ fn test_gcloud_root_disk_must_be_sda() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: test-12345,
     google_cloud_artefacts_bucket_name: Aye,
     disable_consul_quorum_tests: true,
@@ -2539,6 +2552,7 @@ fn test_gcloud_non_root_disk_doesnt_follow_convention() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: test-12345,
     google_cloud_artefacts_bucket_name: Aye,
     disable_consul_quorum_tests: true,
@@ -2676,6 +2690,7 @@ fn test_gcloud_disk_size_not_multiple_of_gigabyte() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: test-12345,
     google_cloud_artefacts_bucket_name: Aye,
     disable_consul_quorum_tests: true,
@@ -2807,6 +2822,7 @@ fn test_gcloud_disk_sizes_exceed_256tb() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: test-12345,
     google_cloud_artefacts_bucket_name: Aye,
     disable_consul_quorum_tests: true,

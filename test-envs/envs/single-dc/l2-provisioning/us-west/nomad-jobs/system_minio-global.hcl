@@ -132,6 +132,7 @@ mc mb --ignore-existing --with-lock thisminio/loki
 mc mb --ignore-existing --with-lock thisminio/loki2
 mc mb --ignore-existing --with-lock thisminio/tempo
 mc mb --ignore-existing --with-lock thisminio/app1
+mc mb --ignore-existing --with-lock thisminio/bb-app1
 
 
 # privision policies
@@ -376,6 +377,54 @@ cat <<EOF > /secrets/policy.json
 EOF
 mc admin policy add thisminio ro-app1 /secrets/policy.json
 
+cat <<EOF > /secrets/policy.json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket",
+        "s3:GetBucketLocation",
+        "s3:GetObject"
+      ],
+      "Resource": ["arn:aws:s3:::bb-app1"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": [
+        "arn:aws:s3:::bb-app1/*"
+      ]
+    }
+  ]
+}
+EOF
+mc admin policy add thisminio rw-bb-app1 /secrets/policy.json
+
+cat <<EOF > /secrets/policy.json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetBucketLocation",
+        "s3:GetObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::bb-app1/*",
+        "arn:aws:s3:::bb-app1"
+      ]
+    }
+  ]
+}
+EOF
+mc admin policy add thisminio ro-bb-app1 /secrets/policy.json
+
 
 # provision extra bucket users
 mc admin user add thisminio docker_registry {{ with secret "epl/data/minio/global" }}{{ .Data.data.minio_user_docker_registry_password }}{{ end }}
@@ -386,6 +435,8 @@ mc admin user add thisminio tempo_us_west {{ with secret "epl/data/minio/global"
 mc admin policy set thisminio rw-tempo user=tempo_us_west
 mc admin user add thisminio epl_app_test_hello_world {{ with secret "epl/data/minio/global" }}{{ .Data.data.minio_user_epl_app_test_hello_world_password }}{{ end }}
 mc admin policy set thisminio rw-app1 user=epl_app_test_hello_world
+mc admin user add thisminio bb-depl-moonbeam-dev {{ with secret "epl/data/minio/global" }}{{ .Data.data.minio_user_bb-depl-moonbeam-dev_password }}{{ end }}
+mc admin policy set thisminio rw-bb-app1 user=bb-depl-moonbeam-dev
 EOL
       }
     }

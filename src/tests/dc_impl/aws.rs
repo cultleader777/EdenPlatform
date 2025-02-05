@@ -1281,6 +1281,7 @@ fn test_aws_undefined_bucket_name() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -1425,6 +1426,7 @@ fn test_aws_too_long_bucket_name() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     aws_artefacts_s3_bucket_name: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
@@ -1568,6 +1570,7 @@ fn test_aws_non_kebab_case_bucket_name() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     aws_artefacts_s3_bucket_name: ' hou bois ',
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
@@ -1711,6 +1714,7 @@ fn test_aws_unused_bucket_name() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     aws_artefacts_s3_bucket_name: abc,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,

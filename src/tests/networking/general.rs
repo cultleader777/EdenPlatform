@@ -151,6 +151,7 @@ DATA EXCLUSIVE network {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -197,6 +198,7 @@ DATA EXCLUSIVE network {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -1398,13 +1400,13 @@ fn test_vault_quorum_count() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_dns_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -1452,7 +1454,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT server [
@@ -1544,13 +1545,13 @@ fn test_vault_too_many_instances_in_single_dc_3() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_dns_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -1607,7 +1608,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT server [
@@ -1702,13 +1702,13 @@ fn test_vault_too_many_instances_in_single_dc_5() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_dns_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -1765,7 +1765,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT server [
@@ -1871,13 +1870,13 @@ fn test_nomad_quorum_count() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_vault_quorum_tests: true,
     disable_dns_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -1925,7 +1924,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT server [
@@ -2017,13 +2015,13 @@ fn test_nomad_too_many_instances_in_single_dc_3() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_vault_quorum_tests: true,
     disable_dns_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -2080,7 +2078,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT server [
@@ -2174,13 +2171,13 @@ fn test_nomad_too_many_instances_in_single_dc_5() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_vault_quorum_tests: true,
     disable_dns_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -2237,7 +2234,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT server [
@@ -2343,13 +2339,13 @@ fn test_consul_quorum_count() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
     disable_dns_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -2397,7 +2393,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT server [
@@ -2489,13 +2484,13 @@ fn test_consul_too_many_instances_in_single_dc_3() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
     disable_dns_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -2552,7 +2547,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT server [
@@ -2646,13 +2640,13 @@ fn test_consul_too_many_instances_in_single_dc_5() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
     disable_dns_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -2709,7 +2703,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT server [
@@ -2816,10 +2809,10 @@ fn test_single_dc_region_violation() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -2873,7 +2866,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA EXCLUSIVE network {
@@ -2901,10 +2893,10 @@ fn test_multi_dc_region_violation() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -2959,7 +2951,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA EXCLUSIVE network {
@@ -2988,10 +2979,10 @@ fn test_vpn_gateway_instance_pair_has_no_public_ip() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -3033,7 +3024,6 @@ DATA STRUCT docker_registry_instance {
 
 DATA STRUCT EXCLUSIVE tld {
     domain: epl-infra.net,
-    expose_admin: false,
 }
 
 DATA STRUCT EXCLUSIVE datacenter [
@@ -3409,10 +3399,10 @@ fn test_vpn_gateway_instance_has_no_vpn_interface() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -3454,7 +3444,6 @@ DATA STRUCT docker_registry_instance {
 
 DATA STRUCT EXCLUSIVE tld {
     domain: epl-infra.net,
-    expose_admin: false,
 }
 
 DATA STRUCT EXCLUSIVE datacenter [
@@ -3817,10 +3806,10 @@ fn test_vpn_gateway_instance_vpn_interface_is_not_named_wg0() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -3862,7 +3851,6 @@ DATA STRUCT docker_registry_instance {
 
 DATA STRUCT EXCLUSIVE tld {
     domain: epl-infra.net,
-    expose_admin: false,
 }
 
 DATA STRUCT EXCLUSIVE datacenter [
@@ -4231,10 +4219,10 @@ fn test_dc_has_not_enough_vpn_gateways() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -4276,7 +4264,6 @@ DATA STRUCT docker_registry_instance {
 
 DATA STRUCT EXCLUSIVE tld {
     domain: epl-infra.net,
-    expose_admin: false,
 }
 
 DATA STRUCT EXCLUSIVE datacenter [
@@ -4691,6 +4678,7 @@ DATA EXCLUSIVE network {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_tracing_tests: true,
     disable_region_logging_tests: true,
@@ -4746,6 +4734,7 @@ DATA EXCLUSIVE network {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -4800,6 +4789,7 @@ DATA EXCLUSIVE network {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -4861,6 +4851,7 @@ DATA EXCLUSIVE network {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -4912,6 +4903,7 @@ DATA EXCLUSIVE network {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -4963,6 +4955,7 @@ DATA EXCLUSIVE network {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -5021,6 +5014,7 @@ DATA EXCLUSIVE network {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -5060,6 +5054,7 @@ DATA EXCLUSIVE network {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -5099,6 +5094,7 @@ DATA EXCLUSIVE network {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -5139,6 +5135,7 @@ DATA EXCLUSIVE network {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -5178,6 +5175,7 @@ DATA EXCLUSIVE network {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -5217,6 +5215,7 @@ DATA EXCLUSIVE network {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -5256,6 +5255,7 @@ DATA EXCLUSIVE network {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -5325,6 +5325,7 @@ DATA subnet_router_floating_ip {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -5391,6 +5392,7 @@ DATA subnet_router_floating_ip {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -5459,6 +5461,7 @@ DATA subnet_router_floating_ip {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -5529,6 +5532,7 @@ DATA subnet_router_floating_ip {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
@@ -5579,6 +5583,7 @@ DATA EXCLUSIVE network {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,

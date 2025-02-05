@@ -2079,6 +2079,13 @@ async fn nomad_ui_responds_us_west() -> Result<(), Box<dyn Error>> {
 }
 
 #[tokio::test]
+async fn pg_deployment_testdb_db_exists_bbtest() -> Result<(), Box<dyn Error>> {
+    assert!(does_prometheus_metric_exist("10.17.0.10", 9090, "pg_locks_count{job='epl-pg-testdb-pg-exp',datname='bbtest'}").await?);
+
+    Ok(())
+}
+
+#[tokio::test]
 async fn pg_deployment_testdb_db_exists_grafana() -> Result<(), Box<dyn Error>> {
     assert!(does_prometheus_metric_exist("10.17.0.10", 9090, "pg_locks_count{job='epl-pg-testdb-pg-exp',datname='grafana'}").await?);
 

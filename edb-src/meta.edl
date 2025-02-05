@@ -28,6 +28,8 @@ TABLE global_settings {
   enable_ipv6 BOOL DEFAULT true,
   // enabling this flag ensures all ingresses is required
   force_ipv6 BOOL DEFAULT false,
+  // tld for admin site and internal DNS names
+  admin_tld REF tld,
 
   CHECK { isValidPort(docker_registry_port) },
   CHECK { isValidPort(local_docker_cache_port) },

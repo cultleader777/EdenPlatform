@@ -55,6 +55,24 @@ END
 
 EOF
 
+export THIS_DB_PW=$( vault kv get -field=pg_db_bbtest_password epl/pg/testdb )
+echo "SELECT 'CREATE DATABASE bbtest' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'bbtest')\gexec" | psql
+cat <<EOF | psql -f -
+
+DO
+\$\$
+BEGIN
+  IF NOT EXISTS (SELECT * FROM pg_user WHERE usename = 'bbtest') THEN
+     CREATE USER bbtest password '$THIS_DB_PW';
+  END IF;
+  GRANT ALL PRIVILEGES ON DATABASE bbtest TO bbtest;
+  ALTER DATABASE bbtest OWNER TO bbtest;
+END
+\$\$
+;
+
+EOF
+
 export THIS_DB_PW=$( vault kv get -field=pg_db_testdb_a_password epl/pg/testdb )
 echo "SELECT 'CREATE DATABASE testdb_a' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'testdb_a')\gexec" | psql
 cat <<EOF | psql -f -

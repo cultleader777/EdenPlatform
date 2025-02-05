@@ -1,11 +1,16 @@
-# FROM postgres:15.1-bullseye
-FROM postgres@sha256:766e8867182b474f02e48c7b1a556d12ddfa246138ddc748d70c891bf2873d82
+# FROM postgres:17.2-bookworm
+FROM postgres@sha256:87ec5e0a167dc7d4831729f9e1d2ee7b8597dcc49ccd9e43cc5f89e808d2adae
+
+# get latest libpq version like so
+# apt-get update
+# apt-cache madison libpq-dev
+# apt-cache madison python3-pip
 
 RUN apt-get update && \
-    apt-get install -y python3-pip=20.3.4-4+deb11u1 libpq-dev=15.1-1.pgdg110+1 && \
+    apt-get install -y python3-pip=23.0.1+dfsg-1 libpq-dev=17.2-1.pgdg120+1 && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install 'psycopg2==2.9.5' && \
-    pip install 'patroni[consul]==2.1.4'
+RUN pip install --break-system-packages 'psycopg2==2.9.10' && \
+    pip install --break-system-packages 'patroni[consul]==4.0.4'
 
 USER postgres

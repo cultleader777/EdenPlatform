@@ -7,7 +7,7 @@ use crate::{database::{
     Database, TableRowPointerPgDeploymentSchemas, TableRowPointerPgDeploymentUnmanagedDb,
     TableRowPointerMinioBucket, TableRowPointerMonitoringCluster, TableRowPointerServer,
     TableRowPointerServerVolume, TableRowPointerTld, TableRowPointerRegion, TableRowPointerLokiCluster, TableRowPointerServerKind, TableRowPointerDockerImage, TableRowPointerChDeploymentSchemas, TableRowPointerNomadNamespace,
-}, codegen::{l1_provisioning::{consul::consul_tests, nomad::nomad_tests, vault::vault_tests}, CodegenSecrets}};
+}, codegen::{l1_provisioning::{consul::consul_tests, nomad::nomad_tests, vault::vault_tests}, CodegenSecrets}, static_analysis::get_global_settings};
 
 use super::{
     http_endpoints::{CorePathSegment, HttpPathTree, PageMethod},
@@ -149,7 +149,7 @@ pub enum IntegrationTest {
 #[derive(Eq, PartialEq, Hash)]
 pub enum PgAccessKind {
     Managed(TableRowPointerPgDeploymentSchemas),
-    Unmanaged(TableRowPointerPgDeploymentUnmanagedDb),
+    UnmanagedRw(TableRowPointerPgDeploymentUnmanagedDb),
 }
 
 #[derive(Eq, PartialEq, Hash)]
@@ -201,6 +201,7 @@ impl RouteContent {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RouteData {
     pub content: RouteContent,
+    pub basic_auth: String,
 }
 
 // we can slice only by /path/
@@ -360,6 +361,7 @@ pub struct MinIOUser {
 
 #[derive(Clone)]
 pub enum MinIOBucketPermission {
+    // TODO: read only
     ReadWrite,
 }
 
@@ -401,6 +403,8 @@ pub struct VaultSecretHandle {
     vault_secret_engine: String,
     vault_secret_name: String,
     vault_secret_key: String,
+    left: String,
+    right: String,
 }
 
 impl VaultSecretHandle {
@@ -408,9 +412,18 @@ impl VaultSecretHandle {
         let engine = &self.vault_secret_engine;
         let name = &self.vault_secret_name;
         let key = &self.vault_secret_key;
+        let left = &self.left;
+        let right = &self.right;
         format!(
-            r#"{{{{ with secret "{engine}/data/{name}" }}}}{{{{ .Data.data.{key} }}}}{{{{ end }}}}"#
+            r#"{left}{{{{ with secret "{engine}/data/{name}" }}}}{{{{ .Data.data.{key} }}}}{{{{ end }}}}{right}"#
         )
+    }
+
+    pub fn surround_expression(&self, left: String, right: String) -> VaultSecretHandle {
+        let mut cloned = self.clone();
+        cloned.left = left;
+        cloned.right = right;
+        cloned
     }
 
     pub fn request(&self) -> &VaultSecretRequest {
@@ -431,6 +444,8 @@ impl VaultSecretHandle {
             vault_secret_engine: "epl".to_string(),
             vault_secret_name: name.to_string(),
             vault_secret_key: key.to_string(),
+            left: "".to_string(),
+            right: "".to_string(),
         }
     }
 }
@@ -535,7 +550,7 @@ impl FinalizedVaultSecrets {
 
 fn is_valid_s3_username_regex(input: &str) -> bool {
     lazy_static! {
-        pub static ref S3_USERNAME_REGEX: Regex = Regex::new(r#"^[a-z0-9_]+$"#).unwrap();
+        pub static ref S3_USERNAME_REGEX: Regex = Regex::new(r#"^[a-z0-9_-]+$"#).unwrap();
     }
 
     S3_USERNAME_REGEX.is_match(input)
@@ -593,8 +608,9 @@ impl<'a> VaultSecretBuilder<'a> {
             vault_secret_engine: self.engine_key.clone(),
             vault_secret_name: self.vault_secret_name.clone(),
             vault_secret_key: key.to_string(),
+            left: "".to_string(),
+            right: "".to_string(),
         };
-
 
         let map = self
             .sr
@@ -619,6 +635,10 @@ impl<'a> VaultSecretBuilder<'a> {
             vault_policy_name: format!("epl-{}", self.vault_secret_name.replace("/", "-")),
             vault_secret_name: self.vault_secret_name,
         }
+    }
+
+    pub fn fetch_pg_access(&self, ptr: &PgAccessKind) -> &PostgresDbCredentials {
+        self.sr.fetch_pg_access(ptr)
     }
 
     /// Fetch MinIO bucket credentials to use in configuration
@@ -1195,7 +1215,7 @@ impl ServerRuntime {
         region: TableRowPointerRegion,
         tld: TableRowPointerTld,
         subdomain: &str,
-        content: RouteContent,
+        route_data: RouteData,
     ) -> Result<(), PlatformValidationError> {
         let vs = ValidSubdomain::new(subdomain)?;
 
@@ -1216,7 +1236,7 @@ impl ServerRuntime {
             .or_insert_with(|| SubdomainRouteChunk {
                 routes: HttpPathTree::root(),
             });
-        subr.routes.lock_root(RouteData { content }).map_err(|e| {
+        subr.routes.lock_root(route_data).map_err(|e| {
             match e {
                 crate::static_analysis::http_endpoints::HttpPathTreeCheckerErrors::RootPageAlreadySet { .. } => {
                     PlatformValidationError::ExternalLbRouteIsDuplicated {
@@ -1248,42 +1268,42 @@ impl ServerRuntime {
         assert!(!adm_svc.service_title.contains('\"'));
         assert!(!adm_svc.service_title.contains('\''));
 
-        for tld in db.tld().rows_iter() {
-            if db.tld().c_expose_admin(tld) {
-                let ingress_domains = self.admin_dns_ingress_services.entry(tld).or_default();
-                if ingress_domains.is_empty() {
-                    ingress_domains.push("admin".to_string());
-                }
-                ingress_domains.push(full_subdomain.clone());
+        let tld = get_global_settings(db).admin_tld;
+        let ingress_domains = self.admin_dns_ingress_services.entry(tld).or_default();
+        if ingress_domains.is_empty() {
+            ingress_domains.push("admin".to_string());
+        }
+        ingress_domains.push(full_subdomain.clone());
 
-                let e = self
-                    .admin_links
-                    .entry(adm_svc.service_title.clone())
-                    .or_default();
+        let e = self
+            .admin_links
+            .entry(adm_svc.service_title.clone())
+            .or_default();
 
-                e.push(format!(
-                    "<a target=\"_blank\" href=\"https://{}.{}\">{}</a>",
-                    full_subdomain,
-                    db.tld().c_domain(tld),
-                    adm_svc.service_instance
-                ));
+        e.push(format!(
+            "<a target=\"_blank\" href=\"https://{}.{}\">{}</a>",
+            full_subdomain,
+            db.tld().c_domain(tld),
+            adm_svc.service_instance
+        ));
 
-                for region in db.region().rows_iter() {
-                    self.expose_root_route_in_tld(
-                        db,
-                        region,
-                        tld,
-                        &full_subdomain,
-                        RouteContent::InternalUpstream {
-                            is_https: adm_svc.is_https,
-                            consul_service: adm_svc.service_internal_upstream.clone(),
-                            port: adm_svc.service_internal_port,
-                            target_path: "/".to_string(),
-                            unlimited_body: false,
-                        },
-                    )?;
-                }
-            }
+        for region in db.region().rows_iter() {
+            self.expose_root_route_in_tld(
+                db,
+                region,
+                tld,
+                &full_subdomain,
+                RouteData {
+                    content: RouteContent::InternalUpstream {
+                        is_https: adm_svc.is_https,
+                        consul_service: adm_svc.service_internal_upstream.clone(),
+                        port: adm_svc.service_internal_port,
+                        target_path: "/".to_string(),
+                        unlimited_body: false,
+                    },
+                    basic_auth: "".to_string(),
+                },
+            )?;
         }
 
         Ok(())
@@ -2647,12 +2667,15 @@ fn test_docker_image_validation() {
     assert!(!is_valid_docker_image("@@EPL_APP_IMAGE:some-app@@"));
     assert!(is_valid_docker_image("@@EPL_APP_IMAGE_x86_64:some-app@@"));
     assert!(is_valid_docker_image("@@EPL_APP_IMAGE_arm64:some-app@@"));
+    assert!(is_valid_docker_image(
+        "epl-docker-registry.service.consul:5000/wookie@sha256:0560b16bec6e84345f29fb6693cd2430884e6efff16a95d5bdd0bb06d7661c45"
+    ));
 }
 
 fn is_valid_docker_image(input: &str) -> bool {
     lazy_static! {
         pub static ref DOCKER_IMAGE_REGEX: Regex =
-            Regex::new(r#"^([a-z0-9.-]+/)?([a-zA-Z0-9_-]+/)?[a-zA-Z0-9_-]+@sha256:[0-9a-f]{64}$"#)
+            Regex::new(r#"^([a-z0-9.-]+(:[1-9][0-9]+)?/)?([a-zA-Z0-9_-]+/)?[a-zA-Z0-9_-]+@sha256:[0-9a-f]{64}$"#)
                 .unwrap();
         pub static ref DOCKER_IMAGE_EPL_APP_REGEX: Regex =
             Regex::new(r#"^@@EPL_APP_IMAGE_(x86_64|arm64):"#)
@@ -2980,6 +3003,8 @@ impl NomadTask {
     /// Returns absolute path
     pub fn add_secure_config(&mut self, fname: String, contents: String) -> String {
         let abs_path = format!("/secrets/{fname}");
+        // otherwise nomad file is messed up
+        assert!(contents.ends_with("\n"));
         // configs are flat, we strive to pass args to components so they'd be used
         // grafana broke this rule with /secure/provisioning/datasources/datasources.yml
         // assert!(!fname.contains("/"), "Secure config name cannot be nested deeper into folders");

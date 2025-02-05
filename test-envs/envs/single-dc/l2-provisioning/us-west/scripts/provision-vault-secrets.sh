@@ -143,7 +143,8 @@ SEC_5=$(random_password_42)
 SEC_6=$(random_password_42)
 SEC_7=$(random_password_42)
 SEC_8=$(random_password_42)
-MERGED_SECRET=$( echo "{\"consul_token\":\"$SEC_1\",\"pg_admin_password\":\"$SEC_2\",\"pg_db_grafana_password\":\"$SEC_3\",\"pg_db_testdb_a_password\":\"$SEC_4\",\"pg_exporter_password\":\"$SEC_5\",\"pg_replicator_password\":\"$SEC_6\",\"pg_rewind_password\":\"$SEC_7\",\"pg_superuser_password\":\"$SEC_8\"} $CURRENT_SECRET" | jq -S -s add )
+SEC_9=$(random_password_42)
+MERGED_SECRET=$( echo "{\"consul_token\":\"$SEC_1\",\"pg_admin_password\":\"$SEC_2\",\"pg_db_bbtest_password\":\"$SEC_3\",\"pg_db_grafana_password\":\"$SEC_4\",\"pg_db_testdb_a_password\":\"$SEC_5\",\"pg_exporter_password\":\"$SEC_6\",\"pg_replicator_password\":\"$SEC_7\",\"pg_rewind_password\":\"$SEC_8\",\"pg_superuser_password\":\"$SEC_9\"} $CURRENT_SECRET" | jq -S -s add )
 if [ "$MERGED_SECRET" != "$CURRENT_SECRET" ];
 then
   echo "Secret $SEC_KEY changed"
@@ -213,6 +214,26 @@ path "epl/data/app/test-hello-world" {
 EOF
 )
 ensure_vault_policy_for_kv_exists "epl-app-test-hello-world" "$VAULT_POLICY"
+# bb-depl/moonbeam-dev
+SEC_KEY=epl/bb-depl/moonbeam-dev
+CURRENT_SECRET=$( vault kv get -format=json $SEC_KEY | jq -S '.data.data' )
+CURRENT_SECRET=${CURRENT_SECRET:-\{\}}
+SEC_1=$(aws_secret_key)
+SEC_2=$( vault kv get -format=json epl/pg/testdb | jq -Srj '.data.data.pg_db_bbtest_password' | sed 's/$/\\n/g' | tr -d '\n' | sed 's/..$//' )
+MERGED_SECRET=$( echo "{\"env_var_test_minio\":\"$SEC_1\",\"env_var_test_postgresql\":\"$SEC_2\"} $CURRENT_SECRET" | jq -S -s add )
+if [ "$MERGED_SECRET" != "$CURRENT_SECRET" ];
+then
+  echo "Secret $SEC_KEY changed"
+  echo "$MERGED_SECRET" | vault kv put $SEC_KEY -
+fi
+# create vault kv policy for job
+VAULT_POLICY=$( cat <<EOF
+path "epl/data/bb-depl/moonbeam-dev" {
+  capabilities = ["read"]
+}
+EOF
+)
+ensure_vault_policy_for_kv_exists "epl-bb-depl-moonbeam-dev" "$VAULT_POLICY"
 # grafana/main
 SEC_KEY=epl/grafana/main
 CURRENT_SECRET=$( vault kv get -format=json $SEC_KEY | jq -S '.data.data' )
@@ -238,11 +259,12 @@ SEC_KEY=epl/minio/global
 CURRENT_SECRET=$( vault kv get -format=json $SEC_KEY | jq -S '.data.data' )
 CURRENT_SECRET=${CURRENT_SECRET:-\{\}}
 SEC_1=$(aws_secret_key)
-SEC_2=$( vault kv get -format=json epl/docker-registry | jq -Srj '.data.data.minio_bucket_password' | sed 's/$/\\n/g' | tr -d '\n' | sed 's/..$//' )
-SEC_3=$( vault kv get -format=json epl/app/test-hello-world | jq -Srj '.data.data.minio_bucket_storage_password' | sed 's/$/\\n/g' | tr -d '\n' | sed 's/..$//' )
-SEC_4=$( vault kv get -format=json epl/loki/main | jq -Srj '.data.data.minio_bucket_password' | sed 's/$/\\n/g' | tr -d '\n' | sed 's/..$//' )
-SEC_5=$( vault kv get -format=json epl/tempo/us-west | jq -Srj '.data.data.minio_bucket_password' | sed 's/$/\\n/g' | tr -d '\n' | sed 's/..$//' )
-MERGED_SECRET=$( echo "{\"admin_password\":\"$SEC_1\",\"minio_user_docker_registry_password\":\"$SEC_2\",\"minio_user_epl_app_test_hello_world_password\":\"$SEC_3\",\"minio_user_loki_main_password\":\"$SEC_4\",\"minio_user_tempo_us_west_password\":\"$SEC_5\"} $CURRENT_SECRET" | jq -S -s add )
+SEC_2=$( vault kv get -format=json epl/bb-depl/moonbeam-dev | jq -Srj '.data.data.env_var_test_minio' | sed 's/$/\\n/g' | tr -d '\n' | sed 's/..$//' )
+SEC_3=$( vault kv get -format=json epl/docker-registry | jq -Srj '.data.data.minio_bucket_password' | sed 's/$/\\n/g' | tr -d '\n' | sed 's/..$//' )
+SEC_4=$( vault kv get -format=json epl/app/test-hello-world | jq -Srj '.data.data.minio_bucket_storage_password' | sed 's/$/\\n/g' | tr -d '\n' | sed 's/..$//' )
+SEC_5=$( vault kv get -format=json epl/loki/main | jq -Srj '.data.data.minio_bucket_password' | sed 's/$/\\n/g' | tr -d '\n' | sed 's/..$//' )
+SEC_6=$( vault kv get -format=json epl/tempo/us-west | jq -Srj '.data.data.minio_bucket_password' | sed 's/$/\\n/g' | tr -d '\n' | sed 's/..$//' )
+MERGED_SECRET=$( echo "{\"admin_password\":\"$SEC_1\",\"minio_user_bb-depl-moonbeam-dev_password\":\"$SEC_2\",\"minio_user_docker_registry_password\":\"$SEC_3\",\"minio_user_epl_app_test_hello_world_password\":\"$SEC_4\",\"minio_user_loki_main_password\":\"$SEC_5\",\"minio_user_tempo_us_west_password\":\"$SEC_6\"} $CURRENT_SECRET" | jq -S -s add )
 if [ "$MERGED_SECRET" != "$CURRENT_SECRET" ];
 then
   echo "Secret $SEC_KEY changed"

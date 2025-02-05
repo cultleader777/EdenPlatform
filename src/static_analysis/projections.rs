@@ -22,6 +22,7 @@ use super::http_endpoints::{
     check_app_duplicate_paths, check_frontend_duplicate_paths, check_http_path, HttpPathTree,
     PathArgs,
 };
+use super::l2_provisioning::blackbox_deployments::compute_available_resources_projection;
 use super::server_disks::server_disk_analysis;
 use super::server_labels::build_label_database;
 use super::{L1Projections, CloudTopologies, SyncChecksOutputs, get_global_settings, BmTopologies};
@@ -427,6 +428,8 @@ pub fn create_projections(db: &Database, sync_checks: &SyncChecksOutputs) -> Res
       .find(|ns| db.nomad_namespace().c_namespace(*ns) == "epl")
       .expect("we should always have this namespace");
 
+    let bb_depl_resources_per_region = compute_available_resources_projection(db);
+
     let l1proj = L1Projections {
         application_deployment_pg_wirings: &application_deployment_pg_wirings,
         application_deployment_ch_wirings: &application_deployment_ch_wirings,
@@ -457,6 +460,7 @@ pub fn create_projections(db: &Database, sync_checks: &SyncChecksOutputs) -> Res
         used_architectures_per_region: &used_architectures_per_region,
         label_database: &label_database,
         versioned_types: &versioned_types,
+        bb_depl_resources_per_region: &bb_depl_resources_per_region,
         epl_nomad_namespace,
     };
     let server_runtime =
@@ -467,10 +471,10 @@ pub fn create_projections(db: &Database, sync_checks: &SyncChecksOutputs) -> Res
     // what a mess, we add ingresses for region after server runtime
     // because only then we know admin service ips
     for region in db.region().rows_iter() {
-        let tld = db.region().c_tld(region);
+        let tld = global_settings.admin_tld;
         // only dns master region exposes admin for now
         let is_dns_master = db.region().c_is_dns_master(region);
-        if is_dns_master && db.tld().c_expose_admin(tld) {
+        if is_dns_master {
             match (&region_ingresses.get(&region), &server_runtime.admin_dns_ingress_entries().get(&tld)) {
                 (Some(ingresses), Some(admin_svcs)) => {
                     let entries = ingress_dns_entries.entry(tld).or_default();
@@ -538,5 +542,6 @@ pub fn create_projections(db: &Database, sync_checks: &SyncChecksOutputs) -> Res
         used_architectures_per_region,
         label_database,
         server_disk_sizes,
+        bb_depl_resources_per_region,
     })
 }

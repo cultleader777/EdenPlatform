@@ -40,8 +40,8 @@ pub fn deploy_all_components(
     grafana_loki::deploy_loki(db, runtime, l1proj)?;
     grafana_tempo::deploy_tempo(db, runtime, l1proj)?;
     epl_jobs::deploy_epl_applications(db, runtime, l1proj)?;
-    minio::deploy_minio_instances(db, runtime, l1proj)?;
     blackbox_deployments::deploy_blackbox_deployments(db, runtime, l1proj)?;
+    minio::deploy_minio_instances(db, runtime, l1proj)?;
     epl_app_ingress::deploy_epl_backend_applications(
         db,
         runtime,
@@ -52,6 +52,10 @@ pub fn deploy_all_components(
         db,
         runtime,
         l1proj.checked_frontend_pages
+    )?;
+    epl_app_ingress::deploy_epl_blackbox_applications(
+        db,
+        runtime
     )?;
 
     for region in db.region().rows_iter() {

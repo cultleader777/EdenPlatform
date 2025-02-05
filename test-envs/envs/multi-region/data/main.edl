@@ -4,6 +4,7 @@ INCLUDE "region_us_east.edl"
 DATA STRUCT global_settings {
   project_name: multi-region,
   admin_email: admin@epl-infra.net,
+  admin_tld: epl-infra.net,
 }
 
 DATA STRUCT region [
@@ -20,7 +21,6 @@ DATA STRUCT region [
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
     automatic_certificates: false,
   }
 ]
@@ -60,7 +60,6 @@ DEFAULTS {
   datacenter.implementation testvms,
   datacenter.default_server_kind testvm.cpu1ram5120,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region none,
   backend_application_deployment.region none,

@@ -1,15 +1,14 @@
 
 TABLE tld {
   domain TEXT PRIMARY KEY,
-  expose_admin BOOL DEFAULT true, // TODO: prove there's only one admin panel
   automatic_certificates BOOL DEFAULT true,
+  dnssec_enabled BOOL DEFAULT true,
   CHECK { isValidTld(domain) },
 }
 
 TABLE region {
   region_name TEXT PRIMARY KEY,
   availability_mode TEXT DEFAULT single_dc,
-  tld REF tld DETACHED DEFAULT,
   // for quorums
   is_dns_master BOOL DEFAULT false,
   is_dns_slave BOOL DEFAULT false,

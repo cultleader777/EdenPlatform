@@ -115,6 +115,7 @@ job "ch-keeper-testkeeper" {
         <server_id>1</server_id>
         <log_storage_path>/var/lib/clickhouse/coordination/log</log_storage_path>
         <snapshot_storage_path>/var/lib/clickhouse/coordination/snapshots</snapshot_storage_path>
+        <enable_reconfiguration>true</enable_reconfiguration>
 
         <coordination_settings>
             <operation_timeout_ms>10000</operation_timeout_ms>
@@ -252,6 +253,7 @@ EOL
         <server_id>2</server_id>
         <log_storage_path>/var/lib/clickhouse/coordination/log</log_storage_path>
         <snapshot_storage_path>/var/lib/clickhouse/coordination/snapshots</snapshot_storage_path>
+        <enable_reconfiguration>true</enable_reconfiguration>
 
         <coordination_settings>
             <operation_timeout_ms>10000</operation_timeout_ms>
@@ -389,6 +391,7 @@ EOL
         <server_id>3</server_id>
         <log_storage_path>/var/lib/clickhouse/coordination/log</log_storage_path>
         <snapshot_storage_path>/var/lib/clickhouse/coordination/snapshots</snapshot_storage_path>
+        <enable_reconfiguration>true</enable_reconfiguration>
 
         <coordination_settings>
             <operation_timeout_ms>10000</operation_timeout_ms>

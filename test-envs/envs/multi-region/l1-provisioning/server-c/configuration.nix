@@ -687,7 +687,7 @@ done
 
        enable = true;
      };
-
+# NIX REGION custom_hardware START
     imports =
       [ "${modulesPath}/profiles/qemu-guest.nix" ];
 
@@ -745,7 +745,7 @@ done
 
 
     hardware.cpu.amd.updateMicrocode = lib.mkDefault true;
-
+# NIX REGION custom_hardware END
     users.users.named.extraGroups = ["keys"];
     services.bind =
     {
@@ -823,6 +823,18 @@ view lan {
 
           };
 
+zone "epl-infra.net." {
+  type slave;
+  file "/run/named/private-epl-infra.net.zone.signed";
+  masters { 10.17.0.13; };
+  transfer-source 10.17.0.12;
+};
+zone "10.in-addr.arpa." {
+  type slave;
+  file "/run/named/private-10.in-addr.arpa.zone.signed";
+  masters { 10.17.0.13; };
+  transfer-source 10.17.0.12;
+};
 zone "us-west.epl-infra.net." {
   type slave;
   file "/run/named/private-us-west.epl-infra.net.zone.signed";

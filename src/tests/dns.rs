@@ -20,6 +20,7 @@ fn test_dns_more_than_one_master() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -84,6 +85,7 @@ fn test_dns_more_than_two_slaves() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -158,6 +160,7 @@ fn test_dns_no_master_specified() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -218,6 +221,7 @@ fn test_dns_no_slaves_specified() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -283,13 +287,13 @@ fn test_dns_more_than_one_master_region() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -350,7 +354,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT server [
@@ -457,13 +460,13 @@ fn test_dns_more_than_two_slave_dc() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -542,7 +545,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT server [
@@ -708,13 +710,13 @@ fn test_dns_no_master_region_specified() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -777,7 +779,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT server [
@@ -875,13 +876,13 @@ fn test_dns_no_slave_region_specified() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -941,7 +942,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT server [
@@ -1039,13 +1039,13 @@ fn test_dns_single_dc_no_master() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld epl-infra.net,
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -1095,7 +1095,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT server [
@@ -1159,13 +1158,13 @@ fn test_dns_lan_interface_master() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -1213,7 +1212,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT server [
@@ -1281,13 +1279,13 @@ fn test_dns_lan_interface_slave() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -1335,7 +1333,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT server [
@@ -1403,13 +1400,13 @@ fn test_dc_name_and_frontend_app_ingress_clash() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld epl-infra.net,
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -1457,7 +1454,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT frontend_application [
@@ -1507,13 +1503,13 @@ fn test_dc_name_and_backend_app_ingress_clash() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
 }
 
 DEFAULTS {
-    region.tld epl-infra.net,
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -1561,7 +1557,6 @@ DATA STRUCT datacenter [
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: false,
 }
 
 DATA STRUCT backend_application_deployment {

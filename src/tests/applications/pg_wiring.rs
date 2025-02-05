@@ -15,6 +15,7 @@ fn test_application_db_wiring_bad_syntax() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -163,6 +164,7 @@ fn test_application_db_wiring_no_db_shards() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -299,6 +301,7 @@ fn test_application_db_wiring_invalid_app_shard() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -446,6 +449,7 @@ fn test_application_db_wiring_invalid_target_deployment_shard() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -601,6 +605,7 @@ fn test_application_pg_wiring_schema_mismatch() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -752,6 +757,7 @@ fn test_application_db_wiring_shard_defined_multiple_times() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -899,6 +905,7 @@ fn test_application_db_wiring_shard_undefined() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -1042,6 +1049,7 @@ fn test_application_db_wiring_shards_point_to_duplicate_db() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,

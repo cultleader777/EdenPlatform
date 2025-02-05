@@ -21,7 +21,6 @@ DEFAULTS {
     datacenter.implementation testvms,
     datacenter.default_server_kind testvm.cpu4ram8192,
     server_disk.disk_kind default-ssd,
-    region.tld epl-infra.net,
     rust_compilation_environment.nixpkgs_environment default_nixpkgs,
     frontend_application_deployment.region us-west,
     backend_application_deployment.region us-west,
@@ -39,7 +38,6 @@ DEFAULTS {
 
 DATA STRUCT EXCLUSIVE tld {
     domain: epl-infra.net,
-    expose_admin: true,
 }
 
 INCLUDE LUA {

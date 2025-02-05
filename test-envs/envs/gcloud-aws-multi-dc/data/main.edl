@@ -1,6 +1,7 @@
 DATA STRUCT global_settings {
   project_name: gcloud-aws-multi-dc,
   admin_email: admin@epl-infra.net,
+  admin_tld: epl-infra.net,
   aws_artefacts_s3_bucket_name: bdeyfszkpttb,
   google_cloud_artefacts_bucket_name: smmjkglmnoaa,
   google_cloud_project_id: test1-406308,
@@ -45,7 +46,6 @@ DEFAULTS {
   datacenter.implementation gcloud,
   datacenter.default_server_kind gcloud.e2-standard-4,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -76,7 +76,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
     automatic_certificates: false,
   }
 ]

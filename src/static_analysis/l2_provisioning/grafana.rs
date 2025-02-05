@@ -63,7 +63,7 @@ pub fn deploy_grafana(
         let port = db.grafana().c_port(graf);
         let memory_mb = db.grafana().c_memory_mb(graf);
         let dba = runtime
-            .fetch_pg_access(&PgAccessKind::Unmanaged(db_depl))
+            .fetch_pg_access(&PgAccessKind::UnmanagedRw(db_depl))
             .clone();
         let locked_port = runtime.lock_port_all_servers(port as u16, format!("Grafana {deployment_name}"))?;
         let memory = runtime.reserve_stateless_memory_mb(format!("Grafana {deployment_name}"), memory_mb);

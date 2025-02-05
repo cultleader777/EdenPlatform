@@ -2,7 +2,7 @@
 use crate::static_analysis::PlatformValidationError;
 
 #[cfg(test)]
-use super::common;
+use super::super::common;
 
 #[test]
 fn test_non_sequential_ports() {

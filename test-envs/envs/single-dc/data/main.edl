@@ -1,6 +1,7 @@
 DATA STRUCT global_settings {
   project_name: single-dc,
   admin_email: admin@epl-infra.net,
+  admin_tld: epl-infra.net,
 }
 
 DATA admin_ssh_keys {
@@ -44,7 +45,6 @@ DEFAULTS {
   datacenter.implementation testvms,
   datacenter.default_server_kind testvm.cpu2ram8192,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -75,7 +75,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
     automatic_certificates: false,
   }
 ]
@@ -939,7 +938,10 @@ DATA STRUCT pg_deployment [
     ] WITH pg_deployment_unmanaged_db [
       {
         db_name: grafana,
-      }
+      },
+      {
+        db_name: bbtest,
+      },
     ]
   }
 ]
@@ -985,6 +987,9 @@ DATA STRUCT minio_cluster {
     },
     {
       bucket_name: app1,
+    },
+    {
+      bucket_name: bb-app1,
     },
   ]
 }
@@ -1271,6 +1276,20 @@ DATA STRUCT blackbox_deployment {
         {
           target_path: '/data',
           server_volume: server-d=>moonbeam-dev,
+        },
+      ]
+      WITH blackbox_deployment_env_variable [
+        {
+           var_name: TEST_POSTGRESQL,
+           value_source: 'pg:rw:testdb:bbtest',
+        },
+        {
+           var_name: TEST_MINIO,
+           value_source: 's3:rw:global:bb-app1',
+        },
+        {
+           var_name: TEST_RAW_VALUE,
+           raw_value: 'hello',
         },
       ]
     }

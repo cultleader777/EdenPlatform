@@ -3207,6 +3207,7 @@ fn test_disallow_cross_region_db_instance() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -3488,6 +3489,7 @@ fn test_disallow_cross_region_nats_instance() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -3769,6 +3771,7 @@ fn test_disallow_cross_region_tempo_instance() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -4042,6 +4045,7 @@ fn test_tempo_disallow_cross_region_monitoring_instance() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -4317,6 +4321,7 @@ fn test_tempo_disallow_cross_region_logging_instance() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -4592,6 +4597,7 @@ fn test_disallow_cross_region_monitoring_instance() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -4862,6 +4868,7 @@ fn test_disallow_cross_region_logging_minio_cluster() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -5134,6 +5141,7 @@ fn test_disallow_cross_region_docker_registry_and_minio_cluster() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -5405,6 +5413,7 @@ fn test_disallow_cross_region_grafana_and_db() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -5697,6 +5706,7 @@ fn test_disallow_cross_region_application_pg_access() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -6066,6 +6076,7 @@ fn test_disallow_cross_region_application_ch_access() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -6419,6 +6430,7 @@ fn test_disallow_cross_region_nats_to_ch_stream() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -6780,6 +6792,7 @@ fn test_disallow_cross_region_application_s3_access() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -7138,6 +7151,7 @@ fn test_disallow_cross_region_application_queue_access() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -7480,6 +7494,7 @@ fn test_disallow_double_usage_of_bucket_logging() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -7776,6 +7791,7 @@ fn test_disallow_double_usage_of_bucket_docker() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -8072,6 +8088,7 @@ fn test_disallow_double_usage_of_bucket_loki_and_docker() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -8368,6 +8385,7 @@ fn test_disallow_double_usage_of_bucket_loki_and_backend_app() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -8699,6 +8717,7 @@ fn test_minio_too_few_dcs() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: 12345-project,
     google_cloud_artefacts_bucket_name: henlo-bois,
     aws_artefacts_s3_bucket_name: henlo-bois,
@@ -8741,7 +8760,6 @@ DEFAULTS {
   datacenter.implementation aws,
   datacenter.default_server_kind testvm.cpu2ram8192,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -8779,7 +8797,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
   }
 ]
 
@@ -9342,6 +9359,7 @@ fn test_minio_unequal_distribution_across_dcs() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: 12345-project,
     google_cloud_artefacts_bucket_name: henlo-bois,
     aws_artefacts_s3_bucket_name: henlo-bois,
@@ -9384,7 +9402,6 @@ DEFAULTS {
   datacenter.implementation aws,
   datacenter.default_server_kind testvm.cpu2ram8192,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -9422,7 +9439,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
   }
 ]
 
@@ -9976,6 +9992,7 @@ fn test_minio_unequal_distribution_allow_across_dcs() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: 12345-project,
     google_cloud_artefacts_bucket_name: henlo-bois,
     aws_artefacts_s3_bucket_name: henlo-bois,
@@ -10018,7 +10035,6 @@ DEFAULTS {
   datacenter.implementation aws,
   datacenter.default_server_kind testvm.cpu2ram8192,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -10056,7 +10072,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
   }
 ]
 

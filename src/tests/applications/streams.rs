@@ -12,6 +12,7 @@ fn test_application_stream_wiring_bad_syntax() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -140,6 +141,7 @@ fn test_application_stream_wiring_app_no_streams() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -260,6 +262,7 @@ fn test_application_stream_wiring_app_non_existing_stream() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -389,6 +392,7 @@ fn test_application_stream_wiring_no_target_stream() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -517,6 +521,7 @@ fn test_application_stream_wiring_type_mismatch() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -660,6 +665,7 @@ fn test_application_stream_wiring_enable_subjects_mismatch() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -804,6 +810,7 @@ fn test_application_stream_wiring_redefined_multiple_times() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -933,6 +940,7 @@ fn test_application_stream_wiring_undefined() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -1059,6 +1067,7 @@ fn test_application_stream_wiring_double_point_to_same_stream() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,

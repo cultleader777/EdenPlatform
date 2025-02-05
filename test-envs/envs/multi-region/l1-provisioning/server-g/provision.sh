@@ -978,6 +978,92 @@ fi
 rm -f $TMP_SECRET_PATH || true
 TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 
+# NIX REGION secret_value_K10-in-addr-arpa--015-20386-private START
+cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
+Private-key-format: v1.3
+Algorithm: 15 (ED25519)
+PrivateKey: OYKo9b0ENemfbDa3Js37Z/mlreq2AK9iFkLa5T0fTAU=
+Created: 20240306032225
+Publish: 20240306032225
+Activate: 20240306032225
+LilBoiPeepLikesBenzTruck
+
+# NIX REGION secret_value_K10-in-addr-arpa--015-20386-private END
+if id -u named &>/dev/null && id -g named &>/dev/null; then
+  chown named $TMP_SECRET_PATH
+  chgrp named $TMP_SECRET_PATH
+  unset NEEDS_MOVE
+  cmp --silent $TMP_SECRET_PATH /run/keys/K10-in-addr-arpa--015-20386-private || NEEDS_MOVE=true
+  [ "$(stat -c '%A:%U:%G' $TMP_SECRET_PATH)" == "$(stat -c '%A:%U:%G' '/run/keys/K10-in-addr-arpa--015-20386-private')" ] || NEEDS_MOVE=true
+  [ -n "$NEEDS_MOVE" ] && mv -f $TMP_SECRET_PATH /run/keys/K10-in-addr-arpa--015-20386-private
+fi
+rm -f $TMP_SECRET_PATH || true
+TMP_SECRET_PATH=/run/tmpsec-$RANDOM
+
+# NIX REGION secret_value_K10-in-addr-arpa--015-01203-private START
+cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
+Private-key-format: v1.3
+Algorithm: 15 (ED25519)
+PrivateKey: 2PKAaB8NyMorKbHgZZ4tOnYQ6kdu6tCxF/I+OoE7ZRw=
+Created: 20240306032225
+Publish: 20240306032225
+Activate: 20240306032225
+LilBoiPeepLikesBenzTruck
+
+# NIX REGION secret_value_K10-in-addr-arpa--015-01203-private END
+if id -u named &>/dev/null && id -g named &>/dev/null; then
+  chown named $TMP_SECRET_PATH
+  chgrp named $TMP_SECRET_PATH
+  unset NEEDS_MOVE
+  cmp --silent $TMP_SECRET_PATH /run/keys/K10-in-addr-arpa--015-01203-private || NEEDS_MOVE=true
+  [ "$(stat -c '%A:%U:%G' $TMP_SECRET_PATH)" == "$(stat -c '%A:%U:%G' '/run/keys/K10-in-addr-arpa--015-01203-private')" ] || NEEDS_MOVE=true
+  [ -n "$NEEDS_MOVE" ] && mv -f $TMP_SECRET_PATH /run/keys/K10-in-addr-arpa--015-01203-private
+fi
+rm -f $TMP_SECRET_PATH || true
+TMP_SECRET_PATH=/run/tmpsec-$RANDOM
+
+# NIX REGION secret_value_K10-in-addr-arpa--015-20386-key START
+cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
+; This is a zone-signing key, keyid 20386, for 10.in-addr.arpa.
+; Created: 20240306032225 (Wed Mar  6 05:22:25 2024)
+; Publish: 20240306032225 (Wed Mar  6 05:22:25 2024)
+; Activate: 20240306032225 (Wed Mar  6 05:22:25 2024)
+10.in-addr.arpa. IN DNSKEY 256 3 15 NgribxUefs+s3YJR/Pe71IaSOLpmD86d4JBPD+Gqseo=
+LilBoiPeepLikesBenzTruck
+
+# NIX REGION secret_value_K10-in-addr-arpa--015-20386-key END
+if id -u named &>/dev/null && id -g named &>/dev/null; then
+  chown named $TMP_SECRET_PATH
+  chgrp named $TMP_SECRET_PATH
+  unset NEEDS_MOVE
+  cmp --silent $TMP_SECRET_PATH /run/keys/K10-in-addr-arpa--015-20386-key || NEEDS_MOVE=true
+  [ "$(stat -c '%A:%U:%G' $TMP_SECRET_PATH)" == "$(stat -c '%A:%U:%G' '/run/keys/K10-in-addr-arpa--015-20386-key')" ] || NEEDS_MOVE=true
+  [ -n "$NEEDS_MOVE" ] && mv -f $TMP_SECRET_PATH /run/keys/K10-in-addr-arpa--015-20386-key
+fi
+rm -f $TMP_SECRET_PATH || true
+TMP_SECRET_PATH=/run/tmpsec-$RANDOM
+
+# NIX REGION secret_value_K10-in-addr-arpa--015-01203-key START
+cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
+; This is a key-signing key, keyid 1203, for 10.in-addr.arpa.
+; Created: 20240306032225 (Wed Mar  6 05:22:25 2024)
+; Publish: 20240306032225 (Wed Mar  6 05:22:25 2024)
+; Activate: 20240306032225 (Wed Mar  6 05:22:25 2024)
+10.in-addr.arpa. IN DNSKEY 257 3 15 xziBKJb8w4Iu+ITuIHJu72RUx4/BvW5vg6QmkQmyCoE=
+LilBoiPeepLikesBenzTruck
+
+# NIX REGION secret_value_K10-in-addr-arpa--015-01203-key END
+if id -u named &>/dev/null && id -g named &>/dev/null; then
+  chown named $TMP_SECRET_PATH
+  chgrp named $TMP_SECRET_PATH
+  unset NEEDS_MOVE
+  cmp --silent $TMP_SECRET_PATH /run/keys/K10-in-addr-arpa--015-01203-key || NEEDS_MOVE=true
+  [ "$(stat -c '%A:%U:%G' $TMP_SECRET_PATH)" == "$(stat -c '%A:%U:%G' '/run/keys/K10-in-addr-arpa--015-01203-key')" ] || NEEDS_MOVE=true
+  [ -n "$NEEDS_MOVE" ] && mv -f $TMP_SECRET_PATH /run/keys/K10-in-addr-arpa--015-01203-key
+fi
+rm -f $TMP_SECRET_PATH || true
+TMP_SECRET_PATH=/run/tmpsec-$RANDOM
+
 # NIX REGION secret_value_K18-10-in-addr-arpa--015-63576-private START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 Private-key-format: v1.3
@@ -1060,6 +1146,92 @@ if id -u named &>/dev/null && id -g named &>/dev/null; then
   cmp --silent $TMP_SECRET_PATH /run/keys/K18-10-in-addr-arpa--015-42662-key || NEEDS_MOVE=true
   [ "$(stat -c '%A:%U:%G' $TMP_SECRET_PATH)" == "$(stat -c '%A:%U:%G' '/run/keys/K18-10-in-addr-arpa--015-42662-key')" ] || NEEDS_MOVE=true
   [ -n "$NEEDS_MOVE" ] && mv -f $TMP_SECRET_PATH /run/keys/K18-10-in-addr-arpa--015-42662-key
+fi
+rm -f $TMP_SECRET_PATH || true
+TMP_SECRET_PATH=/run/tmpsec-$RANDOM
+
+# NIX REGION secret_value_Kepl-infra-net--015-56589-private START
+cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
+Private-key-format: v1.3
+Algorithm: 15 (ED25519)
+PrivateKey: PXlMxE3x50fZxJMQFHCN0fOEMMJnco9uTq04ZQE+IgI=
+Created: 20240306032225
+Publish: 20240306032225
+Activate: 20240306032225
+LilBoiPeepLikesBenzTruck
+
+# NIX REGION secret_value_Kepl-infra-net--015-56589-private END
+if id -u named &>/dev/null && id -g named &>/dev/null; then
+  chown named $TMP_SECRET_PATH
+  chgrp named $TMP_SECRET_PATH
+  unset NEEDS_MOVE
+  cmp --silent $TMP_SECRET_PATH /run/keys/Kepl-infra-net--015-56589-private || NEEDS_MOVE=true
+  [ "$(stat -c '%A:%U:%G' $TMP_SECRET_PATH)" == "$(stat -c '%A:%U:%G' '/run/keys/Kepl-infra-net--015-56589-private')" ] || NEEDS_MOVE=true
+  [ -n "$NEEDS_MOVE" ] && mv -f $TMP_SECRET_PATH /run/keys/Kepl-infra-net--015-56589-private
+fi
+rm -f $TMP_SECRET_PATH || true
+TMP_SECRET_PATH=/run/tmpsec-$RANDOM
+
+# NIX REGION secret_value_Kepl-infra-net--015-00239-private START
+cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
+Private-key-format: v1.3
+Algorithm: 15 (ED25519)
+PrivateKey: IPySjznuWzieD4L18zpf711WlAOQE0pFUGVncAoS1M4=
+Created: 20240306032225
+Publish: 20240306032225
+Activate: 20240306032225
+LilBoiPeepLikesBenzTruck
+
+# NIX REGION secret_value_Kepl-infra-net--015-00239-private END
+if id -u named &>/dev/null && id -g named &>/dev/null; then
+  chown named $TMP_SECRET_PATH
+  chgrp named $TMP_SECRET_PATH
+  unset NEEDS_MOVE
+  cmp --silent $TMP_SECRET_PATH /run/keys/Kepl-infra-net--015-00239-private || NEEDS_MOVE=true
+  [ "$(stat -c '%A:%U:%G' $TMP_SECRET_PATH)" == "$(stat -c '%A:%U:%G' '/run/keys/Kepl-infra-net--015-00239-private')" ] || NEEDS_MOVE=true
+  [ -n "$NEEDS_MOVE" ] && mv -f $TMP_SECRET_PATH /run/keys/Kepl-infra-net--015-00239-private
+fi
+rm -f $TMP_SECRET_PATH || true
+TMP_SECRET_PATH=/run/tmpsec-$RANDOM
+
+# NIX REGION secret_value_Kepl-infra-net--015-56589-key START
+cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
+; This is a zone-signing key, keyid 56589, for epl-infra.net.
+; Created: 20240306032225 (Wed Mar  6 05:22:25 2024)
+; Publish: 20240306032225 (Wed Mar  6 05:22:25 2024)
+; Activate: 20240306032225 (Wed Mar  6 05:22:25 2024)
+epl-infra.net. IN DNSKEY 256 3 15 joaF2KQBXjam8tvQJajs87Aj6EwMpu01zYoQieiH1B8=
+LilBoiPeepLikesBenzTruck
+
+# NIX REGION secret_value_Kepl-infra-net--015-56589-key END
+if id -u named &>/dev/null && id -g named &>/dev/null; then
+  chown named $TMP_SECRET_PATH
+  chgrp named $TMP_SECRET_PATH
+  unset NEEDS_MOVE
+  cmp --silent $TMP_SECRET_PATH /run/keys/Kepl-infra-net--015-56589-key || NEEDS_MOVE=true
+  [ "$(stat -c '%A:%U:%G' $TMP_SECRET_PATH)" == "$(stat -c '%A:%U:%G' '/run/keys/Kepl-infra-net--015-56589-key')" ] || NEEDS_MOVE=true
+  [ -n "$NEEDS_MOVE" ] && mv -f $TMP_SECRET_PATH /run/keys/Kepl-infra-net--015-56589-key
+fi
+rm -f $TMP_SECRET_PATH || true
+TMP_SECRET_PATH=/run/tmpsec-$RANDOM
+
+# NIX REGION secret_value_Kepl-infra-net--015-00239-key START
+cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
+; This is a key-signing key, keyid 239, for epl-infra.net.
+; Created: 20240306032225 (Wed Mar  6 05:22:25 2024)
+; Publish: 20240306032225 (Wed Mar  6 05:22:25 2024)
+; Activate: 20240306032225 (Wed Mar  6 05:22:25 2024)
+epl-infra.net. IN DNSKEY 257 3 15 baEW4FrpIp5KsX6jmedjTmZ2eHhnLg9XVCInj8IeoQY=
+LilBoiPeepLikesBenzTruck
+
+# NIX REGION secret_value_Kepl-infra-net--015-00239-key END
+if id -u named &>/dev/null && id -g named &>/dev/null; then
+  chown named $TMP_SECRET_PATH
+  chgrp named $TMP_SECRET_PATH
+  unset NEEDS_MOVE
+  cmp --silent $TMP_SECRET_PATH /run/keys/Kepl-infra-net--015-00239-key || NEEDS_MOVE=true
+  [ "$(stat -c '%A:%U:%G' $TMP_SECRET_PATH)" == "$(stat -c '%A:%U:%G' '/run/keys/Kepl-infra-net--015-00239-key')" ] || NEEDS_MOVE=true
+  [ -n "$NEEDS_MOVE" ] && mv -f $TMP_SECRET_PATH /run/keys/Kepl-infra-net--015-00239-key
 fi
 rm -f $TMP_SECRET_PATH || true
 TMP_SECRET_PATH=/run/tmpsec-$RANDOM
@@ -2407,7 +2579,7 @@ done
 
        enable = true;
      };
-
+# NIX REGION custom_hardware START
     imports =
       [ "${modulesPath}/profiles/qemu-guest.nix" ];
 
@@ -2465,7 +2637,7 @@ done
 
 
     hardware.cpu.amd.updateMicrocode = lib.mkDefault true;
-
+# NIX REGION custom_hardware END
     users.users.named.extraGroups = ["keys"];
     services.bind =
     {
@@ -2543,6 +2715,18 @@ view lan {
 
           };
 
+zone "epl-infra.net." {
+  type slave;
+  file "/run/named/private-epl-infra.net.zone.signed";
+  masters { 10.17.0.13; };
+  transfer-source 10.18.0.12;
+};
+zone "10.in-addr.arpa." {
+  type slave;
+  file "/run/named/private-10.in-addr.arpa.zone.signed";
+  masters { 10.17.0.13; };
+  transfer-source 10.18.0.12;
+};
 zone "us-east.epl-infra.net." {
   type slave;
   file "/run/named/private-us-east.epl-infra.net.zone.signed";
@@ -3155,7 +3339,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"296168d102d003a481d96451daaaf8aa302962b431bc512da0f4bcbcc4f0d538\",hostname=\"server-g\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"077531842c545a1bec4c4b4dad698274e12bfae15fda0f4116a12a3e08e79701\",hostname=\"server-g\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE

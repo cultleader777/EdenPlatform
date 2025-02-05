@@ -2652,7 +2652,7 @@ done
 
        enable = true;
      };
-
+# NIX REGION custom_hardware START
     imports = [ "${modulesPath}/virtualisation/google-compute-image.nix" ];
 
 
@@ -2689,7 +2689,7 @@ done
 
 
     networking.usePredictableInterfaceNames = false;
-
+# NIX REGION custom_hardware END
     users.users.named.extraGroups = ["keys"];
     services.bind =
     {
@@ -3430,7 +3430,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"f7bc5c863d3b625735530fc6285366028d7beb119c65b1c8a267f960115a68a2\",hostname=\"server-a\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"839c00e1fed7cb22b438a4ab26c12940e3656f84c7a472384453c7db57b674ac\",hostname=\"server-a\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE
@@ -3438,15 +3438,15 @@ epl_l1_provisioning_last_hash{hash=\"f7bc5c863d3b625735530fc6285366028d7beb119c6
   # l1 expected hash
   METRICS_FILE=/var/lib/node_exporter/epl_l1_expected_hash.prom
   echo '
-epl_l1_provisioning_expected_hash{hash="f7bc5c863d3b625735530fc6285366028d7beb119c65b1c8a267f960115a68a2",hostname="server-a"} 1
-epl_l1_provisioning_expected_hash{hash="937dc1811f8185ce75e4497a0f9e3b27fa0f58ad7be4a684f596ef9024c8113c",hostname="server-b"} 1
-epl_l1_provisioning_expected_hash{hash="aa728023054cef1b3c03ec04311897e5c8286af550058b7daa12299915c19650",hostname="server-c"} 1
-epl_l1_provisioning_expected_hash{hash="d1d2f9851fb5e79905b0936f31200ed52fb3c57d6ceda1d005afc503292b7a55",hostname="server-d"} 1
-epl_l1_provisioning_expected_hash{hash="4c10250c5ba77904cec1eabbe669139cc0af3f066f8b09208519e05b59c322ad",hostname="server-e"} 1
-epl_l1_provisioning_expected_hash{hash="b09d8b975bd573a0dad0ecee82cc849f9837b621b11e01196ad767b007b8df78",hostname="server-f"} 1
-epl_l1_provisioning_expected_hash{hash="efa1b9b2fa1e09f14db0608d8a5785fefb136a689c5f503c18ea3d8de0de28dc",hostname="server-g"} 1
-epl_l1_provisioning_expected_hash{hash="d75f67ceb163717386efbd0a01e14f3210531088ea7081c92d4a47df3c0d6ca1",hostname="server-h"} 1
-epl_l1_provisioning_expected_hash{hash="3fb38dacc62a2bec506041172ee0ce7bf0aad2603e0d77e3fdb3448806e19f2d",hostname="server-i"} 1
+epl_l1_provisioning_expected_hash{hash="839c00e1fed7cb22b438a4ab26c12940e3656f84c7a472384453c7db57b674ac",hostname="server-a"} 1
+epl_l1_provisioning_expected_hash{hash="5ce8126595d5bf3e9149315ce2a12ba0439467b9b7b454ad49344efa65d5c6a6",hostname="server-b"} 1
+epl_l1_provisioning_expected_hash{hash="5e955c4b2ac8d6fd351722a450ac79ca4a8f75b1b1f67da6fa8e16fc90f01751",hostname="server-c"} 1
+epl_l1_provisioning_expected_hash{hash="d346b991c20f86195d9408cc89af9c937be3a0fc15cc7ec8dfc1e12f87026405",hostname="server-d"} 1
+epl_l1_provisioning_expected_hash{hash="3e6acb5944dc851b375d362801b7824ca19273bfac47382cbeb954f88ac3f2af",hostname="server-e"} 1
+epl_l1_provisioning_expected_hash{hash="4a08b4edd4b012c367a154e5d04cc5cde22cc8ea4c945f937af97a5f54e91617",hostname="server-f"} 1
+epl_l1_provisioning_expected_hash{hash="e411f60f702d929dc8f71e760c5c64106f8ff0d550dfa92aefc9c23dea5b9300",hostname="server-g"} 1
+epl_l1_provisioning_expected_hash{hash="69c9ded741eb9fa22a145b25a75a62c9d72c5dde4693e0cac8b64e9a66f5d1a6",hostname="server-h"} 1
+epl_l1_provisioning_expected_hash{hash="6202d40e88c1979298f83fe319685e5d039fd9f42d38f31a1715a640c12e5d44",hostname="server-i"} 1
 
 ' > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp

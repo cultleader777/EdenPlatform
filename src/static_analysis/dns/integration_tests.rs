@@ -2,7 +2,7 @@ use std::collections::{BTreeSet, HashSet};
 
 use convert_case::Casing;
 
-use crate::{database::Database, static_analysis::{L1Projections, server_runtime::{ServerRuntime, IntegrationTest}}, codegen::l1_provisioning::dns::reverse_ip};
+use crate::{database::Database, static_analysis::{L1Projections, server_runtime::{ServerRuntime, IntegrationTest}, get_global_settings}, codegen::l1_provisioning::dns::reverse_ip};
 
 pub fn dns_tests(db: &Database, l1proj: &L1Projections, runtime: &mut ServerRuntime) {
     all_servers_resolve(db, l1proj, runtime);
@@ -291,9 +291,9 @@ fn public_dns_works_for_lb(db: &Database, l1proj: &L1Projections, runtime: &mut 
 }
 
 fn internal_ptr_records_exist_for_all_servers(db: &Database, l1proj: &L1Projections, runtime: &mut ServerRuntime) {
+    let tld = get_global_settings(db).admin_tld;
+    let tld_name = db.tld().c_domain(tld);
     for r in db.region().rows_iter() {
-        let tld = db.region().c_tld(r);
-        let tld_name = db.tld().c_domain(tld);
         let reg_name = db.region().c_region_name(r);
         let uc_region = reg_name.to_case(convert_case::Case::Snake);
         let mut all_servers_with_dns: Vec<(String, Vec<String>)> = Vec::new();
@@ -366,39 +366,38 @@ fn ns_records_exist_for_region(db: &Database, l1proj: &L1Projections, runtime: &
         master_dns_servers.push(format!("{ip}:53"));
     }
 
-    for tld in db.tld().rows_iter() {
-        let mut ns_records: Vec<(String, Vec<String>)> = Vec::new();
-        let tld_name = db.tld().c_domain(tld);
-        let tld_name_snake = tld_name.to_case(convert_case::Case::Snake).replace(".", "_");
-        for region in db.tld().c_referrers_region__tld(tld) {
-            let region_name = db.region().c_region_name(*region);
-            let query_domain = format!("{region_name}.{tld_name}");
-            let mut expected_ns: Vec<String> = Vec::new();
+    let tld = get_global_settings(db).admin_tld;
+    let mut ns_records: Vec<(String, Vec<String>)> = Vec::new();
+    let tld_name = db.tld().c_domain(tld);
+    let tld_name_snake = tld_name.to_case(convert_case::Case::Snake).replace(".", "_");
+    for region in db.region().rows_iter() {
+        let region_name = db.region().c_region_name(region);
+        let query_domain = format!("{region_name}.{tld_name}");
+        let mut expected_ns: Vec<String> = Vec::new();
 
-            let mut ns_count = 0;
-            for _ in &master_dns_servers {
-                ns_count += 1;
-                expected_ns.push(format!("ns{ns_count}.{region_name}.{tld_name}."));
-            }
-
-            ns_records.push((query_domain, expected_ns));
+        let mut ns_count = 0;
+        for _ in &master_dns_servers {
+            ns_count += 1;
+            expected_ns.push(format!("ns{ns_count}.{region_name}.{tld_name}."));
         }
 
-        runtime.add_integration_test(
-            format!("dns_ns_records_exist_for_regions_{tld_name_snake}"),
-            IntegrationTest::DnsResolutionWorksNsRecords {
-                target_servers: master_dns_servers.clone(),
-                queries: ns_records.clone(),
-            }
-        );
+        ns_records.push((query_domain, expected_ns));
     }
+
+    runtime.add_integration_test(
+        format!("dns_ns_records_exist_for_regions_{tld_name_snake}"),
+        IntegrationTest::DnsResolutionWorksNsRecords {
+            target_servers: master_dns_servers.clone(),
+            queries: ns_records.clone(),
+        }
+    );
 }
 
 fn ns_servers_resolve(db: &Database, l1proj: &L1Projections, runtime: &mut ServerRuntime) {
+    let tld = get_global_settings(db).admin_tld;
+    let domain = db.tld().c_domain(tld);
     for r in db.region().rows_iter() {
         let rname = db.region().c_region_name(r);
-        let tld = db.region().c_tld(r);
-        let domain = db.tld().c_domain(tld);
         let uc_region = db.region().c_region_name(r).to_case(convert_case::Case::Snake);
         let mut all_servers_with_dns: Vec<(String, Vec<String>)> = Vec::new();
         let mut all_dns_servers: Vec<String> = Vec::new();
@@ -440,77 +439,76 @@ fn ns_servers_resolve(db: &Database, l1proj: &L1Projections, runtime: &mut Serve
 }
 
 fn internal_dns_sec_works(db: &Database, l1proj: &L1Projections, runtime: &mut ServerRuntime) {
-    for tld in db.tld().rows_iter() {
-        let tld_name = db.tld().c_domain(tld);
-        let tld_snake = tld_name.to_case(convert_case::Case::Snake).replace(".", "_");
-        for r in db.tld().c_referrers_region__tld(tld) {
-            let uc_region = db.region().c_region_name(*r).to_case(convert_case::Case::Snake);
-            let mut master_servers: Vec<String> = Vec::new();
-            let mut slave_servers: Vec<String> = Vec::new();
-            let mut other_servers: Vec<String> = Vec::new();
-            let mut first_server = None;
-            for dc in db.region().c_referrers_datacenter__region(*r) {
-                for server in db.datacenter().c_referrers_server__dc(*dc) {
-                    if first_server.is_none() {
-                        first_server = Some(server);
-                    }
-                    let lan_iface = l1proj.consul_network_iface.value(*server);
-                    let lan_ip = db.network_interface().c_if_ip(*lan_iface);
+    let tld = get_global_settings(db).admin_tld;
+    let tld_name = db.tld().c_domain(tld);
+    let tld_snake = tld_name.to_case(convert_case::Case::Snake).replace(".", "_");
+    for r in db.region().rows_iter() {
+        let uc_region = db.region().c_region_name(r).to_case(convert_case::Case::Snake);
+        let mut master_servers: Vec<String> = Vec::new();
+        let mut slave_servers: Vec<String> = Vec::new();
+        let mut other_servers: Vec<String> = Vec::new();
+        let mut first_server = None;
+        for dc in db.region().c_referrers_datacenter__region(r) {
+            for server in db.datacenter().c_referrers_server__dc(*dc) {
+                if first_server.is_none() {
+                    first_server = Some(server);
+                }
+                let lan_iface = l1proj.consul_network_iface.value(*server);
+                let lan_ip = db.network_interface().c_if_ip(*lan_iface);
 
-                    let this_dns_srv = lan_ip.clone();
-                    if db.server().c_is_dns_master(*server) {
-                        master_servers.push(this_dns_srv);
-                    } else if db.server().c_is_dns_slave(*server) {
-                        slave_servers.push(this_dns_srv);
-                    } else {
-                        other_servers.push(this_dns_srv);
-                    }
+                let this_dns_srv = lan_ip.clone();
+                if db.server().c_is_dns_master(*server) {
+                    master_servers.push(this_dns_srv);
+                } else if db.server().c_is_dns_slave(*server) {
+                    slave_servers.push(this_dns_srv);
+                } else {
+                    other_servers.push(this_dns_srv);
                 }
             }
+        }
 
-            if let Some(first_server) = first_server {
-                let first_server_lan_iface = l1proj.consul_network_iface.value(*first_server);
-                let first_server_lan_ip = db.network_interface().c_if_ip(*first_server_lan_iface);
-                let libvirt_gw_ip =
-                    format!("{first_server_lan_ip}/24")
-                    .parse::<ipnet::Ipv4Net>()
-                    .unwrap().hosts().next().unwrap().to_string();
-                runtime.add_integration_test(
-                    format!("dns_sec_works_from_master_{tld_snake}_{uc_region}"),
-                    IntegrationTest::DnsSecWorksInternal {
-                        target_servers: master_servers,
-                        source_ip: libvirt_gw_ip.clone(),
-                        server_to_lookup: db.server().c_hostname(*first_server).clone(),
-                        server_to_lookup_ip: first_server_lan_ip.clone(),
-                        region: db.region().c_region_name(*r).clone(),
-                        tld: tld_name.to_string(),
-                    }
-                );
+        if let Some(first_server) = first_server {
+            let first_server_lan_iface = l1proj.consul_network_iface.value(*first_server);
+            let first_server_lan_ip = db.network_interface().c_if_ip(*first_server_lan_iface);
+            let libvirt_gw_ip =
+                format!("{first_server_lan_ip}/24")
+                .parse::<ipnet::Ipv4Net>()
+                .unwrap().hosts().next().unwrap().to_string();
+            runtime.add_integration_test(
+                format!("dns_sec_works_from_master_{tld_snake}_{uc_region}"),
+                IntegrationTest::DnsSecWorksInternal {
+                    target_servers: master_servers,
+                    source_ip: libvirt_gw_ip.clone(),
+                    server_to_lookup: db.server().c_hostname(*first_server).clone(),
+                    server_to_lookup_ip: first_server_lan_ip.clone(),
+                    region: db.region().c_region_name(r).clone(),
+                    tld: tld_name.to_string(),
+                }
+            );
 
-                runtime.add_integration_test(
-                    format!("dns_sec_works_from_slave_{tld_snake}_{uc_region}"),
-                    IntegrationTest::DnsSecWorksInternal {
-                        target_servers: slave_servers,
-                        source_ip: libvirt_gw_ip.clone(),
-                        server_to_lookup: db.server().c_hostname(*first_server).clone(),
-                        server_to_lookup_ip: first_server_lan_ip.clone(),
-                        region: db.region().c_region_name(*r).clone(),
-                        tld: tld_name.to_string(),
-                    }
-                );
+            runtime.add_integration_test(
+                format!("dns_sec_works_from_slave_{tld_snake}_{uc_region}"),
+                IntegrationTest::DnsSecWorksInternal {
+                    target_servers: slave_servers,
+                    source_ip: libvirt_gw_ip.clone(),
+                    server_to_lookup: db.server().c_hostname(*first_server).clone(),
+                    server_to_lookup_ip: first_server_lan_ip.clone(),
+                    region: db.region().c_region_name(r).clone(),
+                    tld: tld_name.to_string(),
+                }
+            );
 
-                runtime.add_integration_test(
-                    format!("dns_sec_works_from_others_{tld_snake}_{uc_region}"),
-                    IntegrationTest::DnsSecWorksInternal {
-                        target_servers: other_servers,
-                        source_ip: libvirt_gw_ip.clone(),
-                        server_to_lookup: db.server().c_hostname(*first_server).clone(),
-                        server_to_lookup_ip: first_server_lan_ip.clone(),
-                        region: db.region().c_region_name(*r).clone(),
-                        tld: tld_name.to_string(),
-                    }
-                );
-            }
+            runtime.add_integration_test(
+                format!("dns_sec_works_from_others_{tld_snake}_{uc_region}"),
+                IntegrationTest::DnsSecWorksInternal {
+                    target_servers: other_servers,
+                    source_ip: libvirt_gw_ip.clone(),
+                    server_to_lookup: db.server().c_hostname(*first_server).clone(),
+                    server_to_lookup_ip: first_server_lan_ip.clone(),
+                    region: db.region().c_region_name(r).clone(),
+                    tld: tld_name.to_string(),
+                }
+            );
         }
     }
 }

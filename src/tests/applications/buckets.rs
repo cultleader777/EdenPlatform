@@ -20,6 +20,7 @@ fn test_application_bucket_wiring_redefined_multiple_times() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -165,6 +166,7 @@ fn test_application_bucket_wiring_target_bucket_doesnt_exist() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -310,6 +312,7 @@ fn test_application_bucket_wiring_has_no_bucket_specified() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -453,6 +456,7 @@ fn test_application_bucket_wiring_has_no_buckets() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -591,6 +595,7 @@ fn test_application_bucket_wiring_invalid_format() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -732,6 +737,7 @@ fn test_application_bucket_wiring_undefined_app_bucket() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,
@@ -875,6 +881,7 @@ fn test_application_bucket_wiring_points_to_same_bucket() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_region_logging_tests: true,
     disable_region_monitoring_tests: true,
     disable_region_tracing_tests: true,

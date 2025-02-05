@@ -102,7 +102,7 @@ pub fn ingress_static_analysis(
             let region = db.frontend_application_deployment().c_region(deployment);
             regions_with_ingresses.insert(region);
 
-            let tld = db.region().c_tld(region);
+            let tld = db.frontend_application_deployment_ingress().c_tld(fe_ingress);
             let e = dns_table.entry(tld).or_default();
             let subdomain = db.frontend_application_deployment_ingress().c_subdomain(fe_ingress);
             if let Some(used_region) = e.get(subdomain) {
@@ -124,16 +124,38 @@ pub fn ingress_static_analysis(
             let region = db.backend_application_deployment().c_region(deployment);
             regions_with_ingresses.insert(region);
 
-            let tld = db.region().c_tld(region);
+            let tld = db.backend_application_deployment_ingress().c_tld(be_ingress);
             let e = dns_table.entry(tld).or_default();
             let subdomain = db.backend_application_deployment_ingress().c_subdomain(be_ingress);
             if let Some(used_region) = e.get(subdomain) {
                 if region != *used_region {
                     panic!(
-                        "Multiple datacenters targeted with single fqdn {}.{} is not supported yet (backend deployment {} is trying to do)",
+                        "Multiple regions targeted with single fqdn {}.{} is not supported yet (backend deployment {} is trying to do)",
                         db.backend_application_deployment_ingress().c_subdomain(be_ingress),
                         db.tld().c_domain(tld),
                         db.backend_application_deployment().c_deployment_name(deployment),
+                    )
+                }
+            } else {
+                let _ = e.insert(subdomain.clone(), region);
+            }
+        }
+
+        for bb_ingress in db.blackbox_deployment_ingress().rows_iter() {
+            let service_reg = db.blackbox_deployment_ingress().c_service(bb_ingress);
+            let deployment = db.blackbox_deployment_service_registration().c_parent(service_reg);
+            let region = db.blackbox_deployment().c_region(deployment);
+            regions_with_ingresses.insert(region);
+            let tld = db.blackbox_deployment_ingress().c_tld(bb_ingress);
+            let e = dns_table.entry(tld).or_default();
+            let subdomain = db.blackbox_deployment_ingress().c_subdomain(bb_ingress);
+            if let Some(used_region) = e.get(subdomain) {
+                if region != *used_region {
+                    panic!(
+                        "Multiple regions targeted with single fqdn {}.{} is not supported yet (blackbox deployment {} is trying to do)",
+                        db.blackbox_deployment_ingress().c_subdomain(bb_ingress),
+                        db.tld().c_domain(tld),
+                        db.blackbox_deployment().c_deployment_name(deployment),
                     )
                 }
             } else {
@@ -288,7 +310,7 @@ pub fn deploy_epl_backend_applications(
                     .unwrap(),
                 target_path: nginx_path.downstream_path.clone(),
             };
-            let rd = RouteData { content: upstream };
+            let rd = RouteData { content: upstream, basic_auth: "".to_string() };
             runtime.expose_route_in_tld_for_app(
                 region,
                 tld,
@@ -375,6 +397,7 @@ pub fn deploy_epl_frontend_applications(
             "epl-app-",
             RouteData {
                 content: resources_upstream,
+                basic_auth: "".to_string(),
             },
             db.frontend_application_deployment()
                 .c_deployment_name(depl)
@@ -397,7 +420,7 @@ pub fn deploy_epl_frontend_applications(
                 target_path: nginx_path.downstream_path.clone(),
                 unlimited_body: false,
             };
-            let rd = RouteData { content: upstream };
+            let rd = RouteData { content: upstream, basic_auth: "".to_string() };
             runtime.expose_route_in_tld_for_app(
                 region,
                 tld,
@@ -413,6 +436,73 @@ pub fn deploy_epl_frontend_applications(
                 mountpoint.as_str(),
             )?;
         }
+    }
+
+    Ok(())
+}
+
+pub fn deploy_epl_blackbox_applications(
+    db: &Database,
+    runtime: &mut ServerRuntime,
+) -> Result<(), PlatformValidationError> {
+    for ingress in db.blackbox_deployment_ingress().rows_iter() {
+        let service = db.blackbox_deployment_ingress().c_service(ingress);
+        let port = db.blackbox_deployment_ingress().c_port(ingress);
+        let deployment = db.blackbox_deployment_service_registration().c_parent(service);
+        let region = db.blackbox_deployment().c_region(deployment);
+        let tld = db.blackbox_deployment_ingress().c_tld(ingress);
+        let subdomain = db
+            .blackbox_deployment_ingress()
+            .c_subdomain(ingress);
+
+        let mut found_ports = 0;
+        for reg in db.blackbox_deployment_service_registration().c_referrers_blackbox_deployment_service_instance__service_registration(service) {
+            let inst_port = db.blackbox_deployment_service_instance().c_port(*reg);
+            let inst_port_value = db.blackbox_deployment_port().c_port(inst_port);
+            if port == inst_port_value {
+                if db.blackbox_deployment_port().c_protocol(inst_port) != "http" {
+                    return Err(PlatformValidationError::BlackboxIngressPortInvalidProtocol {
+                        bb_deployment: db.blackbox_deployment().c_deployment_name(deployment).clone(),
+                        port: inst_port_value,
+                        protocol: db.blackbox_deployment_port().c_protocol(inst_port).to_string(),
+                        expected_protocol: "http".to_string(),
+                    });
+                }
+
+                found_ports += 1;
+            }
+        }
+
+        if found_ports == 0 {
+            return Err(PlatformValidationError::BlackboxIngressPortNotFound {
+                ingress_tld: db.tld().c_domain(tld).clone(),
+                ingress_subdomain: db.blackbox_deployment_ingress().c_subdomain(ingress).clone(),
+                bb_deployment: db.blackbox_deployment().c_deployment_name(deployment).clone(),
+                port,
+            });
+        }
+
+        let service = runtime.fetch_existing_consul_service(
+            region, &db.blackbox_deployment_service_registration().c_service_name(service)
+        );
+        let upstream = RouteContent::InternalUpstream {
+            is_https: false,
+            consul_service: service,
+            unlimited_body: false,
+            port: port.try_into()
+                .unwrap(),
+            target_path: "/".to_string(),
+        };
+        runtime.expose_root_route_in_tld(
+            db,
+            region,
+            tld,
+            subdomain,
+            RouteData {
+                content: upstream,
+                basic_auth: db.blackbox_deployment_ingress().c_basic_auth_credentials(ingress).clone(),
+            },
+        )?;
     }
 
     Ok(())

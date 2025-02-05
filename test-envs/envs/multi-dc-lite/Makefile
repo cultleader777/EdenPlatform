@@ -27,7 +27,7 @@ DOCKER_CACHE_DIR ?= ../../docker-cache
 DOCKER_CACHE_IMAGE ?= registry@sha256:cc6393207bf9d3e032c4d9277834c1695117532c9f7e8c64e7b7adcda3a85f39
 
 DOCKER_CACHE_CONFIG = $(DOCKER_CACHE_DIR)/config.yml
-EPL_SOURCES = $(EPL_PROJECT_DIR)/Cargo.lock $(EPL_PROJECT_DIR)/Cargo.toml $(EPL_PROJECT_DIR)/build.rs $(shell find $(EPL_PROJECT_DIR)/src -type f) $(shell find $(EPL_PROJECT_DIR)/edb-src -type f)
+
 LOAD_SHELL_LIB=cd servers; source ./library.sh;
 
 RUN_AS_NON_ROOT = $(shell [ "$$(id -u)" -eq 0 ] && echo 'sudo -E -u $$SUDO_USER' )
@@ -257,7 +257,8 @@ endif
 
 
 .PHONY: epl-executable
-epl-executable: $(EPL_EXECUTABLE)
+epl-executable:
+	cd $(EPL_PROJECT_DIR) && cargo build
 
 
 .PHONY: wait-until-integration-tests
@@ -323,9 +324,6 @@ infra-state.sqlite:
 .PHONY: refresh-l1-provisioning-state
 refresh-l1-provisioning-state:
 	$(LOAD_SHELL_LIB) refresh_l1_provisioning_state
-
-$(EPL_EXECUTABLE): $(EPL_SOURCES)
-	cd $(EPL_PROJECT_DIR) && cargo build
 
 #############################################
 # all servers l1 provision
@@ -687,17 +685,17 @@ ci-vault-unseal_region_us-west: ci-vault-unseal_region_us-west_server_server-b c
 ci-vault-unseal_region_us-west_server_server-b:
 	$(MAKE) -j $(L1_PROVISIONING_JOBS) -e L1_PROVISIONING_ID=$$( cat l1-fast/epl-prov-id ) nothing \
 	 $$( echo " SELECT 'l1-provision-ww_' || hostname FROM servers_for_slow_l1_provision WHERE hostname = 'server-b' " | sqlite3 infra-state.sqlite )
-	$(LOAD_SHELL_LIB) maybe_unseal_vault 10.17.0.13 https://server-b.us-west.epl-infra.net:8200 us-west $(EPL_EXECUTABLE) default
+	$(LOAD_SHELL_LIB) maybe_unseal_vault 77.77.77.11 https://server-b.us-west.epl-infra.net:8200 us-west $(EPL_EXECUTABLE) default
 .PHONY: ci-vault-unseal_region_us-west_server_server-c
 ci-vault-unseal_region_us-west_server_server-c:
 	$(MAKE) -j $(L1_PROVISIONING_JOBS) -e L1_PROVISIONING_ID=$$( cat l1-fast/epl-prov-id ) nothing \
 	 $$( echo " SELECT 'l1-provision-ww_' || hostname FROM servers_for_slow_l1_provision WHERE hostname = 'server-c' " | sqlite3 infra-state.sqlite )
-	$(LOAD_SHELL_LIB) maybe_unseal_vault 10.18.0.10 https://server-c.us-west.epl-infra.net:8200 us-west $(EPL_EXECUTABLE) default
+	$(LOAD_SHELL_LIB) maybe_unseal_vault 77.77.77.12 https://server-c.us-west.epl-infra.net:8200 us-west $(EPL_EXECUTABLE) default
 .PHONY: ci-vault-unseal_region_us-west_server_server-d
 ci-vault-unseal_region_us-west_server_server-d:
 	$(MAKE) -j $(L1_PROVISIONING_JOBS) -e L1_PROVISIONING_ID=$$( cat l1-fast/epl-prov-id ) nothing \
 	 $$( echo " SELECT 'l1-provision-ww_' || hostname FROM servers_for_slow_l1_provision WHERE hostname = 'server-d' " | sqlite3 infra-state.sqlite )
-	$(LOAD_SHELL_LIB) maybe_unseal_vault 10.18.0.11 https://server-d.us-west.epl-infra.net:8200 us-west $(EPL_EXECUTABLE) default
+	$(LOAD_SHELL_LIB) maybe_unseal_vault 77.77.77.13 https://server-d.us-west.epl-infra.net:8200 us-west $(EPL_EXECUTABLE) default
 .PHONY: ci-vault-unseal_region_us-west_server_server-e
 ci-vault-unseal_region_us-west_server_server-e:
 	$(MAKE) -j $(L1_PROVISIONING_JOBS) -e L1_PROVISIONING_ID=$$( cat l1-fast/epl-prov-id ) nothing \
@@ -1217,12 +1215,12 @@ refresh-static-server-infra-state: infra-state.sqlite
 	  DELETE FROM servers; \
 	  INSERT INTO servers(hostname, region, expected_l1_hash) \
 	  VALUES \
-	    ('server-a','us-west','4a6cfcb23c90e9d896a08a23e37d5b11a0b9e980c4a3bc48a3bb14474b5f6d63'), \
-	    ('server-b','us-west','9e1a10bcfcdca9723d2d989f7ae5b6b7a95df0030fc3c90ce611009667f9dff1'), \
-	    ('server-c','us-west','6516d314ec129316f1d187bf96e1bb46bf3ab4ac9de6796706cc54c283807f51'), \
-	    ('server-d','us-west','de0e956ee4065484b746942e303be5c90493fe5fd5d91ba66a9178b64d272810'), \
-	    ('server-e','us-west','177083dacb83706567f218d41ecb925bf2a3a97ec7dfdd87dfd8d5772fe09371'), \
-	    ('server-f','us-west','8d9ae12cfc9f777329b49a03fe5c50de4e08197cc9b1784078c83b914be485a3'); \
+	    ('server-a','us-west','de10b60b1a44b384dfe0955f2fd56aab7d5b59fa734e5548a561292e33a20e35'), \
+	    ('server-b','us-west','8fd7fec35dd0407faccba28ad1c7e8e3d9c0d24d45457d9640b08f07d30ab5b9'), \
+	    ('server-c','us-west','f017264c4da9a118f93a7a20963c0ce24127cc5e7ef12563d8ba8667387a85ea'), \
+	    ('server-d','us-west','994391c4917d4fd2d0e166cc56dfe5137300b92e22e786ce1533480fd16b218a'), \
+	    ('server-e','us-west','23e982fb4693d95df0c8bcb490747d1dcc1ba01fd2746e5b2c3d2e7836cb1c03'), \
+	    ('server-f','us-west','426c50ea8b333823d456f756ac4bbc4c1f06c464f621d062885233b9bf4cebec'); \
 	" | sqlite3 infra-state.sqlite
 
 

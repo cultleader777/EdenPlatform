@@ -25,10 +25,10 @@ fn test_regression_duplicate_internet_ips() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 }
 
 DEFAULTS {
-    region.tld 'epl-infra.net',
     datacenter.region us-west,
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
@@ -70,7 +70,6 @@ DATA STRUCT docker_registry_instance {
 
 DATA STRUCT EXCLUSIVE tld {
     domain: epl-infra.net,
-    expose_admin: false,
 }
 
 DATA STRUCT EXCLUSIVE datacenter [
@@ -483,6 +482,7 @@ DATA STRUCT EXCLUSIVE datacenter {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 }
 
 DEFAULTS {
@@ -492,7 +492,6 @@ DEFAULTS {
   datacenter.implementation aws,
   datacenter.default_server_kind testvm.cpu2ram8192,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -529,7 +528,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
   }
 ]
 
@@ -898,6 +896,7 @@ DATA STRUCT EXCLUSIVE datacenter {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 }
 
 DEFAULTS {
@@ -907,7 +906,6 @@ DEFAULTS {
   datacenter.implementation aws,
   datacenter.default_server_kind testvm.cpu2ram8192,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -944,7 +942,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
   }
 ]
 

@@ -1917,6 +1917,7 @@ fn test_server_disk_unsupported() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: test-12345,
     google_cloud_artefacts_bucket_name: Aye,
     disable_consul_quorum_tests: true,
@@ -2055,6 +2056,7 @@ fn test_server_disk_no_serial_assigned() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: test-12345,
     google_cloud_artefacts_bucket_name: Aye,
     disable_consul_quorum_tests: true,
@@ -2195,6 +2197,7 @@ fn test_server_disk_duplicate_serials() {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: test-12345,
     google_cloud_artefacts_bucket_name: Aye,
     disable_consul_quorum_tests: true,

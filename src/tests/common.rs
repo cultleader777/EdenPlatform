@@ -335,6 +335,7 @@ fn custom_global_flags() -> &'static str {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     disable_consul_quorum_tests: true,
     disable_nomad_quorum_tests: true,
     disable_vault_quorum_tests: true,
@@ -355,7 +356,6 @@ DEFAULTS {
     datacenter.implementation manual,
     datacenter.default_server_kind testvm.cpu4ram8192,
     server_disk.disk_kind default-ssd,
-    region.tld epl-infra.net,
     server.nixpkgs_environment default_nixpkgs,
     rust_compilation_environment.nixpkgs_environment default_nixpkgs,
     frontend_application_deployment.region us-west,
@@ -397,7 +397,6 @@ DATA STRUCT datacenter {
 
 DATA STRUCT EXCLUSIVE tld {
     domain: 'epl-infra.net',
-    expose_admin: true,
 }
 "#
 }

@@ -5,7 +5,7 @@ use crate::{
     static_analysis::{
         alerts,
         server_runtime::{AdminService, NomadJobKind, NomadJobStage, ServerRuntime, IntegrationTest, epl_architecture_to_nomad_architecture},
-        PlatformValidationError, L1Projections, networking::{server_region, admin_service_responds_test, prometheus_metric_exists_test, prometheus_metric_doesnt_exist_test, check_servers_regional_distribution}, docker_images::image_handle_from_pin,
+        PlatformValidationError, L1Projections, networking::{server_region, admin_service_responds_test, prometheus_metric_exists_test, prometheus_metric_doesnt_exist_test, check_servers_regional_distribution}, docker_images::image_handle_from_pin, get_global_settings,
     },
 };
 use std::fmt::Write;
@@ -16,12 +16,7 @@ pub fn deploy_monitoring_instances(
     l1proj: &L1Projections,
 ) -> Result<(), PlatformValidationError> {
     let job_kind = NomadJobKind::BoundStateful;
-
-    let admin_tlds = db
-        .tld()
-        .rows_iter()
-        .filter(|i| db.tld().c_expose_admin(*i))
-        .collect::<Vec<_>>();
+    let gs = get_global_settings(db);
 
     for mon_c in db.monitoring_cluster().rows_iter() {
         let mon_instances = db.monitoring_cluster().c_children_monitoring_instance(mon_c).len();
@@ -245,8 +240,7 @@ pub fn deploy_monitoring_instances(
                     is_this_region_default,
                 ),
             );
-            assert_eq!(admin_tlds.len(), 1);
-            let admin_domain = db.tld().c_domain(admin_tlds[0]);
+            let admin_domain = db.tld().c_domain(gs.admin_tld);
             prometheus_task.add_memory(locked_prometheus_mem);
             prometheus_task.bind_volume(volume_lock.clone(), "/volume".to_string());
             prometheus_task.set_arguments(vec![

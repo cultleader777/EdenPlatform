@@ -9,6 +9,7 @@ DATA STRUCT EXCLUSIVE datacenter {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 }
 
 DEFAULTS {
@@ -18,7 +19,6 @@ DEFAULTS {
   datacenter.implementation testvms,
   datacenter.default_server_kind testvm.cpu2ram8192,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -55,7 +55,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
   }
 ]
 
@@ -1128,12 +1127,12 @@ DATA STRUCT frontend_application_deployment_ingress [
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
 }
 
 DEFAULTS {
   server.dc dc1,
   server.nixpkgs_environment default_nixpkgs,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -1267,7 +1266,6 @@ DATA STRUCT EXCLUSIVE region [
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
   }
 ]
 
@@ -1952,6 +1950,7 @@ DATA STRUCT EXCLUSIVE datacenter {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     aws_artefacts_s3_bucket_name: henlo-bois,
 }
 
@@ -1962,7 +1961,6 @@ DEFAULTS {
   datacenter.implementation aws,
   datacenter.default_server_kind testvm.cpu2ram8192,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -1999,7 +1997,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
   }
 ]
 
@@ -2357,6 +2354,7 @@ DATA STRUCT EXCLUSIVE datacenter {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     aws_artefacts_s3_bucket_name: henlo-bois,
 }
 
@@ -2367,7 +2365,6 @@ DEFAULTS {
   datacenter.implementation aws,
   datacenter.default_server_kind testvm.cpu2ram8192,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -2404,7 +2401,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
   }
 ]
 
@@ -2840,6 +2836,7 @@ DATA STRUCT EXCLUSIVE datacenter [
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     aws_artefacts_s3_bucket_name: henlo-bois,
 }
 
@@ -2850,7 +2847,6 @@ DEFAULTS {
   datacenter.implementation aws,
   datacenter.default_server_kind testvm.cpu2ram8192,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -2888,7 +2884,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
   }
 ]
 
@@ -3363,6 +3358,7 @@ pub fn scenario_gcloud_single_dc_env() -> &'static str {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: 12345-project,
     google_cloud_artefacts_bucket_name: henlo-bois,
 }
@@ -3384,7 +3380,6 @@ DEFAULTS {
   datacenter.implementation gcloud,
   datacenter.default_server_kind testvm.cpu2ram8192,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -3421,7 +3416,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
   }
 ]
 
@@ -3768,6 +3762,7 @@ pub fn scenario_gcloud_multi_dc_env() -> &'static str {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: 12345-project,
     google_cloud_artefacts_bucket_name: henlo-bois,
 }
@@ -3809,7 +3804,6 @@ DEFAULTS {
   datacenter.implementation aws,
   datacenter.default_server_kind testvm.cpu2ram8192,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -3847,7 +3841,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
   }
 ]
 
@@ -4322,6 +4315,7 @@ pub fn scenario_gcloud_single_dc_multisub_env() -> &'static str {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: 12345-project,
     google_cloud_artefacts_bucket_name: henlo-bois,
 }
@@ -4344,7 +4338,6 @@ DEFAULTS {
   datacenter.implementation gcloud,
   datacenter.default_server_kind testvm.cpu2ram8192,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -4381,7 +4374,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
   }
 ]
 
@@ -4759,6 +4751,7 @@ pub fn scenario_gcloud_aws_multi_dc_env() -> &'static str {
 DATA STRUCT global_settings {
     project_name: test-env,
     admin_email: admin@epl-infra.net,
+    admin_tld: epl-infra.net,
     google_cloud_project_id: 12345-project,
     google_cloud_artefacts_bucket_name: henlo-bois,
     aws_artefacts_s3_bucket_name: henlo-bois,
@@ -4801,7 +4794,6 @@ DEFAULTS {
   datacenter.implementation aws,
   datacenter.default_server_kind testvm.cpu2ram8192,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -4839,7 +4831,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
   }
 ]
 
@@ -5367,6 +5358,7 @@ pub fn scenario_single_dc_coprocessor() -> &'static str {
 DATA STRUCT global_settings {
   project_name: single-dc,
   admin_email: admin@epl-infra.net,
+  admin_tld: epl-infra.net,
 }
 
 DATA admin_ssh_keys {
@@ -5413,7 +5405,6 @@ DEFAULTS {
   datacenter.implementation testvms,
   datacenter.default_server_kind testvm.cpu2ram8192,
   server_disk.disk_kind default-ssd,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,
@@ -5444,7 +5435,6 @@ DATA STRUCT region {
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
   }
 ]
 

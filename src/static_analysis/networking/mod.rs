@@ -1945,15 +1945,12 @@ pub fn admin_service_responds_test(
     path: &str,
     expected_string: &str,
 ) -> IntegrationTest {
-    let mut tld_str = String::new();
+    let gs = get_global_settings(db);
+    let tld_str = db.tld().c_domain(gs.admin_tld);
     let mut ingress_ips = Vec::new();
     for region in db.region().rows_iter() {
-        let tld = db.region().c_tld(region);
-        if db.tld().c_expose_admin(tld) {
-            tld_str = db.tld().c_domain(tld).to_string();
-            if let Some(v) = l1proj.region_ingresses.get(&region) {
-                ingress_ips = v.ipv4.iter().map(|i| i.to_string()).collect();
-            }
+        if let Some(v) = l1proj.region_ingresses.get(&region) {
+            ingress_ips = v.ipv4.iter().map(|i| i.to_string()).collect();
         }
     }
 

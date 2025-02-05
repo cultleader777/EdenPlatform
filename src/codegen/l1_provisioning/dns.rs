@@ -54,15 +54,19 @@ fn generate_all_dns_sec_keys(db: &CheckedDB, secrets: &mut SecretsStorage) -> Al
     for tld in db.db.tld().rows_iter() {
         let fqdn = db.db.tld().c_domain(tld);
         assert!(tlds.insert(tld, generate_dns_sec_key(fqdn, secrets)).is_none());
-        for region in db.db.tld().c_referrers_region__tld(tld) {
-            let fqdn = format!("{}.{}", db.db.region().c_region_name(*region), fqdn);
-            regions.insert(*region, generate_dns_sec_key(&fqdn, secrets));
+    }
 
-            for dc in db.db.region().c_referrers_datacenter__region(*region) {
-                let second_octet = cidr_second_octet(db.db.datacenter().c_network_cidr(*dc));
-                let rev_fqdn = format!("{second_octet}.10.in-addr.arpa");
-                assert!(rev_zones.insert(format!("{rev_fqdn}."), generate_dns_sec_key(&rev_fqdn, secrets)).is_none());
-            }
+    let gs = get_global_settings(&db.db);
+    let admin_tld = gs.admin_tld;
+    for region in db.db.region().rows_iter() {
+        let admin_fqdn = db.db.tld().c_domain(admin_tld);
+        let fqdn = format!("{}.{}", db.db.region().c_region_name(region), admin_fqdn);
+        regions.insert(region, generate_dns_sec_key(&fqdn, secrets));
+
+        for dc in db.db.region().c_referrers_datacenter__region(region) {
+            let second_octet = cidr_second_octet(db.db.datacenter().c_network_cidr(*dc));
+            let rev_fqdn = format!("{second_octet}.10.in-addr.arpa");
+            assert!(rev_zones.insert(format!("{rev_fqdn}."), generate_dns_sec_key(&rev_fqdn, secrets)).is_none());
         }
     }
 
@@ -264,18 +268,15 @@ struct DnsSecNeededKeys<'a> {
 
 fn provision_bind(db: &CheckedDB, plans: &mut NixAllServerPlans, keys: &AllDnsSecKeys) {
     let dns = &db.projections.dns_checks;
+    let gs = get_global_settings(&db.db);
 
     let mut zone_files: HashMap<(TableRowPointerTld, TableRowPointerRegion), ZoneFiles> = HashMap::new();
     for region in db.db.region().rows_iter() {
-        for tld in db.db.tld().rows_iter() {
-            assert!(zone_files.insert((tld, region), dns_internal_zone_files_gen(db, tld, region)).is_none());
-        }
+        assert!(zone_files.insert((gs.admin_tld, region), dns_internal_zone_files_gen(db, gs.admin_tld, region)).is_none());
     }
 
     let mut private_root_zone_files: HashMap<TableRowPointerTld, ZoneFiles> = HashMap::new();
-    for tld in db.db.tld().rows_iter() {
-        assert!(private_root_zone_files.insert(tld, dns_private_root_zone_file(db, tld, keys)).is_none());
-    }
+    assert!(private_root_zone_files.insert(gs.admin_tld, dns_private_root_zone_file(db, gs.admin_tld, keys)).is_none());
 
     let mut public_root_zone_files: HashMap<TableRowPointerTld, ZoneFiles> = HashMap::new();
     for tld in db.db.tld().rows_iter() {
@@ -290,7 +291,6 @@ fn provision_bind(db: &CheckedDB, plans: &mut NixAllServerPlans, keys: &AllDnsSe
     let root_fwd_zone_configs = generate_root_forwarding_zone_configs(db);
 
     let is_multi_region_setup = db.db.region().len() >= 2;
-    let is_single_region_setup = !is_multi_region_setup;
 
     for server in db.db.server().rows_iter() {
         let dc = db.db.server().c_dc(server);
@@ -310,7 +310,6 @@ fn provision_bind(db: &CheckedDB, plans: &mut NixAllServerPlans, keys: &AllDnsSe
             zone_files: &zone_files,
             keys,
             region,
-            is_single_region_setup,
             is_multi_region_setup,
             dns_sec_keys_for_server: &mut dnssec_keys_for_server,
             zone_vars: ZoneVars { linkings: String::new() },
@@ -672,10 +671,13 @@ fi
             },
         );
 
+        let mut any_certs_made = false;
         for tld in db.db.tld().rows_iter() {
             if !db.db.tld().c_automatic_certificates(tld) {
                 continue;
             }
+
+            any_certs_made = true;
 
             let key = keys.tlds.get(&tld).unwrap();
             let tld_name = db.db.tld().c_domain(tld);
@@ -710,9 +712,6 @@ RFC2136_TSIG_SECRET='{key}'
             } else { "".to_string() };
 
             plan.add_custom_nix_block(format!(r#"
-    users.users.acme.extraGroups = ["keys"];
-    security.acme.acceptTerms = true;
-    security.acme.defaults.email = "{admin_email}";
     security.acme.certs."{tld_name}" = {{
         domain = "{tld_name}";
         extraDomainNames = [ "*.{tld_name}" ];
@@ -723,7 +722,16 @@ RFC2136_TSIG_SECRET='{key}'
     }};
 "#));
         }
+
+        if any_certs_made {
+            plan.add_custom_nix_block(format!(r#"
+    users.users.acme.extraGroups = ["keys"];
+    security.acme.acceptTerms = true;
+    security.acme.defaults.email = "{admin_email}";
+"#));
+        }
     }
+
 
     // generate vault policy for cert update + token
     for region in db.db.region().rows_iter() {
@@ -805,10 +813,12 @@ fn bind_trust_anchors(db: &CheckedDB, keys: &AllDnsSecKeys) -> String {
     res += "trust-anchors {\n";
 
     for tld in db.db.tld().rows_iter() {
-        let key = keys.tlds.get(&tld).unwrap();
-        res += "  ";
-        res += &key.ksk_trust_anchor_key;
-        res += "\n";
+        if db.db.tld().c_dnssec_enabled(tld) {
+            let key = keys.tlds.get(&tld).unwrap();
+            res += "  ";
+            res += &key.ksk_trust_anchor_key;
+            res += "\n";
+        }
     }
 
     for region in db.db.region().rows_iter() {
@@ -883,7 +893,6 @@ struct BindContext<'a> {
     private_root_zone_files: &'a HashMap<TableRowPointerTld, ZoneFiles>,
     public_root_zone_files: &'a HashMap<TableRowPointerTld, ZoneFiles>,
     zone_files: &'a HashMap<(TableRowPointerTld, TableRowPointerRegion), ZoneFiles>,
-    is_single_region_setup: bool,
     is_multi_region_setup: bool,
     region: TableRowPointerRegion,
     keys: &'a AllDnsSecKeys,
@@ -1028,101 +1037,24 @@ fn write_dc_slave_public_bind_configs(db: &CheckedDB, res: &mut String, ctx: &mu
 fn write_dc_master_internal_bind_configs(db: &CheckedDB, res: &mut String, ctx: &mut BindContext) {
     let dns = db.projections.dns_checks.regions.get(&ctx.region).unwrap();
     let prefix = "private";
+    let gs = get_global_settings(&db.db);
+    let tld = gs.admin_tld;
+
     if db.db.region().c_is_dns_master(ctx.region) {
-        for tld in db.db.tld().rows_iter() {
-            let fqdn = format!("{}.", db.db.tld().c_domain(tld));
-            let is_master = true;
-            let key_for_domain = ctx.keys.tlds.get(&tld).unwrap();
-            ctx.dns_sec_tag_key(key_for_domain);
-            // Main zone
-            let zone_file = ctx.private_root_zone_files.get(&tld).unwrap();
-            write_nix_zone(
-                res,
-                prefix,
-                &mut ctx.zone_vars,
-                &fqdn,
-                is_master,
-                &db.projections.dns_checks.all_regions.master_lan_ip(db),
-                &db.projections.dns_checks.all_regions.slaves_lan_ips(db),
-                &zone_file.tld_zone,
-                "",
-            );
-
-            // Reverse zone
-            for (rev_fqdn, zfile) in &zone_file.reverse_zones {
-                ctx.dns_sec_tag_key(ctx.keys.rev_zones.get(rev_fqdn).unwrap());
-                write_nix_zone(
-                    res,
-                    prefix,
-                    &mut ctx.zone_vars,
-                    rev_fqdn,
-                    is_master,
-                    &db.projections.dns_checks.all_regions.master_lan_ip(db),
-                    &db.projections.dns_checks.all_regions.slaves_lan_ips(db),
-                    zfile,
-                    "",
-                );
-            }
-        }
-    }
-
-    if ctx.is_multi_region_setup {
-        // master zone file
-        // TODO: use public ip here to transfer across DCs
-        if db.db.region().c_is_dns_slave(ctx.region) {
-            for tld in db.db.tld().rows_iter() {
-                let fqdn = format!("{}.", db.db.tld().c_domain(tld));
-                let is_master = false;
-                let key_for_domain = ctx.keys.tlds.get(&tld).unwrap();
-                ctx.dns_sec_tag_key(key_for_domain);
-                // Main zone
-                let zone_file = ctx.private_root_zone_files.get(&tld).unwrap();
-                write_nix_zone(
-                    res,
-                    prefix,
-                    &mut ctx.zone_vars,
-                    &fqdn,
-                    is_master,
-                    &db.projections.dns_checks.all_regions.master_lan_ip(db),
-                    &db.projections.dns_checks.all_regions.slaves_lan_ips(db),
-                    &zone_file.tld_zone,
-                    "",
-                );
-
-                // Reverse zone
-                for (rev_fqdn, zfile) in &zone_file.reverse_zones {
-                    ctx.dns_sec_tag_key(ctx.keys.rev_zones.get(rev_fqdn).unwrap());
-                    write_nix_zone(
-                        res,
-                        prefix,
-                        &mut ctx.zone_vars,
-                        rev_fqdn,
-                        is_master,
-                        &db.projections.dns_checks.all_regions.master_lan_ip(db),
-                        &db.projections.dns_checks.all_regions.slaves_lan_ips(db),
-                        zfile,
-                        "",
-                    );
-                }
-            }
-        }
-    }
-
-    for tld in db.db.tld().rows_iter() {
-        let fqdn = format!("{}.{}.", db.db.region().c_region_name(ctx.region), db.db.tld().c_domain(tld));
-        let key_for_domain = ctx.keys.regions.get(&ctx.region).unwrap();
-        ctx.dns_sec_tag_key(key_for_domain);
+        let fqdn = format!("{}.", db.db.tld().c_domain(tld));
         let is_master = true;
+        let key_for_domain = ctx.keys.tlds.get(&tld).unwrap();
+        ctx.dns_sec_tag_key(key_for_domain);
         // Main zone
-        let zone_file = ctx.zone_files.get(&(tld, ctx.region)).unwrap();
+        let zone_file = ctx.private_root_zone_files.get(&tld).unwrap();
         write_nix_zone(
             res,
             prefix,
             &mut ctx.zone_vars,
             &fqdn,
             is_master,
-            &dns.master_lan_ip(db),
-            &dns.slaves_lan_ips(db),
+            &db.projections.dns_checks.all_regions.master_lan_ip(db),
+            &db.projections.dns_checks.all_regions.slaves_lan_ips(db),
             &zone_file.tld_zone,
             "",
         );
@@ -1136,26 +1068,24 @@ fn write_dc_master_internal_bind_configs(db: &CheckedDB, res: &mut String, ctx: 
                 &mut ctx.zone_vars,
                 rev_fqdn,
                 is_master,
-                &dns.master_lan_ip(db),
-                &dns.slaves_lan_ips(db),
-                &zfile,
+                &db.projections.dns_checks.all_regions.master_lan_ip(db),
+                &db.projections.dns_checks.all_regions.slaves_lan_ips(db),
+                zfile,
                 "",
             );
         }
     }
-}
 
-fn write_dc_slave_internal_bind_configs(db: &CheckedDB, res: &mut String, ctx: &mut BindContext) {
-    let dns = db.projections.dns_checks.regions.get(&ctx.region).unwrap();
-    let is_master = false;
-    let prefix = "private";
-    if ctx.is_single_region_setup {
-        for tld in db.db.tld().rows_iter() {
+    if ctx.is_multi_region_setup {
+        // master zone file
+        // TODO: use public ip here to transfer across DCs
+        if db.db.region().c_is_dns_slave(ctx.region) {
             let fqdn = format!("{}.", db.db.tld().c_domain(tld));
-            // Main zone
-            let zone_file = ctx.private_root_zone_files.get(&tld).unwrap();
+            let is_master = false;
             let key_for_domain = ctx.keys.tlds.get(&tld).unwrap();
             ctx.dns_sec_tag_key(key_for_domain);
+            // Main zone
+            let zone_file = ctx.private_root_zone_files.get(&tld).unwrap();
             write_nix_zone(
                 res,
                 prefix,
@@ -1186,39 +1116,111 @@ fn write_dc_slave_internal_bind_configs(db: &CheckedDB, res: &mut String, ctx: &
         }
     }
 
-    for tld in db.db.tld().rows_iter() {
-        let fqdn = format!("{}.{}.", db.db.region().c_region_name(ctx.region), db.db.tld().c_domain(tld));
-        // Main zone
-        let zone_file = ctx.zone_files.get(&(tld, ctx.region)).unwrap();
-        let key_for_domain = ctx.keys.regions.get(&ctx.region).unwrap();
-        ctx.dns_sec_tag_key(key_for_domain);
+    let fqdn = format!("{}.{}.", db.db.region().c_region_name(ctx.region), db.db.tld().c_domain(tld));
+    let key_for_domain = ctx.keys.regions.get(&ctx.region).unwrap();
+    ctx.dns_sec_tag_key(key_for_domain);
+    let is_master = true;
+    // Main zone
+    let zone_file = ctx.zone_files.get(&(tld, ctx.region)).unwrap();
+    write_nix_zone(
+        res,
+        prefix,
+        &mut ctx.zone_vars,
+        &fqdn,
+        is_master,
+        &dns.master_lan_ip(db),
+        &dns.slaves_lan_ips(db),
+        &zone_file.tld_zone,
+        "",
+    );
+
+    // Reverse zone
+    for (rev_fqdn, zfile) in &zone_file.reverse_zones {
+        ctx.dns_sec_tag_key(ctx.keys.rev_zones.get(rev_fqdn).unwrap());
         write_nix_zone(
             res,
             prefix,
             &mut ctx.zone_vars,
-            &fqdn,
+            rev_fqdn,
             is_master,
             &dns.master_lan_ip(db),
             &dns.slaves_lan_ips(db),
-            &zone_file.tld_zone,
+            &zfile,
             "",
         );
+    }
+}
 
-        // Reverse zone
-        for (rev_fqdn, zfile) in &zone_file.reverse_zones {
-            ctx.dns_sec_tag_key(ctx.keys.rev_zones.get(rev_fqdn).unwrap());
-            write_nix_zone(
-                res,
-                prefix,
-                &mut ctx.zone_vars,
-                &rev_fqdn,
-                is_master,
-                &dns.master_lan_ip(db),
-                &dns.slaves_lan_ips(db),
-                zfile,
-                "",
-            );
-        }
+fn write_dc_slave_internal_bind_configs(db: &CheckedDB, res: &mut String, ctx: &mut BindContext) {
+    let dns = db.projections.dns_checks.regions.get(&ctx.region).unwrap();
+    let is_master = false;
+    let prefix = "private";
+    let gs = get_global_settings(&db.db);
+    let tld = gs.admin_tld;
+    let fqdn = format!("{}.", db.db.tld().c_domain(tld));
+    // Main zone
+    let zone_file = ctx.private_root_zone_files.get(&tld).unwrap();
+    let key_for_domain = ctx.keys.tlds.get(&tld).unwrap();
+    ctx.dns_sec_tag_key(key_for_domain);
+    write_nix_zone(
+        res,
+        prefix,
+        &mut ctx.zone_vars,
+        &fqdn,
+        is_master,
+        &db.projections.dns_checks.all_regions.master_lan_ip(db),
+        &db.projections.dns_checks.all_regions.slaves_lan_ips(db),
+        &zone_file.tld_zone,
+        "",
+    );
+
+    // Reverse zone
+    for (rev_fqdn, zfile) in &zone_file.reverse_zones {
+        ctx.dns_sec_tag_key(ctx.keys.rev_zones.get(rev_fqdn).unwrap());
+        write_nix_zone(
+            res,
+            prefix,
+            &mut ctx.zone_vars,
+            rev_fqdn,
+            is_master,
+            &db.projections.dns_checks.all_regions.master_lan_ip(db),
+            &db.projections.dns_checks.all_regions.slaves_lan_ips(db),
+            zfile,
+            "",
+        );
+    }
+
+    let fqdn = format!("{}.{}.", db.db.region().c_region_name(ctx.region), db.db.tld().c_domain(tld));
+    // Main zone
+    let zone_file = ctx.zone_files.get(&(tld, ctx.region)).unwrap();
+    let key_for_domain = ctx.keys.regions.get(&ctx.region).unwrap();
+    ctx.dns_sec_tag_key(key_for_domain);
+    write_nix_zone(
+        res,
+        prefix,
+        &mut ctx.zone_vars,
+        &fqdn,
+        is_master,
+        &dns.master_lan_ip(db),
+        &dns.slaves_lan_ips(db),
+        &zone_file.tld_zone,
+        "",
+    );
+
+    // Reverse zone
+    for (rev_fqdn, zfile) in &zone_file.reverse_zones {
+        ctx.dns_sec_tag_key(ctx.keys.rev_zones.get(rev_fqdn).unwrap());
+        write_nix_zone(
+            res,
+            prefix,
+            &mut ctx.zone_vars,
+            &rev_fqdn,
+            is_master,
+            &dns.master_lan_ip(db),
+            &dns.slaves_lan_ips(db),
+            zfile,
+            "",
+        );
     }
 }
 
@@ -1310,28 +1312,31 @@ fn generate_root_forwarding_zone_configs(db: &CheckedDB) -> String {
     forwarders += "              };\n";
 
     let mut res = String::new();
-    for tld in db.db.tld().rows_iter() {
-        let zone = db.db.tld().c_domain(tld);
-        res += &format!(r#"
+    let gs = get_global_settings(&db.db);
+    let tld = gs.admin_tld;
+    let zone = db.db.tld().c_domain(tld);
+    res += &format!(r#"
           zone "{zone}." IN {{
               type forward;
               forward only;
 {forwarders}
           }};
 "#);
-        res += &format!(r#"
+    res += &format!(r#"
           zone "10.in-addr.arpa." IN {{
               type forward;
               forward only;
 {forwarders}
           }};
 "#);
-    }
 
     res
 }
 
 fn generate_forwarding_zone_configs(db: &CheckedDB, region: TableRowPointerRegion) -> String {
+    let gs = get_global_settings(&db.db);
+    let tld = gs.admin_tld;
+
     let mut res = String::new();
     let region_name = db.db.region().c_region_name(region);
     let mut forwarders = "              forwarders {\n".to_string();
@@ -1352,9 +1357,8 @@ fn generate_forwarding_zone_configs(db: &CheckedDB, region: TableRowPointerRegio
     }
 
     forwarders += "              };\n";
-    for tld in db.db.tld().rows_iter() {
-        let zone = db.db.tld().c_domain(tld);
-        res += &format!(r#"
+    let zone = db.db.tld().c_domain(tld);
+    res += &format!(r#"
           zone "{region_name}.{zone}" IN {{
               type forward;
               forward only;
@@ -1362,17 +1366,16 @@ fn generate_forwarding_zone_configs(db: &CheckedDB, region: TableRowPointerRegio
           }};
 "#);
 
-        // every dc has different 10. ip range
-        for dc in db.db.region().c_referrers_datacenter__region(region) {
-            let zone_third_octet = cidr_second_octet(db.db.datacenter().c_network_cidr(*dc));
-            res += &format!(r#"
+    // every dc has different 10. ip range
+    for dc in db.db.region().c_referrers_datacenter__region(region) {
+        let zone_third_octet = cidr_second_octet(db.db.datacenter().c_network_cidr(*dc));
+        res += &format!(r#"
           zone "{zone_third_octet}.10.in-addr.arpa." IN {{
               type forward;
               forward only;
 {forwarders}
           }};
 "#);
-        }
     }
 
     res
@@ -1707,24 +1710,19 @@ fn dns_internal_zone_files_gen(db: &CheckedDB, tld: TableRowPointerTld, region: 
         }
 
         for server in db.db.server().rows_iter() {
-            let dc = db.db.server().c_dc(server);
-            let region = db.db.datacenter().c_region(dc);
-            let this_tld = db.db.region().c_tld(region);
-            if this_tld == tld {
-                let iface = db.projections.consul_network_iface.value(server);
-                let fqdn = format!("{}.{}", db.db.server().c_hostname(server), prefix);
-                let ip = db.db.network_interface().c_if_ip(*iface);
-                let rev_ip = reverse_ip(ip);
-                if let Entry::Vacant(e) = ip_to_dns_map.entry(rev_ip) {
-                    // Only if not more authoritative dns record
-                    // exists generate PTR record
-                    let _ = e.insert(fqdn.clone());
-                }
-                res += &fqdn;
-                res += "\tIN\tA\t";
-                res += ip;
-                res += "\n";
+            let iface = db.projections.consul_network_iface.value(server);
+            let fqdn = format!("{}.{}", db.db.server().c_hostname(server), prefix);
+            let ip = db.db.network_interface().c_if_ip(*iface);
+            let rev_ip = reverse_ip(ip);
+            if let Entry::Vacant(e) = ip_to_dns_map.entry(rev_ip) {
+                // Only if not more authoritative dns record
+                // exists generate PTR record
+                let _ = e.insert(fqdn.clone());
             }
+            res += &fqdn;
+            res += "\tIN\tA\t";
+            res += ip;
+            res += "\n";
         }
     }
 

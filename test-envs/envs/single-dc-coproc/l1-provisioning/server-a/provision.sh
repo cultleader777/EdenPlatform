@@ -2090,7 +2090,7 @@ done
 
        enable = true;
      };
-
+# NIX REGION custom_hardware START
     imports =
       [ "${modulesPath}/profiles/qemu-guest.nix" ];
 
@@ -2148,7 +2148,7 @@ done
 
 
     hardware.cpu.amd.updateMicrocode = lib.mkDefault true;
-
+# NIX REGION custom_hardware END
     users.users.named.extraGroups = ["keys"];
     services.bind =
     {
@@ -2604,7 +2604,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"2db86dc4fd18cb7c93fcdd2c7bc9833346d93e87c33a85e0918733189aafe148\",hostname=\"server-a\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"f9a32c148d64d2383fb0878fe88e24cd509bea536cc51fa2bad7e375bbee4f3a\",hostname=\"server-a\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE
@@ -2612,12 +2612,12 @@ epl_l1_provisioning_last_hash{hash=\"2db86dc4fd18cb7c93fcdd2c7bc9833346d93e87c33
   # l1 expected hash
   METRICS_FILE=/var/lib/node_exporter/epl_l1_expected_hash.prom
   echo '
-epl_l1_provisioning_expected_hash{hash="2db86dc4fd18cb7c93fcdd2c7bc9833346d93e87c33a85e0918733189aafe148",hostname="server-a"} 1
-epl_l1_provisioning_expected_hash{hash="d79b7452e6735499143f1a719274b4222abaf72175ea6f2119cc9537666b2e72",hostname="server-b"} 1
-epl_l1_provisioning_expected_hash{hash="21eb422b9e027ab2c88649239917e268f9c958cb7742622befc438464e23f7e6",hostname="server-c"} 1
-epl_l1_provisioning_expected_hash{hash="84f8d66c656c8ae90feb66fcb9d0ac0cc42f06cf3fb27f925adfd71f6e069d3c",hostname="server-d"} 1
-epl_l1_provisioning_expected_hash{hash="2bbf5f3f10a8283a6391367ed4bf0dd286f01cece8859f23cb663afda11b02eb",hostname="server-e"} 1
-epl_l1_provisioning_expected_hash{hash="77c2aab85379862eeb504378dec512daa5043754837a56684b7838ff8a54e6d4",hostname="server-f"} 1
+epl_l1_provisioning_expected_hash{hash="f9a32c148d64d2383fb0878fe88e24cd509bea536cc51fa2bad7e375bbee4f3a",hostname="server-a"} 1
+epl_l1_provisioning_expected_hash{hash="b048fdd3e63beb2dccaa53a4b66814c66ad7be5eebe45d42ae8d9c617dfbc259",hostname="server-b"} 1
+epl_l1_provisioning_expected_hash{hash="fa13e202ae1275c0f942c5c548b15c48e7b70b557edf6efbdacfa74cde0b67e0",hostname="server-c"} 1
+epl_l1_provisioning_expected_hash{hash="4fa96157e09c4d72e4c77c880125ca9f91e18462005646b3bacae79edac49dde",hostname="server-d"} 1
+epl_l1_provisioning_expected_hash{hash="ed290ba8b183d040bda4b6c0b35a328435991d7191c8475de1f7f2e75fd85640",hostname="server-e"} 1
+epl_l1_provisioning_expected_hash{hash="8a427a71e8c2cf7fb882e19277e116ebe139b9f307c18b3d1a8ab60626224a76",hostname="server-f"} 1
 
 ' > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp

@@ -39,7 +39,6 @@ DATA STRUCT EXCLUSIVE region [
 DATA STRUCT EXCLUSIVE tld [
   {
     domain: epl-infra.net,
-    expose_admin: true,
     automatic_certificates: false,
   }
 ]
@@ -66,6 +65,7 @@ DATA STRUCT network [
 DATA STRUCT global_settings {
   project_name: multi-dc-region,
   admin_email: admin@epl-infra.net,
+  admin_tld: epl-infra.net,
 }
 
 DATA admin_ssh_keys {
@@ -75,7 +75,6 @@ DATA admin_ssh_keys {
 DEFAULTS {
   server.dc dc1,
   server.nixpkgs_environment default_nixpkgs,
-  region.tld epl-infra.net,
   rust_compilation_environment.nixpkgs_environment default_nixpkgs,
   frontend_application_deployment.region us-west,
   backend_application_deployment.region us-west,

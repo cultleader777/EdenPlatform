@@ -3,10 +3,10 @@ use std::collections::{BTreeSet, BTreeMap};
 use convert_case::Casing;
 
 use crate::{
-    database::{Database, TableRowPointerServer, TableRowPointerBlackboxDeploymentGroup, TableRowPointerBlackboxDeploymentPort, TableRowPointerBlackboxDeploymentServiceRegistration, TableRowPointerBlackboxDeploymentTask, TableRowPointerBlackboxDeploymentTaskMount},
+    database::{Database, TableRowPointerServer, TableRowPointerBlackboxDeploymentGroup, TableRowPointerBlackboxDeploymentPort, TableRowPointerBlackboxDeploymentServiceRegistration, TableRowPointerBlackboxDeploymentTask, TableRowPointerBlackboxDeploymentTaskMount, TableRowPointerPgDeploymentUnmanagedDb, TableRowPointerMinioBucket, TableRowPointerNatsCluster, TableRowPointerRegion, TableRowPointerBlackboxDeployment, TableRowPointerBlackboxDeploymentEnvVariable},
     static_analysis::{
-        server_runtime::{ServerRuntime, NomadJobKind, NomadJobStage, LockedServerLabel, LockedPort, ConsulServiceHandle, ReservedMemory, epl_architecture_to_nomad_architecture, SuccessfulVolumeLock, IntegrationTest},
-        L1Projections, PlatformValidationError, networking::{region_monitoring_clusters, region_loki_clusters, first_region_server}, docker_images::image_handle_from_pin,
+        server_runtime::{ServerRuntime, NomadJobKind, NomadJobStage, LockedServerLabel, LockedPort, ConsulServiceHandle, ReservedMemory, epl_architecture_to_nomad_architecture, SuccessfulVolumeLock, IntegrationTest, FinalizedVaultSecrets, PgAccessKind, VaultSecretRequest, VaultSecretHandle, MinIOBucketPermission},
+        L1Projections, PlatformValidationError, networking::{region_monitoring_clusters, region_loki_clusters, first_region_server}, docker_images::image_handle_from_pin, projections::Projection
     },
 };
 
@@ -26,7 +26,6 @@ pub fn deploy_blackbox_deployments(
         let monitoring_cluster = db.blackbox_deployment().c_monitoring_cluster(bb_depl);
         let loki_cluster = db.blackbox_deployment().c_loki_cluster(bb_depl);
         let nomad_job_name = format!("bb-{depl_name}");
-        let mut is_stateless = false;
 
         let monitoring_cluster = l1proj.monitoring_clusters.pick(
             region, &monitoring_cluster
@@ -54,12 +53,66 @@ pub fn deploy_blackbox_deployments(
             });
         }
 
+        let (env_variable_wiring, needs_secrets) = check_blackbox_deployment_wiring(db, bb_depl, l1proj)?;
+
+        let mut finalized_vault_secrets: Option<FinalizedVaultSecrets> = None;
+        let mut env_var_handles: BTreeMap<TableRowPointerBlackboxDeploymentEnvVariable, VaultSecretHandle> = BTreeMap::new();
+        if needs_secrets {
+            // get vault secret here
+            let secret_path = format!("bb-depl/{}", db.blackbox_deployment().c_deployment_name(bb_depl));
+            let mut builder = runtime.issue_vault_secret(region, &secret_path);
+            for (env_var, the_source) in &env_variable_wiring {
+                let var_key = format!("env_var_{}", db.blackbox_deployment_env_variable().c_var_name(*env_var).to_lowercase());
+                match the_source {
+                    BlackBoxDeploymentResource::Pg { pg_db } => {
+                        let access = builder.fetch_pg_access(&PgAccessKind::UnmanagedRw(*pg_db));
+                        let left = format!("postgresql://{}:", access.db_user);
+                        let right = format!("@master.{}:{}/{}", access.db_host, access.db_master_port, access.db_database);
+                        let postgres_password = builder.request_secret(
+                            region,
+                            &var_key,
+                            VaultSecretRequest::ExistingVaultSecret {
+                                handle: Box::new(access.db_password.clone()),
+                                sprintf: None,
+                            },
+                        );
+                        let postgres_url = postgres_password.surround_expression(left, right);
+                        assert!(env_var_handles.insert(*env_var, postgres_url).is_none());
+                    }
+                    BlackBoxDeploymentResource::MinIOBucket { bucket } => {
+                        let user = format!("bb-depl-{}", db.blackbox_deployment().c_deployment_name(bb_depl));
+                        let permission = MinIOBucketPermission::ReadWrite;
+                        let minio_password = builder.fetch_minio_bucket_credentials(
+                            db, &var_key, &user, *bucket, permission
+                        );
+
+                        let cluster = db.minio_bucket().c_parent(*bucket);
+                        let service_slug = db.minio_cluster().c_consul_service_name(cluster);
+                        let port = db.minio_cluster().c_lb_port(cluster);
+                        let minio_url = minio_password.surround_expression(
+                            format!("s3://{}:", user),
+                            // password vault expression in the middle
+                            format!("@{}.service.consul:{}/{}", service_slug, port, db.minio_bucket().c_bucket_name(*bucket)),
+                        );
+
+                        assert!(env_var_handles.insert(*env_var, minio_url).is_none());
+                    }
+                    BlackBoxDeploymentResource::NatsCluster { .. } => {
+                        // no passwords from vault, just set env variable
+                    }
+                }
+            }
+
+            finalized_vault_secrets = Some(builder.finalize());
+        }
+
         let mut group_server_locks: BTreeMap<TableRowPointerBlackboxDeploymentGroup, Vec<LockedServerLabel>> = BTreeMap::new();
         let mut port_locks: BTreeMap<TableRowPointerBlackboxDeploymentGroup, Vec<(String, LockedPort)>> = BTreeMap::new();
         let mut volume_locks: BTreeMap<TableRowPointerBlackboxDeploymentGroup, BTreeMap<TableRowPointerBlackboxDeploymentTaskMount, SuccessfulVolumeLock>> = BTreeMap::new();
         let mut nomad_port_names: BTreeMap<TableRowPointerBlackboxDeploymentGroup, BTreeMap<TableRowPointerBlackboxDeploymentPort, String>> = BTreeMap::new();
         let mut tasks_memory: BTreeMap<TableRowPointerBlackboxDeploymentTask, ReservedMemory> = BTreeMap::new();
 
+        let mut is_stateless = true;
         for grp in db.blackbox_deployment().c_children_blackbox_deployment_group(bb_depl) {
             let mut port_set: BTreeSet<i64> = BTreeSet::new();
             for port in db.blackbox_deployment_group().c_children_blackbox_deployment_port(*grp) {
@@ -282,6 +335,9 @@ pub fn deploy_blackbox_deployments(
         } else { NomadJobKind::BoundStateful };
 
         let job = runtime.fetch_nomad_job(ns, nomad_job_name, region, job_kind, NomadJobStage::Application);
+        if let Some(secrets) = finalized_vault_secrets {
+            job.assign_vault_secrets(secrets);
+        }
 
         job.set_loki_cluster(loki_cluster);
 
@@ -403,6 +459,41 @@ pub fn deploy_blackbox_deployments(
                         }
                     }
                 }
+
+                let mut sec_env_vars: Vec<(&str, &VaultSecretHandle)> = Vec::new();
+                for env_var in db.blackbox_deployment_task().c_children_blackbox_deployment_env_variable(*task) {
+                    if !db.blackbox_deployment_env_variable().c_value_source(*env_var).is_empty() {
+                        let the_resource = env_variable_wiring.get(env_var).expect("We should have info about all wired variables here");
+                        match *the_resource {
+                            BlackBoxDeploymentResource::MinIOBucket { .. } => {
+                                let sec_handle = env_var_handles.get(env_var).expect("This should have been set before");
+                                sec_env_vars.push((db.blackbox_deployment_env_variable().c_var_name(*env_var), sec_handle));
+                            }
+                            BlackBoxDeploymentResource::Pg { .. } => {
+                                let sec_handle = env_var_handles.get(env_var).expect("This should have been set before");
+                                sec_env_vars.push((db.blackbox_deployment_env_variable().c_var_name(*env_var), sec_handle));
+                            }
+                            BlackBoxDeploymentResource::NatsCluster { cluster } => {
+                                nomad_task.set_env_variable(
+                                    db.blackbox_deployment_env_variable().c_var_name(*env_var),
+                                    &format!("nats://epl-nats-{}.service.consul:{}",
+                                            db.nats_cluster().c_cluster_name(*cluster),
+                                            db.nats_cluster().c_nats_clients_port(*cluster))
+                                );
+                            }
+                        }
+                    } else {
+                        assert!(!db.blackbox_deployment_env_variable().c_raw_value(*env_var).is_empty(),
+                                "We assume raw value here");
+                        nomad_task.set_env_variable(
+                            db.blackbox_deployment_env_variable().c_var_name(*env_var),
+                            db.blackbox_deployment_env_variable().c_raw_value(*env_var),
+                        );
+                    }
+                }
+                if !sec_env_vars.is_empty() {
+                    nomad_task.add_secure_env_variables("epl-env-secrets.env".to_string(), &sec_env_vars);
+                }
             }
 
 
@@ -428,6 +519,98 @@ pub fn deploy_blackbox_deployments(
     blackbox_deployments_integration_tests(db, runtime, l1proj);
 
     Ok(())
+}
+
+lazy_static! {
+    pub static ref VALID_ENV_NAME_REGEX: regex::Regex = regex::Regex::new("^[a-zA-Z_][a-zA-Z0-9_]*$").unwrap();
+}
+
+// bool returns if secrets are needed
+fn check_blackbox_deployment_wiring<'a>(
+    db: &Database,
+    bb_depl: TableRowPointerBlackboxDeployment,
+    l1proj: &'a L1Projections,
+) -> Result<(BTreeMap<TableRowPointerBlackboxDeploymentEnvVariable, &'a BlackBoxDeploymentResource>, bool), PlatformValidationError> {
+    let mut res = BTreeMap::new();
+
+    let mut needs_secrets = false;
+    for tg in db.blackbox_deployment().c_children_blackbox_deployment_group(bb_depl) {
+        for task in db.blackbox_deployment_group().c_children_blackbox_deployment_task(*tg) {
+            for env_var in db.blackbox_deployment_task().c_children_blackbox_deployment_env_variable(*task) {
+                let var_name = db.blackbox_deployment_env_variable().c_var_name(*env_var);
+                if !VALID_ENV_NAME_REGEX.is_match(&var_name) {
+                    return Err(PlatformValidationError::BlackboxDeploymentEnvironmentVariableNameIsInvalid {
+                        bb_deployment: db.blackbox_deployment().c_deployment_name(bb_depl).clone(),
+                        bb_region: db.region().c_region_name(db.blackbox_deployment().c_region(bb_depl)).clone(),
+                        group_name: db.blackbox_deployment_group().c_group_name(*tg).clone(),
+                        task_name: db.blackbox_deployment_task().c_task_name(*task).clone(),
+                        env_variable_name: var_name.clone(),
+                        must_match_regex: VALID_ENV_NAME_REGEX.to_string(),
+                    });
+                }
+
+                if db.blackbox_deployment_env_variable().c_raw_value(*env_var).is_empty()
+                    && db.blackbox_deployment_env_variable().c_value_source(*env_var).is_empty()
+                {
+                    return Err(PlatformValidationError::BlackboxDeploymentRawValueOrValueSourceMustBeNotEmpty {
+                        bb_deployment: db.blackbox_deployment().c_deployment_name(bb_depl).clone(),
+                        bb_region: db.region().c_region_name(db.blackbox_deployment().c_region(bb_depl)).clone(),
+                        group_name: db.blackbox_deployment_group().c_group_name(*tg).clone(),
+                        task_name: db.blackbox_deployment_task().c_task_name(*task).clone(),
+                        env_variable_name: var_name.clone(),
+                        raw_value: db.blackbox_deployment_env_variable().c_raw_value(*env_var).clone(),
+                        value_source: db.blackbox_deployment_env_variable().c_value_source(*env_var).clone(),
+                    });
+                }
+
+                if !db.blackbox_deployment_env_variable().c_raw_value(*env_var).is_empty()
+                    && !db.blackbox_deployment_env_variable().c_value_source(*env_var).is_empty()
+                {
+                    return Err(PlatformValidationError::BlackboxDeploymentRawValueAndValueSourceAreMutuallyExclusive {
+                        bb_deployment: db.blackbox_deployment().c_deployment_name(bb_depl).clone(),
+                        bb_region: db.region().c_region_name(db.blackbox_deployment().c_region(bb_depl)).clone(),
+                        group_name: db.blackbox_deployment_group().c_group_name(*tg).clone(),
+                        task_name: db.blackbox_deployment_task().c_task_name(*task).clone(),
+                        env_variable_name: var_name.clone(),
+                        raw_value: db.blackbox_deployment_env_variable().c_raw_value(*env_var).clone(),
+                        value_source: db.blackbox_deployment_env_variable().c_value_source(*env_var).clone(),
+                    });
+                }
+
+                // here we just check that if value_source is set that it exists
+                let val_source = db.blackbox_deployment_env_variable().c_value_source(*env_var);
+                if !val_source.is_empty() {
+                    let available_resources =
+                        l1proj.bb_depl_resources_per_region.value(db.blackbox_deployment().c_region(bb_depl));
+
+                    let Some(resource) = available_resources.get(val_source) else {
+                        return Err(PlatformValidationError::BlackboxDeploymentValueSourceNotFoundInRegion {
+                            bb_deployment: db.blackbox_deployment().c_deployment_name(bb_depl).clone(),
+                            bb_region: db.region().c_region_name(db.blackbox_deployment().c_region(bb_depl)).clone(),
+                            group_name: db.blackbox_deployment_group().c_group_name(*tg).clone(),
+                            task_name: db.blackbox_deployment_task().c_task_name(*task).clone(),
+                            env_variable_name: var_name.clone(),
+                            value_source: val_source.clone(),
+                        });
+                    };
+
+                    match resource {
+                        BlackBoxDeploymentResource::MinIOBucket { .. } | BlackBoxDeploymentResource::Pg { .. } => {
+                            needs_secrets |= true;
+                        }
+                        BlackBoxDeploymentResource::NatsCluster { .. } => {}
+                    }
+
+                    assert!(
+                        res.insert(*env_var, resource).is_none(),
+                        "must be unique"
+                    );
+                }
+            }
+        }
+    }
+
+    Ok((res, needs_secrets))
 }
 
 fn blackbox_deployments_integration_tests(
@@ -457,4 +640,95 @@ fn blackbox_deployments_integration_tests(
             }
         }
     }
+}
+
+pub enum BlackBoxDeploymentResource {
+    Pg {
+        pg_db: TableRowPointerPgDeploymentUnmanagedDb,
+        // TODO: add read only user access once such case is needed
+        // write_allowed: bool,
+    },
+    MinIOBucket {
+        bucket: TableRowPointerMinioBucket,
+        // TODO: add read only permissions to minio
+        // write_allowed: bool,
+    },
+    // NATS unauthenticated for now, rw by default
+    NatsCluster {
+        cluster: TableRowPointerNatsCluster,
+    },
+    // TODO: if we need implement clickhouse unmanaged database
+    // ClickhouseCluster {
+    //     ...
+    // },
+}
+
+pub fn compute_available_resources_projection(db: &Database) -> Projection<TableRowPointerRegion, BTreeMap<String, BlackBoxDeploymentResource>> {
+    Projection::create(db.region().rows_iter(), |region| {
+        let mut res: BTreeMap<String, BlackBoxDeploymentResource> =
+            BTreeMap::new();
+
+        for minio_cluster in db.region().c_referrers_minio_cluster__region(region) {
+            for bucket in db.minio_cluster().c_children_minio_bucket(*minio_cluster) {
+                let key_rw = format!(
+                    "s3:rw:{}:{}",
+                    db.minio_cluster().c_cluster_name(*minio_cluster),
+                    db.minio_bucket().c_bucket_name(*bucket),
+                );
+                //let key_ro = format!(
+                //    "s3:ro:{}:{}",
+                //    db.minio_cluster().c_cluster_name(*minio_cluster),
+                //    db.minio_bucket().c_bucket_name(*bucket),
+                //);
+
+                assert!(
+                    res.insert(key_rw, BlackBoxDeploymentResource::MinIOBucket {
+                        bucket: *bucket,
+                        // write_allowed: true,
+                    }).is_none(),
+                    "must be unique"
+                );
+                //assert!(
+                //    res.insert(key_ro, BlackBoxDeploymentResource::MinIOBucket {
+                //        bucket: *bucket,
+                //        write_allowed: false,
+                //    }).is_none(),
+                //    "must be unique"
+                //);
+            }
+        }
+
+        for pg_depl in db.region().c_referrers_pg_deployment__region(region) {
+            // only unmanaged databases are candidates
+            for unm_db in db.pg_deployment().c_children_pg_deployment_unmanaged_db(*pg_depl) {
+                let key_rw = format!(
+                    "pg:rw:{}:{}",
+                    db.pg_deployment().c_deployment_name(*pg_depl),
+                    db.pg_deployment_unmanaged_db().c_db_name(*unm_db),
+                );
+
+                assert!(
+                    res.insert(key_rw, BlackBoxDeploymentResource::Pg {
+                        pg_db: *unm_db,
+                    }).is_none(),
+                    "must be unique"
+                );
+            }
+        }
+
+        for nats_cluster in db.region().c_referrers_nats_cluster__region(region) {
+            let key_rw = format!(
+                "nats:rw:{}",
+                db.nats_cluster().c_cluster_name(*nats_cluster),
+            );
+            assert!(
+                res.insert(key_rw, BlackBoxDeploymentResource::NatsCluster {
+                    cluster: *nats_cluster,
+                }).is_none(),
+                "must be unique"
+            );
+        }
+
+        res
+    })
 }
