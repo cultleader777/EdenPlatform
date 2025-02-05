@@ -104,7 +104,7 @@ job "bb-moonbeam-dev" {
         perms = "644"
         env = true
         data = <<EOL
-TEST_POSTGRESQL=postgresql://bbtest:{{ with secret "epl/data/bb-depl/moonbeam-dev" }}{{ .Data.data.env_var_test_postgresql }}{{ end }}@epl-pg-testdb.service.consul:5433/bbtest
+TEST_POSTGRESQL=postgresql://bbtest:{{ with secret "epl/data/bb-depl/moonbeam-dev" }}{{ .Data.data.env_var_test_postgresql }}{{ end }}@master.epl-pg-testdb.service.consul:5433/bbtest
 TEST_MINIO=s3://bb-depl-moonbeam-dev:{{ with secret "epl/data/bb-depl/moonbeam-dev" }}{{ .Data.data.env_var_test_minio }}{{ end }}@epl-minio-global.service.consul:9002/bb-app1
 EOL
       }
