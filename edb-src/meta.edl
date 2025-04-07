@@ -37,3 +37,11 @@ TABLE global_settings {
   // in this case ipv6 is disabled but we force ipv6? no good
   CHECK { not (not enable_ipv6 and force_ipv6) },
 }
+
+TABLE custom_secret {
+  // value is stored inside secrets.yml under custom_ prefix
+  key TEXT PRIMARY KEY,
+  is_file BOOL DEFAULT false,
+
+  CHECK { isSnakeCase(key) },
+}

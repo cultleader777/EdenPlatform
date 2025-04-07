@@ -2574,9 +2574,9 @@ epl_l1_provisioning_last_hash{hash=\"e7ee5e2ab5757e2815b614e18a5757e95ee84552963
   METRICS_FILE=/var/lib/node_exporter/epl_l1_expected_hash.prom
   echo '
 epl_l1_provisioning_expected_hash{hash="e7ee5e2ab5757e2815b614e18a5757e95ee8455296322a1d9e1a8f629a79bd0e",hostname="server-a"} 1
-epl_l1_provisioning_expected_hash{hash="92458b628ce6e14e71bc2d4c424e8844485ac83958f27eaea8ab25f957a215f5",hostname="server-b"} 1
-epl_l1_provisioning_expected_hash{hash="be509b5657628bf5ee279b00a1bfe2f6a799c2bd0bdbce49f270c7e3aca7caee",hostname="server-c"} 1
-epl_l1_provisioning_expected_hash{hash="780e952ecd674bd84eb39b0d92581375e42ce47d04c11e326d6fbc1e0efe8c81",hostname="server-d"} 1
+epl_l1_provisioning_expected_hash{hash="bc0cd06889778e6092eff21dff8c787a2284c5b429a585565eeae89cffb857f9",hostname="server-b"} 1
+epl_l1_provisioning_expected_hash{hash="b7410b03a5a4db90c6047bc2be072e1791bb37f19153b6825268b2e85e2fac50",hostname="server-c"} 1
+epl_l1_provisioning_expected_hash{hash="590ac96d84ddca676f4212653a3866ae03fe5ae44f78748b98d5efb0f9b20688",hostname="server-d"} 1
 
 ' > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp

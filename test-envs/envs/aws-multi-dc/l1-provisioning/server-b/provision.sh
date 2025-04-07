@@ -1871,6 +1871,14 @@ do
   sleep 3
 done
 
+# in case we need to restart due to raft logs
+if sudo journalctl -u vault.service --since "$(systemctl show vault.service -p ExecMainStartTimestamp | cut -d= -f2)" | grep 'no TLS config found' &>/dev/null
+then
+  echo "Restarting vault and waiting 10 seconds"
+  sudo systemctl restart vault.service
+  sleep 10
+fi
+
 if curl -s $VAULT_ADDR/v1/sys/seal-status | grep '"sealed":true'
 then
   for UK in $(seq 1 3)
@@ -2685,7 +2693,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"f66d542d6ca22fce1a277f13cd51edd3b2b53065f22b6312591d324f1be6d5e4\",hostname=\"server-b\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"b0edbe15dbf79c55f588c30e39284545c0c6e8ece0e5ddd7cb2317e891fb2638\",hostname=\"server-b\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE

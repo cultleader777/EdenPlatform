@@ -29,6 +29,7 @@ pub fn generate_makefile(checked: &CheckedDB, plan: &mut CodegenPlan, l1_outputs
     makefile_integration_tests_target(checked, &mut res);
     makefile_refresh_server_infra_state(checked, &mut res, l1_outputs);
     makefile_refresh_prom_metrics(checked, &mut res);
+    makefile_define_custom_secrets(checked, &mut res);
 
     plan.root_dir.create_file("Makefile", res);
     plan.root_dir.create_file_if_not_exists("custom.mk", "# user custom tasks included in Makefile to be added here".to_string());
@@ -649,6 +650,37 @@ fn makefile_refresh_prom_metrics(checked: &CheckedDB, res: &mut String) {
     *res += " > metrics_db.yml.tmp\n";
     *res += "\tmv -f metrics_db.yml.tmp metrics_db.yml\n";
     *res += "\n";
+}
+
+fn makefile_define_custom_secrets(checked: &CheckedDB, res: &mut String) {
+    if checked.db.custom_secret().len() == 0 {
+        return;
+    }
+
+    tag(res, "define custom secrets");
+
+    for custom_secret in checked.db.custom_secret().rows_iter() {
+        let key = checked.db.custom_secret().c_key(custom_secret);
+
+        if checked.db.custom_secret().c_is_file(custom_secret) {
+            // for file
+            write!(res, ".PHONY: define-secret_file_{key}\n").unwrap();
+            write!(res, "define-secret_file_{key}:\n").unwrap();
+            write!(res, "ifndef SECRET_FILE\n").unwrap();
+            write!(res, "\t$(error SECRET_FILE is undefined)\n").unwrap();
+            write!(res, "endif\n").unwrap();
+            write!(res, "\t$(EPL_EXECUTABLE) override-secret-with-file --output-directory . --key custom_{key} --value-file $(SECRET_FILE) --kind Misc").unwrap();
+            *res += "\n";
+        } else {
+            write!(res, ".PHONY: define-secret_value_{key}\n").unwrap();
+            write!(res, "define-secret_value_{key}:\n").unwrap();
+            write!(res, "ifndef SECRET_VALUE\n").unwrap();
+            write!(res, "\t$(error SECRET_VALUE is undefined)\n").unwrap();
+            write!(res, "endif\n").unwrap();
+            write!(res, "\t$(EPL_EXECUTABLE) override-secret --output-directory . --key custom_{key} --value $(SECRET_VALUE) --kind Misc").unwrap();
+            *res += "\n";
+        }
+    }
 }
 
 fn makefile_preconditions_part(checked: &CheckedDB, res: &mut String) {

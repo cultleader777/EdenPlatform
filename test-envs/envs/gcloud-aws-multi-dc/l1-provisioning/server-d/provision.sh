@@ -1633,12 +1633,24 @@ function update_dns_file() {
   echo ";CHECKSUM $SOURCE_CHECKSUM" >> $TARGET_FILE
   chown named:named $TARGET_FILE
   chmod 644 $TARGET_FILE
+  touch /run/restart-bind
 }
 
 function maybe_update_dns_file() {
   SOURCE_BASE64=$1
   TARGET_FILE=$2
   CHECKSUM=$( echo $SOURCE_BASE64 | base64 -d | sha256sum | awk '{print $1}' )
+
+  # bind journalfile will clash with zone file, we have the source
+  # so journalfile is irrelevant for us
+  if [ -f "$TARGET_FILE.jnl" ]
+  then
+    # just delete journal file as under normal circumstances it is not needed
+    # only for acme update keys
+    rm -f $TARGET_FILE.jnl
+    touch /run/restart-bind
+  fi
+
   if [ ! -f $TARGET_FILE ]
   then
      echo zone target $TARGET_FILE doesnt exist, installing to $TARGET_FILE
@@ -1650,16 +1662,6 @@ function maybe_update_dns_file() {
      echo Source file changed, installing to $TARGET_FILE
      update_dns_file $SOURCE_BASE64 $TARGET_FILE $CHECKSUM
      return 0
-  fi
-  # bind journalfile will clash with zone file, we have the source
-  # so journalfile is irrelevant for us
-  if [ -f "$TARGET_FILE.jnl" ]
-  then
-    if [ "$TARGET_FILE" -nt "$TARGET_FILE.jnl" ]
-    then
-      echo "Deleting older journalfile $TARGET_FILE.jnl"
-      rm -f $TARGET_FILE.jnl
-    fi
   fi
 }
 
@@ -3311,12 +3313,24 @@ function update_dns_file() {
   echo ";CHECKSUM $SOURCE_CHECKSUM" >> $TARGET_FILE
   chown named:named $TARGET_FILE
   chmod 644 $TARGET_FILE
+  touch /run/restart-bind
 }
 
 function maybe_update_dns_file() {
   SOURCE_BASE64=$1
   TARGET_FILE=$2
   CHECKSUM=$( echo $SOURCE_BASE64 | base64 -d | sha256sum | awk '{print $1}' )
+
+  # bind journalfile will clash with zone file, we have the source
+  # so journalfile is irrelevant for us
+  if [ -f "$TARGET_FILE.jnl" ]
+  then
+    # just delete journal file as under normal circumstances it is not needed
+    # only for acme update keys
+    rm -f $TARGET_FILE.jnl
+    touch /run/restart-bind
+  fi
+
   if [ ! -f $TARGET_FILE ]
   then
      echo zone target $TARGET_FILE doesnt exist, installing to $TARGET_FILE
@@ -3328,16 +3342,6 @@ function maybe_update_dns_file() {
      echo Source file changed, installing to $TARGET_FILE
      update_dns_file $SOURCE_BASE64 $TARGET_FILE $CHECKSUM
      return 0
-  fi
-  # bind journalfile will clash with zone file, we have the source
-  # so journalfile is irrelevant for us
-  if [ -f "$TARGET_FILE.jnl" ]
-  then
-    if [ "$TARGET_FILE" -nt "$TARGET_FILE.jnl" ]
-    then
-      echo "Deleting older journalfile $TARGET_FILE.jnl"
-      rm -f $TARGET_FILE.jnl
-    fi
   fi
 }
 
@@ -3547,6 +3551,13 @@ maybe_update_dns_file JFRUTCAzNjAwCmluLWFkZHIuYXJwYS4JSU4JU09BCW5zMS5lcGwtaW5mcm
 # to detect if zone files changed later
 /run/current-system/sw/bin/systemctl reload bind.service || true
 
+# zone file changed, reload will not reload it
+if [ -f /run/restart-bind ]
+then
+  rm -f /run/restart-bind
+  /run/current-system/sw/bin/systemctl restart bind.service || true
+fi
+
 
 cp -pu /run/keys/K10-in-addr-arpa--015-04646-private /run/dnsseckeys/K10.in-addr.arpa.+015+04646.private
 cp -pu /run/keys/K10-in-addr-arpa--015-32779-private /run/dnsseckeys/K10.in-addr.arpa.+015+32779.private
@@ -3661,7 +3672,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"d346b991c20f86195d9408cc89af9c937be3a0fc15cc7ec8dfc1e12f87026405\",hostname=\"server-d\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"ef70450d60d02f39b3e01241590947a01db1c5fa8d283317bea6214bc4430310\",hostname=\"server-d\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE

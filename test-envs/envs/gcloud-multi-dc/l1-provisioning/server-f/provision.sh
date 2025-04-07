@@ -974,17 +974,17 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-server.crt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIIB5TCCAYygAwIBAgIUGPi9SRYXJd2kCFnNJ/iuJRidZDcwCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjMxMjEwMDg0MDAwWhcNMjQxMjA5MDg0MDAw
-WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEhejijvyg2Aaqx6OqOJFT/gwG
-MGpnz6RbFp2UU9NgBgHxBFZ9bGfTXhK/g+O/5+Q1Y1iqFERHRX0R0C5b72YfrqOB
+MIIB5zCCAYygAwIBAgIUUySCRpnSf93zwTiEGUqCswiWezowCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjUwNDA3MTQ0MTAwWhcNMjYwNDA3MTQ0MTAw
+WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAERCP5m3LFf6d97pDGAtlbJcD7
+4MmUPD/DxZNS0EFXjPn5+9u0XRkY51DcfZiA/BELUtyc2ijalEBMi3Ua3egp8aOB
 0zCB0DAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUF
-BwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFLJIC6j58GR/7WKTwuDfPzk9ExCj
+BwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFEgZaVyi7G48M6oC0nTZwkMs88Rv
 MB8GA1UdIwQYMBaAFIhoSYZzVNmquhkdIM43ZMuOAVrMMFEGA1UdEQEB/wRHMEWC
 FHNlcnZlci51cy13ZXN0Lm5vbWFkghxub21hZC1zZXJ2ZXJzLnNlcnZpY2UuY29u
-c3Vsgglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0EAwIDRwAwRAIgXuSCi7jDPGy+
-84LdxJghqcIkjwBxcZLOQdyB5D52gyECIGBVNTH2uPg4g0UYTiUohO3As1+OLxaY
-OPhrfb/R4sMk
+c3Vsgglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0EAwIDSQAwRgIhAM8ich4w4dJB
+xeFewzMVILnGstyB4W42CXDos+1ZaLwmAiEAnB+JLSWHDLo0NgtWBzMIM5ldETE9
+um/cK5blKQyYoOA=
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -1001,9 +1001,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-server.key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIMCFNeQ3X7oMBiQ1ATImrAAS9C62vmXpVyCUbXM00iFPoAoGCCqGSM49
-AwEHoUQDQgAEhejijvyg2Aaqx6OqOJFT/gwGMGpnz6RbFp2UU9NgBgHxBFZ9bGfT
-XhK/g+O/5+Q1Y1iqFERHRX0R0C5b72Yfrg==
+MHcCAQEEIMJEO9dOKqT3FB9yIXUhMJt1HsbOxNBfXHwvq1U+q8fBoAoGCCqGSM49
+AwEHoUQDQgAERCP5m3LFf6d97pDGAtlbJcD74MmUPD/DxZNS0EFXjPn5+9u0XRkY
+51DcfZiA/BELUtyc2ijalEBMi3Ua3egp8Q==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -1020,15 +1020,15 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-cli.crt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIIBkDCCATegAwIBAgIUCUFjj6AEtMZ5pTI5jI82xEEfgQ4wCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjMxMjEwMDg0MDAwWhcNMjQxMjA5MDg0MDAw
-WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEhVhT84yCrRq7FSK1EzBvrHZA
-igZMlNtNEx4jwYG5nzRvOhHlvu8Ru04QGTioqPzrlDVdHvUU7yCv0lVLo5D2nKN/
+MIIBkTCCATegAwIBAgIUZkpxGJsKUZy4hWeIqTCdtDb6rMwwCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjUwNDA3MTQ0MTAwWhcNMjYwNDA3MTQ0MTAw
+WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE76tS7KLQshveGCqNF+Ie0fO3
+3XFnjXVEmscdcr5U/mzbTN5uhazIJvcVbs4ucPKrYhME2+0bt4rx5pVHKqZIQKN/
 MH0wDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcD
-AjAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBTTW1DcUwshAiFVf+6ISP5GE4CqcTAf
-BgNVHSMEGDAWgBSIaEmGc1TZqroZHSDON2TLjgFazDAKBggqhkjOPQQDAgNHADBE
-AiAgSTxKv6ODMGGwTCiTdcIUiHTRzyt581bXReQ69bYq6QIgffPEmUygUVdoXqaw
-U6tPzMVA/g093534eIWZBpueMSY=
+AjAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBQdys0iupBBgBTHG+TKE+fwaeo3gzAf
+BgNVHSMEGDAWgBSIaEmGc1TZqroZHSDON2TLjgFazDAKBggqhkjOPQQDAgNIADBF
+AiAURYEAjvIoFYPNK09wd4/4sB9xxXLXby7q2BakPZSr1wIhAJV/XpPUCVnTU2hP
+7mjYlDq4tySfV4UHqaao4Am86iPY
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -1045,9 +1045,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-cli.key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIMP4t1FjlPgyzXycgLpKGaUXZFUs58G+tVhb7JoUsjjaoAoGCCqGSM49
-AwEHoUQDQgAEhVhT84yCrRq7FSK1EzBvrHZAigZMlNtNEx4jwYG5nzRvOhHlvu8R
-u04QGTioqPzrlDVdHvUU7yCv0lVLo5D2nA==
+MHcCAQEEIMUmwVuoh7mqWxf/PN1uKkdSCgLPiqDJc3ChHnRHBbE/oAoGCCqGSM49
+AwEHoUQDQgAE76tS7KLQshveGCqNF+Ie0fO33XFnjXVEmscdcr5U/mzbTN5uhazI
+JvcVbs4ucPKrYhME2+0bt4rx5pVHKqZIQA==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -1089,19 +1089,19 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_vault-instance.crt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIICQjCCAemgAwIBAgIUEtK9bkCr3Y+w0tOtQraJfsu338owCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFdmF1bHQwHhcNMjMxMjEwMDg0MDAwWhcNMjQxMjA5MDg0MDAw
-WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE/z+LSyEZi2HQSsF7vSxz04Tk
-DvWgY4NxGowp16P39OzZUzLCdFwVPh845l1CWnOY4F2jKV+Z0abFPpwGcU1TgKOC
+MIICRDCCAemgAwIBAgIUI1yh6b62E6a7DQBH5LZ/x5Mk4O4wCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFdmF1bHQwHhcNMjUwNDA3MTQ0MTAwWhcNMjYwNDA3MTQ0MTAw
+WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7unUMij6CyzQkluDmrS0gXcQ
+vcjF1OPfxCiQ6hETOUpxLItiCLZ2ydSHVHZSTt6h/0TsqaU+Sjph0RUwm5Vu0aOC
 AS8wggErMA4GA1UdDwEB/wQEAwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYB
-BQUHAwIwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQU0yXGqn0fjuyuuJ56QZkwCpVA
-7/swHwYDVR0jBBgwFoAUK6NVbaHLUr3pH4F7RTnojlzZ9tcwgasGA1UdEQEB/wSB
+BQUHAwIwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQU5QKURyk2cvhmRK1j8JisKUhj
+YtMwHwYDVR0jBBgwFoAUK6NVbaHLUr3pH4F7RTnojlzZ9tcwgasGA1UdEQEB/wSB
 oDCBnYIec2VydmVyLWYudXMtd2VzdC5lcGwtaW5mcmEubmV0ghR2YXVsdC5zZXJ2
 aWNlLmNvbnN1bIIWKi52YXVsdC5zZXJ2aWNlLmNvbnN1bIIcdmF1bHQuc2Vydmlj
 ZS51cy13ZXN0LmNvbnN1bIIeKi52YXVsdC5zZXJ2aWNlLnVzLXdlc3QuY29uc3Vs
-gglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0EAwIDRwAwRAIgUnwP7WZUuVcwAs9Z
-x2tV8be71R4bmmBmhFLchEjehNACIG20ziymmPkCkQE4Ng2aE5iOI/BhZHh0EH5g
-WOuM0FsM
+gglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0EAwIDSQAwRgIhANdoMzXBuzIhgWTp
+BceSsj/iMeEkMxfwJmrowJXz7fHoAiEAhU/8GSCyC9xJ+wXnAkipGTM2VwiUlRFC
+f4VvDCRkruA=
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -1120,9 +1120,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_vault-instance.key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIAWMAQa+jAnIDwvVtSHfFqFbUK7xEIMAbIduyG1iUoYEoAoGCCqGSM49
-AwEHoUQDQgAE/z+LSyEZi2HQSsF7vSxz04TkDvWgY4NxGowp16P39OzZUzLCdFwV
-Ph845l1CWnOY4F2jKV+Z0abFPpwGcU1TgA==
+MHcCAQEEIMFOOczKJbMO0XtzMmH3YTMfyCk7pmv3i654vIIiH/LaoAoGCCqGSM49
+AwEHoUQDQgAE7unUMij6CyzQkluDmrS0gXcQvcjF1OPfxCiQ6hETOUpxLItiCLZ2
+ydSHVHZSTt6h/0TsqaU+Sjph0RUwm5Vu0Q==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -1682,6 +1682,14 @@ do
   sleep 3
 done
 
+# in case we need to restart due to raft logs
+if sudo journalctl -u vault.service --since "$(systemctl show vault.service -p ExecMainStartTimestamp | cut -d= -f2)" | grep 'no TLS config found' &>/dev/null
+then
+  echo "Restarting vault and waiting 10 seconds"
+  sudo systemctl restart vault.service
+  sleep 10
+fi
+
 if curl -s $VAULT_ADDR/v1/sys/seal-status | grep '"sealed":true'
 then
   for UK in $(seq 1 3)
@@ -1851,7 +1859,7 @@ done
 
        enable = true;
      };
-
+# NIX REGION custom_hardware START
     imports = [ "${modulesPath}/virtualisation/google-compute-image.nix" ];
 
 
@@ -1888,7 +1896,7 @@ done
 
 
     networking.usePredictableInterfaceNames = false;
-
+# NIX REGION custom_hardware END
     users.users.named.extraGroups = ["keys"];
     services.bind =
     {
@@ -2501,7 +2509,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"635ea52833e5cbb6158f6526aa8e155589ee63a9ba477e98a387293c19765845\",hostname=\"server-f\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"adf78e7c3306adc392971e5ab36e3f4ffe3ec9f6a3f3660023e778c14e1ec252\",hostname=\"server-f\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE

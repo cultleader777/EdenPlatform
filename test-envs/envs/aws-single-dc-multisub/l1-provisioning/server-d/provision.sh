@@ -1355,17 +1355,17 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-server.crt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIIB5jCCAYygAwIBAgIUWYg4lzr10n+ezRtIKODMeg6jZAEwCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjQwMTAyMDk0MjAwWhcNMjUwMTAxMDk0MjAw
-WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAElfksTp17DTJR9FADJNR5J5A5
-oZf0ssuZR31bW40vl5J9D7tKxBA7gCqCmP1Fhih/2WuCLprg/JBU0G9wuYk4eaOB
+MIIB5zCCAYygAwIBAgIUD4sssxO+kAo6cAZ20L6oq4KKnL4wCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjUwNDA3MTQ0MTAwWhcNMjYwNDA3MTQ0MTAw
+WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAElAL0D07t34iHa3U578j0orel
+8A5mtXMusXnZoIL8AGD4mHZTwbJiCLjJoFU0HBdAdMyPOtRUqpEDIpjsnFVdZKOB
 0zCB0DAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUF
-BwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFNyQamaWCX87ZXS2aVOc+/xLFYCj
+BwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFPKu5yagpFMdWTFcVbMj4cgp+3AG
 MB8GA1UdIwQYMBaAFGHfFzU0Gqrdm5hEfuplV4scSHd6MFEGA1UdEQEB/wRHMEWC
 FHNlcnZlci51cy13ZXN0Lm5vbWFkghxub21hZC1zZXJ2ZXJzLnNlcnZpY2UuY29u
-c3Vsgglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0EAwIDSAAwRQIgcRwfebLDN7qz
-WWwD5gWKoGAcS5gbKUes0dCQSwTaGHICIQCqiN0qFEdFRzbiMQ+clrpQ7RR2fwTw
-pJeCstEF1hkknw==
+c3Vsgglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0EAwIDSQAwRgIhAPfgNMrWy7mv
+rQafJxxG6nu1NEOOouwO304PcaOH1ubTAiEAyL5/5zXH6jZmZ0wMmkV9NVqd3Q2G
+MDmpgIekbGTz8xk=
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -1382,9 +1382,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-server.key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIO+50yoTwDIHWafiatYad7c+V/G1b9gwX6PxxqtSxfYkoAoGCCqGSM49
-AwEHoUQDQgAElfksTp17DTJR9FADJNR5J5A5oZf0ssuZR31bW40vl5J9D7tKxBA7
-gCqCmP1Fhih/2WuCLprg/JBU0G9wuYk4eQ==
+MHcCAQEEIHg0BBtI9aD4xrW+Ku+pnHFh2CX2J9Vdz5ewffB46bn4oAoGCCqGSM49
+AwEHoUQDQgAElAL0D07t34iHa3U578j0orel8A5mtXMusXnZoIL8AGD4mHZTwbJi
+CLjJoFU0HBdAdMyPOtRUqpEDIpjsnFVdZA==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -1401,15 +1401,15 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-cli.crt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIIBkDCCATegAwIBAgIUJpfonuLDSIccuXGTqq0NMoZ/BUMwCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjQwMTAyMDk0MjAwWhcNMjUwMTAxMDk0MjAw
-WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEGeZ+tl/HtC+qjSLtcC9bFAx6
-yXAVXf/FwsZlDzoZuwxR2Fw5Uo1EETvlHx14aJiZpKXl5794h+MOoJpi8nW4iaN/
+MIIBkjCCATegAwIBAgIUamWcp69JzYDAQy/U5bfxD561aBowCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjUwNDA3MTQ0MTAwWhcNMjYwNDA3MTQ0MTAw
+WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEibqJO4YQpqDujI5TRFAWT+/A
+cIweoeuNkEtgpomZ7HiOz9f1jtpRC6H5bnpKI8rQV2YBPBkSKFT7as1ZmZxVRqN/
 MH0wDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcD
-AjAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBR8yB3/D/ilW5WWMyRv50eNmubbATAf
-BgNVHSMEGDAWgBRh3xc1NBqq3ZuYRH7qZVeLHEh3ejAKBggqhkjOPQQDAgNHADBE
-AiBnE8FCvuXYKKOhD9Cw2qA+NY7yBGQcPhg8uwAAcFV2PQIgerCvYha4oPzNxCng
-Ew4nl9lZaC/N4RKUN0UEbjUgg8E=
+AjAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBSc9ug9PQmzK23q7NAdjjZYLLIQ9zAf
+BgNVHSMEGDAWgBRh3xc1NBqq3ZuYRH7qZVeLHEh3ejAKBggqhkjOPQQDAgNJADBG
+AiEAt2xM72Y11jB87IxVmwhydDCGy8cHxCkLM4TSoz6xhlACIQCyHGJxIeEDuI3y
+kfUJM/dPGS74nuRLxSpthXGGv94hiQ==
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -1426,9 +1426,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-cli.key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIHCIYbrSyGPcUhBrv6GwgS0LF1H1CgmQ9EDSSZWqe3SgoAoGCCqGSM49
-AwEHoUQDQgAEGeZ+tl/HtC+qjSLtcC9bFAx6yXAVXf/FwsZlDzoZuwxR2Fw5Uo1E
-ETvlHx14aJiZpKXl5794h+MOoJpi8nW4iQ==
+MHcCAQEEICFtGwzZZus/Nz2nqJEBoXh9ZQ7nLos99BLVv/VU+NUyoAoGCCqGSM49
+AwEHoUQDQgAEibqJO4YQpqDujI5TRFAWT+/AcIweoeuNkEtgpomZ7HiOz9f1jtpR
+C6H5bnpKI8rQV2YBPBkSKFT7as1ZmZxVRg==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -1470,19 +1470,19 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_vault-instance.crt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIICQjCCAemgAwIBAgIUEBPkti1Gi8egx2DtHE4sRXCb+WIwCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFdmF1bHQwHhcNMjQwMTAyMDk0MjAwWhcNMjUwMTAxMDk0MjAw
-WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3+G95f/HOeiN2EdJ6i+b7N7U
-qXMeqjnI6OkDxe40ZBr0sKJKO0/pUOkeSzigpvJIotkfZZ4qB2fN7Yj+IbdESqOC
+MIICQjCCAemgAwIBAgIUIermdf7imjI4hZCffgPw8hnEFYEwCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFdmF1bHQwHhcNMjUwNDA3MTQ0MTAwWhcNMjYwNDA3MTQ0MTAw
+WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEA+48Ot1wsAsmP0G2jTlZuecb
+V8NEmi1jXjj5oVfT812XyJPCtUDJOxa04ZTU54tvnBEjf1g7ClAv35Di8xgi+qOC
 AS8wggErMA4GA1UdDwEB/wQEAwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYB
-BQUHAwIwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQUz8Fr6l8Ii57leG/yGmpqaggF
-YXswHwYDVR0jBBgwFoAUAxzX5mE/kL0xFY2LO6/KeUhT5z8wgasGA1UdEQEB/wSB
+BQUHAwIwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQUv/uZiimRFYX7nNEUVSp8Rv0o
+llIwHwYDVR0jBBgwFoAUAxzX5mE/kL0xFY2LO6/KeUhT5z8wgasGA1UdEQEB/wSB
 oDCBnYIec2VydmVyLWQudXMtd2VzdC5lcGwtaW5mcmEubmV0ghR2YXVsdC5zZXJ2
 aWNlLmNvbnN1bIIWKi52YXVsdC5zZXJ2aWNlLmNvbnN1bIIcdmF1bHQuc2Vydmlj
 ZS51cy13ZXN0LmNvbnN1bIIeKi52YXVsdC5zZXJ2aWNlLnVzLXdlc3QuY29uc3Vs
-gglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0EAwIDRwAwRAIgIRxczOTf2CBnaLzx
-ZjzTKSU/rO6vRGe5hXihNg9GigMCICSQjHhXOMf08dOElznlBpg60Aj70rV3bm64
-XGZ8+VV8
+gglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0EAwIDRwAwRAIgaR5EbmoofnIVRNF8
+nSlOOPENvrRuZWQ3LpX1Vk4q5fECIH9NhjTkJgslofyz6zqexcMssLPA8mmEWQdf
+kgWYvjqL
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -1501,9 +1501,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_vault-instance.key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIOuGHUiDlbpvoDJHw6nx3dypaW0bYEpXmwEgqnwOVGKRoAoGCCqGSM49
-AwEHoUQDQgAE3+G95f/HOeiN2EdJ6i+b7N7UqXMeqjnI6OkDxe40ZBr0sKJKO0/p
-UOkeSzigpvJIotkfZZ4qB2fN7Yj+IbdESg==
+MHcCAQEEIFwLRROjrAuP+da/4QCX0ZKm5OTJtuV+2mn7tRBKWHYEoAoGCCqGSM49
+AwEHoUQDQgAEA+48Ot1wsAsmP0G2jTlZuecbV8NEmi1jXjj5oVfT812XyJPCtUDJ
+Oxa04ZTU54tvnBEjf1g7ClAv35Di8xgi+g==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -1604,12 +1604,24 @@ function update_dns_file() {
   echo ";CHECKSUM $SOURCE_CHECKSUM" >> $TARGET_FILE
   chown named:named $TARGET_FILE
   chmod 644 $TARGET_FILE
+  touch /run/restart-bind
 }
 
 function maybe_update_dns_file() {
   SOURCE_BASE64=$1
   TARGET_FILE=$2
   CHECKSUM=$( echo $SOURCE_BASE64 | base64 -d | sha256sum | awk '{print $1}' )
+
+  # bind journalfile will clash with zone file, we have the source
+  # so journalfile is irrelevant for us
+  if [ -f "$TARGET_FILE.jnl" ]
+  then
+    # just delete journal file as under normal circumstances it is not needed
+    # only for acme update keys
+    rm -f $TARGET_FILE.jnl
+    touch /run/restart-bind
+  fi
+
   if [ ! -f $TARGET_FILE ]
   then
      echo zone target $TARGET_FILE doesnt exist, installing to $TARGET_FILE
@@ -1621,16 +1633,6 @@ function maybe_update_dns_file() {
      echo Source file changed, installing to $TARGET_FILE
      update_dns_file $SOURCE_BASE64 $TARGET_FILE $CHECKSUM
      return 0
-  fi
-  # bind journalfile will clash with zone file, we have the source
-  # so journalfile is irrelevant for us
-  if [ -f "$TARGET_FILE.jnl" ]
-  then
-    if [ "$TARGET_FILE" -nt "$TARGET_FILE.jnl" ]
-    then
-      echo "Deleting older journalfile $TARGET_FILE.jnl"
-      rm -f $TARGET_FILE.jnl
-    fi
   fi
 }
 
@@ -2333,6 +2335,14 @@ do
   sleep 3
 done
 
+# in case we need to restart due to raft logs
+if sudo journalctl -u vault.service --since "$(systemctl show vault.service -p ExecMainStartTimestamp | cut -d= -f2)" | grep 'no TLS config found' &>/dev/null
+then
+  echo "Restarting vault and waiting 10 seconds"
+  sudo systemctl restart vault.service
+  sleep 10
+fi
+
 if curl -s $VAULT_ADDR/v1/sys/seal-status | grep '"sealed":true'
 then
   for UK in $(seq 1 3)
@@ -2504,7 +2514,7 @@ done
 
        enable = true;
      };
-
+# NIX REGION custom_hardware START
     imports = [ "${modulesPath}/virtualisation/amazon-image.nix" ];
 
 
@@ -2539,7 +2549,7 @@ done
 
 
     networking.usePredictableInterfaceNames = false;
-
+# NIX REGION custom_hardware END
     users.users.named.extraGroups = ["keys"];
     services.bind =
     {
@@ -3181,12 +3191,24 @@ function update_dns_file() {
   echo ";CHECKSUM $SOURCE_CHECKSUM" >> $TARGET_FILE
   chown named:named $TARGET_FILE
   chmod 644 $TARGET_FILE
+  touch /run/restart-bind
 }
 
 function maybe_update_dns_file() {
   SOURCE_BASE64=$1
   TARGET_FILE=$2
   CHECKSUM=$( echo $SOURCE_BASE64 | base64 -d | sha256sum | awk '{print $1}' )
+
+  # bind journalfile will clash with zone file, we have the source
+  # so journalfile is irrelevant for us
+  if [ -f "$TARGET_FILE.jnl" ]
+  then
+    # just delete journal file as under normal circumstances it is not needed
+    # only for acme update keys
+    rm -f $TARGET_FILE.jnl
+    touch /run/restart-bind
+  fi
+
   if [ ! -f $TARGET_FILE ]
   then
      echo zone target $TARGET_FILE doesnt exist, installing to $TARGET_FILE
@@ -3198,16 +3220,6 @@ function maybe_update_dns_file() {
      echo Source file changed, installing to $TARGET_FILE
      update_dns_file $SOURCE_BASE64 $TARGET_FILE $CHECKSUM
      return 0
-  fi
-  # bind journalfile will clash with zone file, we have the source
-  # so journalfile is irrelevant for us
-  if [ -f "$TARGET_FILE.jnl" ]
-  then
-    if [ "$TARGET_FILE" -nt "$TARGET_FILE.jnl" ]
-    then
-      echo "Deleting older journalfile $TARGET_FILE.jnl"
-      rm -f $TARGET_FILE.jnl
-    fi
   fi
 }
 
@@ -3348,6 +3360,13 @@ maybe_update_dns_file JFRUTCAzNjAwCmluLWFkZHIuYXJwYS4JSU4JU09BCW5zMS5lcGwtaW5mcm
 # to detect if zone files changed later
 /run/current-system/sw/bin/systemctl reload bind.service || true
 
+# zone file changed, reload will not reload it
+if [ -f /run/restart-bind ]
+then
+  rm -f /run/restart-bind
+  /run/current-system/sw/bin/systemctl restart bind.service || true
+fi
+
 
 cp -pu /run/keys/K10-in-addr-arpa--015-39018-private /run/dnsseckeys/K10.in-addr.arpa.+015+39018.private
 cp -pu /run/keys/K10-in-addr-arpa--015-04946-private /run/dnsseckeys/K10.in-addr.arpa.+015+04946.private
@@ -3454,7 +3473,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"f405ae8a0f3899b4a25b0c93864829665764d80a16249d22a349397cd8a62b42\",hostname=\"server-d\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"f14cf811415db9686c0e8cb284cfe7a4dcd4151d98d8d79e498f242e7a063d7d\",hostname=\"server-d\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE

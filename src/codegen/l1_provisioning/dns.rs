@@ -493,12 +493,24 @@ function update_dns_file() {
   echo ";CHECKSUM $SOURCE_CHECKSUM" >> $TARGET_FILE
   chown named:named $TARGET_FILE
   chmod 644 $TARGET_FILE
+  touch /run/restart-bind
 }
 
 function maybe_update_dns_file() {
   SOURCE_BASE64=$1
   TARGET_FILE=$2
   CHECKSUM=$( echo $SOURCE_BASE64 | base64 -d | sha256sum | awk '{print $1}' )
+
+  # bind journalfile will clash with zone file, we have the source
+  # so journalfile is irrelevant for us
+  if [ -f "$TARGET_FILE.jnl" ]
+  then
+    # just delete journal file as under normal circumstances it is not needed
+    # only for acme update keys
+    rm -f $TARGET_FILE.jnl
+    touch /run/restart-bind
+  fi
+
   if [ ! -f $TARGET_FILE ]
   then
      echo zone target $TARGET_FILE doesnt exist, installing to $TARGET_FILE
@@ -511,16 +523,6 @@ function maybe_update_dns_file() {
      update_dns_file $SOURCE_BASE64 $TARGET_FILE $CHECKSUM
      return 0
   fi
-  # bind journalfile will clash with zone file, we have the source
-  # so journalfile is irrelevant for us
-  if [ -f "$TARGET_FILE.jnl" ]
-  then
-    if [ "$TARGET_FILE" -nt "$TARGET_FILE.jnl" ]
-    then
-      echo "Deleting older journalfile $TARGET_FILE.jnl"
-      rm -f $TARGET_FILE.jnl
-    fi
-  fi
 }
 "#;
         let maybe_reload_bind = if !ctx.zone_vars.linkings.is_empty() {
@@ -528,6 +530,13 @@ function maybe_update_dns_file() {
 # we could implement some complex mechanism
 # to detect if zone files changed later
 /run/current-system/sw/bin/systemctl reload bind.service || true
+
+# zone file changed, reload will not reload it
+if [ -f /run/restart-bind ]
+then
+  rm -f /run/restart-bind
+  /run/current-system/sw/bin/systemctl restart bind.service || true
+fi
 "#
         } else { "" };
         let maybe_linkings = if is_dns_master { linkings.as_str() } else { "" };
@@ -991,6 +1000,85 @@ fn write_dc_master_public_bind_configs(db: &CheckedDB, res: &mut String, ctx: &m
         &rev,
         "",
     );
+}
+
+fn write_tld_misc_recods(db: &CheckedDB, res: &mut String, tld: TableRowPointerTld) {
+    let cname_recs = db.db.tld().c_children_tld_cname_record(tld);
+    if !cname_recs.is_empty() {
+        *res += "; CNAME misc records\n";
+        let mut the_vec = cname_recs.to_vec();
+        // sorting for deterministic results
+        the_vec.sort_by_key(|item| {
+            db.db.tld_cname_record().c_subdomain(*item)
+        });
+
+        for sub in the_vec {
+            let subdomain = db.db.tld_cname_record().c_subdomain(sub);
+
+            // sorting for deterministic results
+            let mut the_values = db.db.tld_cname_record().c_children_tld_cname_record_value(sub).to_vec();
+            the_values.sort_by_key(|item| {
+                db.db.tld_cname_record_value().c_value(*item)
+            });
+
+            for val in the_values {
+                let the_val = db.db.tld_cname_record_value().c_value(val);
+                write!(res, "{subdomain}\tIN\tCNAME\t{the_val}\n").unwrap();
+            }
+        }
+    }
+
+    let txt_recs = db.db.tld().c_children_tld_txt_record(tld);
+    if !txt_recs.is_empty() {
+        *res += "; TXT misc records\n";
+        let mut the_vec = txt_recs.to_vec();
+        // sorting for deterministic results
+        the_vec.sort_by_key(|item| {
+            db.db.tld_txt_record().c_subdomain(*item)
+        });
+
+        for sub in the_vec {
+            let subdomain = db.db.tld_txt_record().c_subdomain(sub);
+
+            // sorting for deterministic results
+            let mut the_values = db.db.tld_txt_record().c_children_tld_txt_record_value(sub).to_vec();
+            the_values.sort_by_key(|item| {
+                db.db.tld_txt_record_value().c_value(*item)
+            });
+
+            for val in the_values {
+                let the_val = db.db.tld_txt_record_value().c_value(val);
+                let the_val = the_val.replace("\"", "\\\"");
+                write!(res, "{subdomain}\tIN\tTXT\t\"{the_val}\"\n").unwrap();
+            }
+        }
+    }
+
+    let mx_recs = db.db.tld().c_children_tld_mx_record(tld);
+    if !mx_recs.is_empty() {
+        *res += "; MX misc records\n";
+        let mut the_vec = mx_recs.to_vec();
+        // sorting for deterministic results
+        the_vec.sort_by_key(|item| {
+            db.db.tld_mx_record().c_subdomain(*item)
+        });
+
+        for sub in the_vec {
+            let subdomain = db.db.tld_mx_record().c_subdomain(sub);
+
+            // sorting for deterministic results
+            let mut the_values = db.db.tld_mx_record().c_children_tld_mx_record_value(sub).to_vec();
+            the_values.sort_by_key(|item| {
+                db.db.tld_mx_record_value().c_value(*item)
+            });
+
+            for val in the_values {
+                let the_val = db.db.tld_mx_record_value().c_value(val);
+                let priority = db.db.tld_mx_record_value().c_priority(val);
+                write!(res, "{subdomain}\tIN\tMX\t{priority}\t{the_val}\n").unwrap();
+            }
+        }
+    }
 }
 
 fn write_dc_slave_public_bind_configs(db: &CheckedDB, res: &mut String, ctx: &mut BindContext) {
@@ -1498,6 +1586,8 @@ fn dns_public_root_zone_file(db: &CheckedDB, tld: TableRowPointerTld) -> ZoneFil
             }
         }
     }
+
+    write_tld_misc_recods(db, &mut res, tld);
 
     ZoneFiles {
         tld_zone: res,

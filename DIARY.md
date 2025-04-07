@@ -5500,3 +5500,25 @@ DONE: dns sec enabled but unsupported by upstream TLD
 TODO: make dnssec root zone validation as part of universal provisioning
 TODO: bound stateful job with stateless task has no server locks error
 TODO: Arbitrary DNS records for domains
+TODO: Expose zpool disk errors via periodic job to file exporter
+
+
+* 2025-02-27
+
+DONE: misc mx/cname/txt record correctness checking
+DONE: misc mx/cname/txt record tests
+DONE: if there's more than two dots cname must be full fqdn
+DONE: misc mx/cname/txt bind9 config generation, we should sort the values for deterministic config
+TODO: test admin. and ingress/misc record clash
+
+* 2025-04-01
+
+Mini project: vault secrets
+DONE: add error that secret is undefined
+DONE: add override secret from file command line
+DONE: check that secret value can be passed in with regex ^[ - ~]+$
+DONE: support secret file rendering to the blackbox deployment task
+TODO: allow non snake case files and make sure it doesn't clash with epl-env-secrets.env
+DONE: if secret is one template expression and one line just put it in quotes
+
+TODO: update telegram secret api key to use custom secrets

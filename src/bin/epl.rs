@@ -44,6 +44,21 @@ pub enum Cli {
         #[clap(required = true, long)]
         kind: epl::codegen::secrets::SecretKind,
     },
+    OverrideSecretWithFile {
+        /// Project output directory
+        #[clap(required = true, long)]
+        output_directory: String,
+        /// Key of the secret
+        #[clap(required = true, long)]
+        key: String,
+        /// FIle with the value of the secret
+        #[clap(required = true, long)]
+        // yeah, passing secret as command line flag is insecure, but should only be done in admin machine
+        value_file: String,
+        /// Secret kind
+        #[clap(required = true, long)]
+        kind: epl::codegen::secrets::SecretKind,
+    },
     /// Get secret
     GetSecret {
         /// Project output directory
@@ -172,6 +187,13 @@ fn main() {
                 std::process::exit(7);
             }
 
+            // we do this after flushing code to disk because makefile might not be generated
+            // to conveniently store secrets yet and couldn't be used
+            if let Err(err) = epl::codegen::secrets::check_secrets_are_defined(&checked, &secrets) {
+                eprintln!("undefined secrets error: {}", err);
+                std::process::exit(7);
+            }
+
             total.end();
         },
         Cli::OverrideSecret { key, value, kind, output_directory } => {
@@ -192,10 +214,32 @@ fn main() {
                 std::process::exit(7);
             }
         },
-        Cli::GetSecret { output_directory, key } => {
+        Cli::OverrideSecretWithFile { key, value_file, kind, output_directory } => {
             let secrets_path = format!("{}/secrets.yml", output_directory);
             let checksums_path = format!("{}/secrets-checksums.yml", output_directory);
             let mut secrets = match epl::codegen::secrets::SecretsStorage::new(&secrets_path, &checksums_path) {
+                Ok(ok) => ok,
+                Err(e) => {
+                    eprintln!("{}: {}", err_color("secrets error"), e);
+                    std::process::exit(7);
+                }
+            };
+
+            let value = String::from_utf8(
+                std::fs::read(&value_file).expect("Can't read the file")
+            ).expect("invalid utf-8 value");
+
+            secrets.override_secret(key, kind, value);
+
+            if let Err(e) = secrets.flush_to_disk() {
+                eprintln!("{}: {}", err_color("secrets saving error"), e);
+                std::process::exit(7);
+            }
+        },
+        Cli::GetSecret { output_directory, key } => {
+            let secrets_path = format!("{}/secrets.yml", output_directory);
+            let checksums_path = format!("{}/secrets-checksums.yml", output_directory);
+            let secrets = match epl::codegen::secrets::SecretsStorage::new(&secrets_path, &checksums_path) {
                 Ok(ok) => ok,
                 Err(e) => {
                     eprintln!("{}: {}", err_color("secrets error"), e);

@@ -3,7 +3,7 @@ use std::collections::{BTreeSet, BTreeMap};
 use convert_case::Casing;
 
 use crate::{
-    database::{Database, TableRowPointerServer, TableRowPointerBlackboxDeploymentGroup, TableRowPointerBlackboxDeploymentPort, TableRowPointerBlackboxDeploymentServiceRegistration, TableRowPointerBlackboxDeploymentTask, TableRowPointerBlackboxDeploymentTaskMount, TableRowPointerPgDeploymentUnmanagedDb, TableRowPointerMinioBucket, TableRowPointerNatsCluster, TableRowPointerRegion, TableRowPointerBlackboxDeployment, TableRowPointerBlackboxDeploymentEnvVariable},
+    database::{Database, TableRowPointerServer, TableRowPointerBlackboxDeploymentGroup, TableRowPointerBlackboxDeploymentPort, TableRowPointerBlackboxDeploymentServiceRegistration, TableRowPointerBlackboxDeploymentTask, TableRowPointerBlackboxDeploymentTaskMount, TableRowPointerPgDeploymentUnmanagedDb, TableRowPointerMinioBucket, TableRowPointerNatsCluster, TableRowPointerRegion, TableRowPointerBlackboxDeployment, TableRowPointerBlackboxDeploymentEnvVariable, TableRowPointerCustomSecret, TableRowPointerBlackboxDeploymentSecretFile},
     static_analysis::{
         server_runtime::{ServerRuntime, NomadJobKind, NomadJobStage, LockedServerLabel, LockedPort, ConsulServiceHandle, ReservedMemory, epl_architecture_to_nomad_architecture, SuccessfulVolumeLock, IntegrationTest, FinalizedVaultSecrets, PgAccessKind, VaultSecretRequest, VaultSecretHandle, MinIOBucketPermission},
         L1Projections, PlatformValidationError, networking::{region_monitoring_clusters, region_loki_clusters, first_region_server}, docker_images::image_handle_from_pin, projections::Projection
@@ -57,6 +57,8 @@ pub fn deploy_blackbox_deployments(
 
         let mut finalized_vault_secrets: Option<FinalizedVaultSecrets> = None;
         let mut env_var_handles: BTreeMap<TableRowPointerBlackboxDeploymentEnvVariable, VaultSecretHandle> = BTreeMap::new();
+        let mut secrets_needed_for_region_as_env: BTreeSet<TableRowPointerCustomSecret> = BTreeSet::new();
+        let mut sec_filename_handles: BTreeMap<TableRowPointerBlackboxDeploymentSecretFile, VaultSecretHandle> = BTreeMap::new();
         if needs_secrets {
             // get vault secret here
             let secret_path = format!("bb-depl/{}", db.blackbox_deployment().c_deployment_name(bb_depl));
@@ -100,10 +102,34 @@ pub fn deploy_blackbox_deployments(
                     BlackBoxDeploymentResource::NatsCluster { .. } => {
                         // no passwords from vault, just set env variable
                     }
+                    BlackBoxDeploymentResource::CustomSecret { key } => {
+                        // no passwords needed, get from secrets.yml
+                        let key_name = db.custom_secret().c_key(*key).clone();
+                        let the_secret = builder.request_secret(region, &var_key, VaultSecretRequest::SecretsYmlEntry { key_name });
+                        secrets_needed_for_region_as_env.insert(*key);
+                        assert!(env_var_handles.insert(*env_var, the_secret).is_none());
+                    }
+                }
+            }
+
+            for grp in db.blackbox_deployment().c_children_blackbox_deployment_group(bb_depl) {
+                for task in db.blackbox_deployment_group().c_children_blackbox_deployment_task(*grp) {
+                    for secret_file in db.blackbox_deployment_task().c_children_blackbox_deployment_secret_file(*task) {
+                        let the_secret = db.blackbox_deployment_secret_file().c_contents(*secret_file);
+                        let filename = db.blackbox_deployment_secret_file().c_filename(*secret_file);
+                        let var_key = format!("sec_file_{}", filename);
+                        let key_name = db.custom_secret().c_key(the_secret).clone();
+                        let the_secret = builder.request_secret(region, &var_key, VaultSecretRequest::SecretsYmlEntry { key_name });
+                        assert!(sec_filename_handles.insert(*secret_file, the_secret).is_none());
+                    }
                 }
             }
 
             finalized_vault_secrets = Some(builder.finalize());
+        }
+
+        for needed_secret in secrets_needed_for_region_as_env {
+            runtime.declare_region_custom_secret_needed_as_env(region, needed_secret);
         }
 
         let mut group_server_locks: BTreeMap<TableRowPointerBlackboxDeploymentGroup, Vec<LockedServerLabel>> = BTreeMap::new();
@@ -188,6 +214,11 @@ pub fn deploy_blackbox_deployments(
                     }
 
                     group_server = Some(server);
+                }
+
+                for secret_file in db.blackbox_deployment_task().c_children_blackbox_deployment_secret_file(*task) {
+                    let custom_secret = db.blackbox_deployment_secret_file().c_contents(*secret_file);
+                    runtime.declare_region_custom_secret_needed_as_file(region, custom_secret);
                 }
             }
 
@@ -481,6 +512,10 @@ pub fn deploy_blackbox_deployments(
                                             db.nats_cluster().c_nats_clients_port(*cluster))
                                 );
                             }
+                            BlackBoxDeploymentResource::CustomSecret { .. } => {
+                                let sec_handle = env_var_handles.get(env_var).expect("This should have been set before");
+                                sec_env_vars.push((db.blackbox_deployment_env_variable().c_var_name(*env_var), sec_handle));
+                            }
                         }
                     } else {
                         assert!(!db.blackbox_deployment_env_variable().c_raw_value(*env_var).is_empty(),
@@ -493,6 +528,12 @@ pub fn deploy_blackbox_deployments(
                 }
                 if !sec_env_vars.is_empty() {
                     nomad_task.add_secure_env_variables("epl-env-secrets.env".to_string(), &sec_env_vars);
+                }
+
+                for sec_file in db.blackbox_deployment_task().c_children_blackbox_deployment_secret_file(*task) {
+                    let fname = db.blackbox_deployment_secret_file().c_filename(*sec_file);
+                    let vault_handle = sec_filename_handles.get(sec_file).unwrap();
+                    nomad_task.add_vault_handle_as_file(fname.clone(), vault_handle);
                 }
             }
 
@@ -595,7 +636,7 @@ fn check_blackbox_deployment_wiring<'a>(
                     };
 
                     match resource {
-                        BlackBoxDeploymentResource::MinIOBucket { .. } | BlackBoxDeploymentResource::Pg { .. } => {
+                        BlackBoxDeploymentResource::MinIOBucket { .. } | BlackBoxDeploymentResource::Pg { .. } | BlackBoxDeploymentResource::CustomSecret { .. } => {
                             needs_secrets |= true;
                         }
                         BlackBoxDeploymentResource::NatsCluster { .. } => {}
@@ -606,6 +647,10 @@ fn check_blackbox_deployment_wiring<'a>(
                         "must be unique"
                     );
                 }
+            }
+
+            if db.blackbox_deployment_task().c_children_blackbox_deployment_secret_file(*task).len() > 0 {
+                needs_secrets |= true;
             }
         }
     }
@@ -657,6 +702,9 @@ pub enum BlackBoxDeploymentResource {
     NatsCluster {
         cluster: TableRowPointerNatsCluster,
     },
+    CustomSecret {
+        key: TableRowPointerCustomSecret,
+    },
     // TODO: if we need implement clickhouse unmanaged database
     // ClickhouseCluster {
     //     ...
@@ -667,6 +715,18 @@ pub fn compute_available_resources_projection(db: &Database) -> Projection<Table
     Projection::create(db.region().rows_iter(), |region| {
         let mut res: BTreeMap<String, BlackBoxDeploymentResource> =
             BTreeMap::new();
+
+        for custom_secret in db.custom_secret().rows_iter() {
+            let key = format!(
+                "custom_secret:{}",
+                db.custom_secret().c_key(custom_secret),
+            );
+
+            assert!(
+                res.insert(key, BlackBoxDeploymentResource::CustomSecret { key: custom_secret }).is_none(),
+                "must be unique"
+            );
+        }
 
         for minio_cluster in db.region().c_referrers_minio_cluster__region(region) {
             for bucket in db.minio_cluster().c_children_minio_bucket(*minio_cluster) {

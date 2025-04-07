@@ -110,6 +110,273 @@ impl DnsChecksSingleInstance {
 }
 
 pub fn dns_checks(db: &Database, server_fqdns: &Projection<TableRowPointerServer, String>) -> Result<DnsChecks, PlatformValidationError> {
+    let mut all_ingresses_subdomains: HashMap<String, &'static str> = HashMap::new();
+    let res = dns_checks_for_servers(db, &mut all_ingresses_subdomains, server_fqdns)?;
+
+    dns_checks_for_misc_records(db, &mut all_ingresses_subdomains)?;
+
+    Ok(res)
+}
+
+
+
+fn dns_checks_for_misc_records(db: &Database, all_ingresses_subdomains: &mut HashMap<String, &'static str>) -> Result<(), PlatformValidationError> {
+    lazy_static! {
+        pub static ref TXT_RECORD_REGEX: regex::Regex = regex::Regex::new(r#"^[a-zA-Z0-9_]([a-zA-Z0-9_-]{0,61}[a-zA-Z0-9_])?$"#).unwrap();
+        pub static ref NORMAL_RECORD_REGEX: regex::Regex = regex::Regex::new(r#"^[a-zA-Z0-9]([a-zA-Z0-9_-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9_]([a-zA-Z0-9_-]{0,61}[a-zA-Z0-9])?)*$"#).unwrap();
+        pub static ref VALID_TXT_VALUE: regex::Regex = regex::Regex::new(r#"^([ -~]{1,253})$"#).unwrap();
+        pub static ref VALID_FQDN_VALUE: regex::Regex = regex::Regex::new(r#"^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.?$"#).unwrap();
+    }
+
+    let gs = get_global_settings(db);
+
+    let max_values = 30;
+    for tld in db.tld().rows_iter() {
+        let tld_value = db.tld().c_domain(tld);
+        for txt_rec in db.tld().c_children_tld_txt_record(tld) {
+            let subdomain = db.tld_txt_record().c_subdomain(*txt_rec);
+            if subdomain.contains(tld_value) {
+                return Err(PlatformValidationError::DnsMiscSubdomainFullTldIsRedundant {
+                    record_type: "TXT".to_string(),
+                    tld: db.tld().c_domain(tld).clone(),
+                    subdomain: subdomain.clone(),
+                    explanation: "Your subdomain should never include the full tld domain, it is already assumed".to_string(),
+                });
+            }
+
+            if subdomain == "_acme-challenge" {
+                return Err(PlatformValidationError::DnsForbiddenMiscTxtRecord {
+                    record_type: "TXT".to_string(),
+                    tld: db.tld().c_domain(tld).clone(),
+                    subdomain: subdomain.clone(),
+                    reserved_values: vec![
+                        "_acme-challenge".to_string(),
+                    ]
+                });
+            }
+
+            if subdomain != "@" {
+                if !TXT_RECORD_REGEX.is_match(&subdomain) {
+                    return Err(PlatformValidationError::DnsInvalidMiscTxtRecordSubdomain {
+                        failed_regex_check: TXT_RECORD_REGEX.to_string(),
+                        tld: db.tld().c_domain(tld).clone(),
+                        subdomain: subdomain.clone(),
+                    });
+                }
+            }
+
+            let values = db.tld_txt_record().c_children_tld_txt_record_value(*txt_rec).len();
+            if values == 0 {
+                return Err(PlatformValidationError::DnsMiscTxtRecordNoValues {
+                    tld: db.tld().c_domain(tld).clone(),
+                    subdomain: subdomain.clone(),
+                    values_found: values,
+                    values_min: 1,
+                });
+            }
+
+            if values > max_values {
+                return Err(PlatformValidationError::DnsMiscTxtRecordTooManyValues {
+                    tld: db.tld().c_domain(tld).clone(),
+                    subdomain: subdomain.clone(),
+                    values_found: values,
+                    values_max: max_values,
+                });
+            }
+
+            for txt_value in db.tld_txt_record().c_children_tld_txt_record_value(*txt_rec) {
+                let the_value = db.tld_txt_record_value().c_value(*txt_value);
+                if !VALID_TXT_VALUE.is_match(&the_value) {
+                    return Err(PlatformValidationError::DnsMiscTxtRecordInvalidValue {
+                        failed_regex_check: VALID_TXT_VALUE.to_string(),
+                        tld: db.tld().c_domain(tld).clone(),
+                        subdomain: subdomain.clone(),
+                        value: db.tld_txt_record_value().c_value(*txt_value).clone(),
+                    });
+                }
+            }
+        }
+
+        for cname_rec in db.tld().c_children_tld_cname_record(tld) {
+            // we don't use any cnames so anything added is misc
+            let subdomain = db.tld_cname_record().c_subdomain(*cname_rec);
+            if subdomain.contains(tld_value) {
+                return Err(PlatformValidationError::DnsMiscSubdomainFullTldIsRedundant {
+                    record_type: "CNAME".to_string(),
+                    tld: db.tld().c_domain(tld).clone(),
+                    subdomain: subdomain.clone(),
+                    explanation: "Your subdomain should never include the full tld domain, it is already assumed".to_string(),
+                });
+            }
+
+            if subdomain == "@" {
+                // having @ CNAME would clash with other records we set for the zone,
+                // potentially clashing with functionality of ingresses and so on
+                // better just forbid it now until we can figure out use case where it is
+                // actually needed
+                return Err(PlatformValidationError::DnsForbiddenMiscCnameRecordSubdomain {
+                    forbidden_value: "@".to_string(),
+                    tld: db.tld().c_domain(tld).clone(),
+                    subdomain: subdomain.clone(),
+                });
+            } else {
+                if !NORMAL_RECORD_REGEX.is_match(&subdomain) {
+                    return Err(PlatformValidationError::DnsInvalidMiscCnameRecordSubdomain {
+                        failed_regex_check: NORMAL_RECORD_REGEX.to_string(),
+                        tld: db.tld().c_domain(tld).clone(),
+                        subdomain: subdomain.clone(),
+                    });
+                }
+
+                if gs.admin_tld == tld {
+                    if subdomain.starts_with("adm-") {
+                        // if someone ever needs this we can do abstraction where we detect
+                        // all ingress reservations, now we just know that epl
+                        // admin services start with adm-
+                        // besides, this check is only on admin_tld domain
+                        return Err(PlatformValidationError::DnsMiscCnameRecordReservedPrefix {
+                            tld: db.tld().c_domain(tld).clone(),
+                            subdomain: subdomain.clone(),
+                            forbidden_prefix: "adm-".to_string(),
+                        });
+                    }
+                }
+
+                let fqdn = format!("{}.{}.", subdomain, db.tld().c_domain(tld));
+                if let Some(existing_value) = all_ingresses_subdomains.insert(fqdn, "tld_cname_record") {
+                    return Err(PlatformValidationError::DnsMiscCnameRecordClashSubdomain {
+                        tld: db.tld().c_domain(tld).clone(),
+                        subdomain: subdomain.clone(),
+                        previous_source: existing_value.to_string(),
+                    });
+                }
+            }
+
+            let values = db.tld_cname_record().c_children_tld_cname_record_value(*cname_rec).len();
+            if values == 0 {
+                return Err(PlatformValidationError::DnsMiscCnameRecordNoValues {
+                    tld: db.tld().c_domain(tld).clone(),
+                    subdomain: subdomain.clone(),
+                    values_found: values,
+                    values_min: 1,
+                });
+            }
+
+            if values > max_values {
+                return Err(PlatformValidationError::DnsMiscCnameRecordTooManyValues {
+                    tld: db.tld().c_domain(tld).clone(),
+                    subdomain: subdomain.clone(),
+                    values_found: values,
+                    values_max: max_values,
+                });
+            }
+
+            for cname_value in db.tld_cname_record().c_children_tld_cname_record_value(*cname_rec) {
+                let the_value = db.tld_cname_record_value().c_value(*cname_value);
+                if !VALID_FQDN_VALUE.is_match(&the_value) {
+                    return Err(PlatformValidationError::DnsMiscCnameRecordInvalidValue {
+                        failed_regex_check: VALID_FQDN_VALUE.to_string(),
+                        tld: db.tld().c_domain(tld).clone(),
+                        subdomain: subdomain.clone(),
+                        value: db.tld_cname_record_value().c_value(*cname_value).clone(),
+                    });
+                }
+
+                // the idea is if we have domain name like u12341.uwueqw.sendgrid.net.
+                // we have suspicion that this is fqdn but is not ended with a period
+                // so bind9 will implicitly add our top level zone at the end
+                let period_count = the_value.match_indices(".").count();
+                if period_count >= 2 && !the_value.ends_with(".") {
+                    return Err(PlatformValidationError::DnsMiscCnameRecordWithAtLeastTwoPeriodsMustBeFqdn {
+                        tld: db.tld().c_domain(tld).clone(),
+                        subdomain: subdomain.clone(),
+                        value: the_value.clone(),
+                        periods_found: period_count,
+                        value_expected_at_the_end: ".".to_string(),
+                    });
+                }
+            }
+        }
+
+        for mx_rec in db.tld().c_children_tld_mx_record(tld) {
+            // we don't use any cnames so anything added is misc
+            let subdomain = db.tld_mx_record().c_subdomain(*mx_rec);
+            if subdomain.contains(tld_value) {
+                return Err(PlatformValidationError::DnsMiscSubdomainFullTldIsRedundant {
+                    record_type: "MX".to_string(),
+                    tld: db.tld().c_domain(tld).clone(),
+                    subdomain: subdomain.clone(),
+                    explanation: "Your subdomain should never include the full tld domain, it is already assumed".to_string(),
+                });
+            }
+
+            if subdomain != "@" {
+                if !NORMAL_RECORD_REGEX.is_match(&subdomain) {
+                    return Err(PlatformValidationError::DnsInvalidMiscTxtRecordSubdomain {
+                        failed_regex_check: NORMAL_RECORD_REGEX.to_string(),
+                        tld: db.tld().c_domain(tld).clone(),
+                        subdomain: subdomain.clone(),
+                    });
+                }
+            }
+
+            let values = db.tld_mx_record().c_children_tld_mx_record_value(*mx_rec).len();
+            if values == 0 {
+                return Err(PlatformValidationError::DnsMiscMxRecordNoValues {
+                    tld: db.tld().c_domain(tld).clone(),
+                    subdomain: subdomain.clone(),
+                    values_found: values,
+                    values_min: 1,
+                });
+            }
+
+            if values > max_values {
+                return Err(PlatformValidationError::DnsMiscMxRecordTooManyValues {
+                    tld: db.tld().c_domain(tld).clone(),
+                    subdomain: subdomain.clone(),
+                    values_found: values,
+                    values_max: max_values,
+                });
+            }
+
+            for mx_value in db.tld_mx_record().c_children_tld_mx_record_value(*mx_rec) {
+                let the_value = db.tld_mx_record_value().c_value(*mx_value);
+                if !VALID_FQDN_VALUE.is_match(&the_value) {
+                    return Err(PlatformValidationError::DnsMiscMxRecordInvalidValue {
+                        failed_regex_check: VALID_FQDN_VALUE.to_string(),
+                        priority: db.tld_mx_record_value().c_priority(*mx_value),
+                        tld: db.tld().c_domain(tld).clone(),
+                        subdomain: subdomain.clone(),
+                        value: db.tld_mx_record_value().c_value(*mx_value).clone(),
+                    });
+                }
+
+                // the idea is if we have domain name like u12341.uwueqw.sendgrid.net.
+                // we have suspicion that this is fqdn but is not ended with a period
+                // so bind9 will implicitly add our top level zone at the end, which might be unexpected
+                let period_count = the_value.match_indices(".").count();
+                if period_count >= 2 && !the_value.ends_with(".") {
+                    return Err(PlatformValidationError::DnsMiscMxRecordWithAtLeastTwoPeriodsMustBeFqdn {
+                        tld: db.tld().c_domain(tld).clone(),
+                        subdomain: subdomain.clone(),
+                        value: the_value.clone(),
+                        periods_found: period_count,
+                        value_expected_at_the_end: ".".to_string(),
+                    });
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
+
+fn dns_checks_for_servers(
+    db: &Database,
+    all_ingresses_subdomains: &mut HashMap<String, &'static str>,
+    server_fqdns: &Projection<TableRowPointerServer, String>
+) -> Result<DnsChecks, PlatformValidationError> {
     let mut res = DnsChecks {
         regions: BTreeMap::new(),
         all_regions: DnsChecksSingleInstance {
@@ -136,22 +403,34 @@ pub fn dns_checks(db: &Database, server_fqdns: &Projection<TableRowPointerServer
 
     let mut slave_regions = Vec::new();
 
-    let mut all_ingresses_subdomains: HashMap<String, &'static str> = HashMap::new();
+    // frontend and backend ingresses can clash because EPL
+    // should ensure they're working together in the same subdomain
     for i in db.frontend_application_deployment_ingress().rows_iter() {
         let tld = db.tld().c_domain(db.frontend_application_deployment_ingress().c_tld(i));
-        let fqdn = format!("{}.{}.", db.frontend_application_deployment_ingress().c_subdomain(i), tld);
-        let _ = all_ingresses_subdomains.insert(fqdn, "frontend_application_deployment_ingress");
+        let subdomain = db.frontend_application_deployment_ingress().c_subdomain(i);
+        let fqdn = format!("{}.{}.", subdomain, tld);
+        let _ = all_ingresses_subdomains.insert(fqdn.clone(), "frontend_application_deployment_ingress");
     }
     for i in db.backend_application_deployment_ingress().rows_iter() {
         let tld = db.tld().c_domain(db.backend_application_deployment_ingress().c_tld(i));
-        let fqdn = format!("{}.{}.", db.backend_application_deployment_ingress().c_subdomain(i), tld);
-        let _ = all_ingresses_subdomains.insert(fqdn, "backend_application_deployment_ingress");
+        let subdomain = db.backend_application_deployment_ingress().c_subdomain(i);
+        let fqdn = format!("{}.{}.", subdomain, tld);
+        let _ = all_ingresses_subdomains.insert(fqdn.clone(), "backend_application_deployment_ingress");
     }
+
+    let admin_fqdn = format!("admin.{}.", db.tld().c_domain(settings.admin_tld));
+    if let Some(clash_source_table) = all_ingresses_subdomains.insert(admin_fqdn.clone(), "admin_domain") {
+        return Err(PlatformValidationError::DnsRegionNameAndIngressSubdomainFqdnClash {
+            fqdn: admin_fqdn,
+            clash_source_table,
+        });
+    }
+
 
     for region in db.region().rows_iter() {
         let tld = db.tld().c_domain(settings.admin_tld);
         let fqdn = format!("{}.{}.", db.region().c_region_name(region), tld);
-        if let Some(clash_source_table) = all_ingresses_subdomains.get(&fqdn) {
+        if let Some(clash_source_table) = all_ingresses_subdomains.insert(fqdn.clone(), "region_tld_name") {
             return Err(PlatformValidationError::DnsRegionNameAndIngressSubdomainFqdnClash {
                 fqdn,
                 clash_source_table,

@@ -1,7 +1,7 @@
 #!/bin/sh
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source $SCRIPT_DIR/library.sh
-EPL_EXECUTABLE=${EPL_EXECUTABLE:-../../target/debug/epl}
+export EPL_EXECUTABLE=${EPL_EXECUTABLE:-../../target/debug/epl}
 REGION=$1
 SERVER_IP=$2
 
@@ -20,6 +20,8 @@ INFRA_ROOT_NOMAD_TOKEN=$( $EPL_EXECUTABLE get-secret --output-directory .. --key
 INFRA_ROOT_VAULT_TOKEN=$( $EPL_EXECUTABLE get-secret --output-directory .. --key vault_region_${REGION}_initial_keys | grep 'Initial Root Token:' | sed -E 's/.*: hvs./hvs./' )
 CONSUL_ROOT_TOKEN=$( $EPL_EXECUTABLE get-secret --output-directory .. --key consul_region_${REGION}_acl_management_token )
 
+SECRETS_EXPORTS="$( ../l2-provisioning/${REGION}/load-secrets.sh )"
+
 rsync -av --mkpath --delete -e 'ssh -i aux/root_ssh_key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=false -o ConnectTimeout=2' \
   ../l2-provisioning/$REGION/ admin@$SERVER_IP:/run/secdir/provisioning
 rsync -av --exclude apps/*/result --exclude=apps/*/target --exclude=apps/*/target/** --delete -e 'ssh -i aux/root_ssh_key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=false -o ConnectTimeout=2' \
@@ -34,4 +36,5 @@ ssh admin@$SERVER_IP -i aux/root_ssh_key \
         export NOMAD_TOKEN=$INFRA_ROOT_NOMAD_TOKEN; \
         export CONSUL_HTTP_TOKEN=$CONSUL_ROOT_TOKEN; \
         export EPL_PROVISIONING_DIR=/run/secdir/provisioning; \
+        $SECRETS_EXPORTS \
       cd /run/secdir/provisioning && /bin/sh /run/secdir/provisioning/provision.sh'"

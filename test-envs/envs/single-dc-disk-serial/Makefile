@@ -1022,9 +1022,9 @@ refresh-static-server-infra-state: infra-state.sqlite
 	  INSERT INTO servers(hostname, region, expected_l1_hash) \
 	  VALUES \
 	    ('server-a','us-west','e7ee5e2ab5757e2815b614e18a5757e95ee8455296322a1d9e1a8f629a79bd0e'), \
-	    ('server-b','us-west','92458b628ce6e14e71bc2d4c424e8844485ac83958f27eaea8ab25f957a215f5'), \
-	    ('server-c','us-west','be509b5657628bf5ee279b00a1bfe2f6a799c2bd0bdbce49f270c7e3aca7caee'), \
-	    ('server-d','us-west','780e952ecd674bd84eb39b0d92581375e42ce47d04c11e326d6fbc1e0efe8c81'); \
+	    ('server-b','us-west','bc0cd06889778e6092eff21dff8c787a2284c5b429a585565eeae89cffb857f9'), \
+	    ('server-c','us-west','b7410b03a5a4db90c6047bc2be072e1791bb37f19153b6825268b2e85e2fac50'), \
+	    ('server-d','us-west','590ac96d84ddca676f4212653a3866ae03fe5ae44f78748b98d5efb0f9b20688'); \
 	" | sqlite3 infra-state.sqlite
 
 

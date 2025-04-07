@@ -844,16 +844,16 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-client.crt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIIBxzCCAW6gAwIBAgIUXnF46osYyxema/dFmJtVhlGkk2wwCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjQwMTEyMTIwNTAwWhcNMjUwMTExMTIwNTAw
-WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFoip1+e+cbQzwyhiP9jXgPQ4
-y1gU2bzgWKWv/45N1VqZUUbyV7ysPZEFlEInA0awUhytEFJuqZvFmF6LQQihNqOB
+MIIByDCCAW6gAwIBAgIUQYSZLRHc2TJlJrA9yTDRh0Eg2HUwCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjUwNDA3MTQ0MTAwWhcNMjYwNDA3MTQ0MTAw
+WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEmtsI7F4q1NfFhwrGlnCfgNdb
+A8XZRIhp+DABYnCsi5XNSkeKfuA3fTl6eNAqsQTZlzUyY5gm1Q2ZcbARKZ0mZ6OB
 tTCBsjAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUF
-BwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFCznS5rt3YhAFMXXnJh+f4nQxIUQ
+BwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFAnBhN72mbCR9a1DU/l86eRyj4VI
 MB8GA1UdIwQYMBaAFDNC5t2G0bqrhLOD31ZmCu2QPsWjMDMGA1UdEQEB/wQpMCeC
 FGNsaWVudC51cy13ZXN0Lm5vbWFkgglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0E
-AwIDRwAwRAIgE2brR9F/C5QY18ON9EUJiuhU2CuDic1rolxqPQJkskICIGS1VsEu
-xxaC0KdhmC7RDBzPxnR+0nE+EqAUmiXcQWuy
+AwIDSAAwRQIgfmPcYDz0pUIIQlqtQrs/s9YXLV96mR/Ms6Lw3qwrYJwCIQDtztbe
+QII5QMMdK0pWKq1Cd38AwPvKrc/4jbAD3UyFoQ==
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -870,9 +870,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-client.key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIAzKqf2mzEBcvKwcDhC5AbSEHrLvGMcSm5CSTGr54sTqoAoGCCqGSM49
-AwEHoUQDQgAEFoip1+e+cbQzwyhiP9jXgPQ4y1gU2bzgWKWv/45N1VqZUUbyV7ys
-PZEFlEInA0awUhytEFJuqZvFmF6LQQihNg==
+MHcCAQEEIM88nfJ9wUWKRoWHmRWyuAYCncZXe3bm+PD+4LCr2+ESoAoGCCqGSM49
+AwEHoUQDQgAEmtsI7F4q1NfFhwrGlnCfgNdbA8XZRIhp+DABYnCsi5XNSkeKfuA3
+fTl6eNAqsQTZlzUyY5gm1Q2ZcbARKZ0mZw==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -1514,7 +1514,7 @@ done
 
        enable = true;
      };
-
+# NIX REGION custom_hardware START
     imports = [ "${modulesPath}/virtualisation/google-compute-image.nix" ];
 
 
@@ -1551,7 +1551,7 @@ done
 
 
     networking.usePredictableInterfaceNames = false;
-
+# NIX REGION custom_hardware END
     users.users.named.extraGroups = ["keys"];
     services.bind =
     {
@@ -1996,7 +1996,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"cf6848740d797d0de5e77b51839dc60017ae577314df6e6afe5a2e33ca10d71f\",hostname=\"server-f\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"52b123f33ee9a07aa5630a5ef5595eb3bf105d110700d37e26e86818d4579d80\",hostname=\"server-f\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE

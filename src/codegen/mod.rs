@@ -11,6 +11,7 @@ pub mod preconditions;
 use std::{
     collections::{HashSet, BTreeSet, BTreeMap},
     io::Write,
+    fmt::Write as OWrite,
     os::unix::prelude::PermissionsExt,
     path::Path,
 };
@@ -886,6 +887,8 @@ fn generate_l2_provisioning_part(prov_dir: &mut Directory, checked: &CheckedDB, 
         }
     }
 
+    generate_secret_loading_scripts(prov_dir, checked, region);
+
     let scripts_dir = prov_dir.create_directory("scripts");
 
     let mut longest_script_name = 0;
@@ -962,7 +965,7 @@ pub(crate) fn generate_vm_provision_script() -> String {
     r#"#!/bin/sh
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source $SCRIPT_DIR/library.sh
-EPL_EXECUTABLE=${EPL_EXECUTABLE:-../../target/debug/epl}
+export EPL_EXECUTABLE=${EPL_EXECUTABLE:-../../target/debug/epl}
 REGION=$1
 SERVER_IP=$2
 
@@ -981,6 +984,8 @@ INFRA_ROOT_NOMAD_TOKEN=$( $EPL_EXECUTABLE get-secret --output-directory .. --key
 INFRA_ROOT_VAULT_TOKEN=$( $EPL_EXECUTABLE get-secret --output-directory .. --key vault_region_${REGION}_initial_keys | grep 'Initial Root Token:' | sed -E 's/.*: hvs./hvs./' )
 CONSUL_ROOT_TOKEN=$( $EPL_EXECUTABLE get-secret --output-directory .. --key consul_region_${REGION}_acl_management_token )
 
+SECRETS_EXPORTS="$( ../l2-provisioning/${REGION}/load-secrets.sh )"
+
 rsync -av --mkpath --delete -e 'ssh -i aux/root_ssh_key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=false -o ConnectTimeout=2' \
   ../l2-provisioning/$REGION/ admin@$SERVER_IP:/run/secdir/provisioning
 rsync -av --exclude apps/*/result --exclude=apps/*/target --exclude=apps/*/target/** --delete -e 'ssh -i aux/root_ssh_key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=false -o ConnectTimeout=2' \
@@ -995,6 +1000,7 @@ ssh admin@$SERVER_IP -i aux/root_ssh_key \
         export NOMAD_TOKEN=$INFRA_ROOT_NOMAD_TOKEN; \
         export CONSUL_HTTP_TOKEN=$CONSUL_ROOT_TOKEN; \
         export EPL_PROVISIONING_DIR=/run/secdir/provisioning; \
+        $SECRETS_EXPORTS \
       cd /run/secdir/provisioning && /bin/sh /run/secdir/provisioning/provision.sh'"
 "#
     .to_string()
@@ -1003,6 +1009,28 @@ ssh admin@$SERVER_IP -i aux/root_ssh_key \
 pub struct SshKeysSecrets {
     pub private_root_ssh_key: SecretValue,
     pub public_root_ssh_key: SecretValue,
+}
+
+fn generate_secret_loading_scripts(prov_dir: &mut Directory, checked: &CheckedDB, region: TableRowPointerRegion) {
+    let secrets_needed = checked.projections.server_runtime.region_secrets_from_yml(region);
+
+    if secrets_needed.len() > 0 {
+        let mut secret_loading_script = String::new();
+
+        for secret in secrets_needed.keys() {
+            let env_variable = format!("CUSTOM_SECRET_{}", checked.db.custom_secret().c_key(*secret).to_uppercase());
+            let secret_yml_key = format!("custom_{}", checked.db.custom_secret().c_key(*secret));
+
+            // TODO: how to do escapes for special characters
+            writeln!(
+                &mut secret_loading_script,
+                "
+printf \"export {env_variable}=%q; \" \"$( $EPL_EXECUTABLE get-secret --output-directory .. --key {secret_yml_key} | base64 -w 0 )\""
+            ).unwrap();
+        }
+
+        prov_dir.create_executable_file("load-secrets.sh", secret_loading_script);
+    }
 }
 
 pub fn generate_ssh_root_key_secrets(secrets: &mut SecretsStorage) -> SshKeysSecrets {

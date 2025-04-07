@@ -372,7 +372,7 @@ fn check_backend_inserter_existence(enr: &EnrichedChDbData, db: &Database, db_pt
                                 })
                             }
                             for (cname, ctype) in &columns.fields {
-                                if ctype.insertion_allowed && !is_supported_inserter_type(&ctype.col_type.as_str()) {
+                                if ctype.insertion_allowed && !is_supported_inserter_type(&ctype.col_type) {
                                     return Err(PlatformValidationError::ApplicationChShardInserterTableTypeNotSupported {
                                         application: db.backend_application().c_application_name(app).clone(),
                                         inserter_table: ins.clone(),
@@ -2412,7 +2412,8 @@ pub async fn get_ch_schema(migration_sql: &str, client: &clickhouse::Client) -> 
         let insertion_allowed = !is_view && (def_kind == "" || def_kind == "DEFAULT" || def_kind == "EPHEMERAL");
         let is_def_expr_empty = def_expr.is_empty() || def_expr.starts_with("defaultValueOfTypeName(");
         let col = ClickhouseSchemaColumn {
-            col_type: ctype.clone(),
+            orig_type: ctype.clone(),
+            col_type: remove_ch_type_wrap(&ctype).to_string(),
             has_default: (def_kind == "DEFAULT" || def_kind == "EPHEMERAL") && !is_def_expr_empty,
             insertion_allowed,
         };
@@ -2465,6 +2466,7 @@ pub fn ch_schemas_in_region(db: &Database) -> Projection<TableRowPointerRegion, 
 }
 
 pub struct ClickhouseSchemaColumn {
+    pub orig_type: String,
     pub col_type: String,
     pub has_default: bool,
     pub insertion_allowed: bool,

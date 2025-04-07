@@ -2,7 +2,7 @@
 use crate::static_analysis::PlatformValidationError;
 
 #[cfg(test)]
-use super::common;
+use super::super::common;
 
 #[test]
 fn test_dns_more_than_one_master() {

@@ -1,7 +1,7 @@
 use std::fmt::Write;
 use crate::{
     database::{Database, TableRowPointerRegion},
-    static_analysis::server_runtime::{NomadJob, NomadJobStage, ServerRuntime, ReplacementMacro, JobUpdateStrategy, NomadJobUpdateExplicitStrategy, NomadUpdateHealthCheckStrategy},
+    static_analysis::server_runtime::{NomadJob, NomadJobStage, ServerRuntime, ReplacementMacro, JobUpdateStrategy, NomadJobUpdateExplicitStrategy, NomadUpdateHealthCheckStrategy, QuoteMode},
 };
 
 pub fn schedule_nomad_jobs(
@@ -502,9 +502,18 @@ fn generate_single_nomad_job(database: &Database, job_data: &NomadJob) -> String
                         res += "\"\n";
                     }
                 }
-                res += "        data = <<EOL\n";
-                res += sc.contents();
-                res += "EOL\n";
+                match sc.quote_mode() {
+                    QuoteMode::EOL => {
+                        res += "        data = <<EOL\n";
+                        res += sc.contents();
+                        res += "EOL\n";
+                    }
+                    QuoteMode::Inline => {
+                        res += "        data = \"";
+                        res += &sc.contents().replace("\"", "\\\"");
+                        res += "\"\n";
+                    }
+                }
                 res += "      }\n";
             }
 

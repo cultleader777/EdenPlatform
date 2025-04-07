@@ -55,6 +55,7 @@ in
     system.stateVersion = "23.11";
 
     environment.sessionVariables = {
+      HISTCONTROL = "ignoreboth";
       NOMAD_ADDR = "https://nomad-servers.service.consul:4646";
       VAULT_ADDR = "https://vault.service.consul:8200";
     };
@@ -124,6 +125,11 @@ Ytpm8Qlf0liWTW3yOqJx/IESsgAakE+m
 
                 cat > /tmp/epl-acme-vault-policy.hcl<<EOL
                 path "epl/data/certs/*" {
+                    capabilities = ["read", "list", "create", "patch", "update", "delete"]
+                }
+
+                # allow updating external load balancer as well
+                path "epl/data/ext-lb" {
                     capabilities = ["read", "list", "create", "patch", "update", "delete"]
                 }
 
@@ -371,8 +377,6 @@ rm -f /run/keys/consul-vrrp-token-dc1.txt
             EOL
 
             nomad acl policy apply -description "Anonymous policy" anonymous /tmp/epl-nomad-anonymous-policy.hcl
-
-            nomad namespace apply -description "Eden platform" epl
 
         '';
         epl-nomad-consul-acl-bootstrap = pkgs.writeShellScriptBin "epl-nomad-consul-acl-bootstrap" ''
@@ -741,7 +745,7 @@ exec ${pkgs.consul}/bin/consul watch -type=key -key=epl-interdc-routes/dc1/10.17
 
        enable = true;
      };
-
+# NIX REGION custom_hardware START
     imports = [ "${modulesPath}/virtualisation/amazon-image.nix" ];
 
 
@@ -776,7 +780,7 @@ exec ${pkgs.consul}/bin/consul watch -type=key -key=epl-interdc-routes/dc1/10.17
 
 
     networking.usePredictableInterfaceNames = false;
-
+# NIX REGION custom_hardware END
     users.users.named.extraGroups = ["keys"];
     services.bind =
     {

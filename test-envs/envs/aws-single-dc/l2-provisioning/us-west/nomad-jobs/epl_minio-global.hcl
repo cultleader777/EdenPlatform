@@ -80,157 +80,6 @@ job "minio-global" {
       }
     }
 
-    task "epl-minio-global-1-daemon" {
-      driver = "docker"
-      resources {
-        memory = 1024
-        memory_max = 1152
-      }
-      env {
-        MINIO_PROMETHEUS_AUTH_TYPE = "public"
-        MINIO_ROOT_USER = "minio"
-      }
-      config {
-        image = "minio/minio@sha256:5db7e40b69f0c3ad5a878521ff5029468e3070ef146c084dc2540e2d492075c4"
-        network_mode = "host"
-        args = [
-          "server",
-          "--address=${meta.private_ip}:9000",
-          "--console-address=${meta.private_ip}:9001",
-          "http://10.17.0.10:9000/var/lib/minio",
-          "http://10.17.0.11:9000/var/lib/minio",
-          "http://10.17.0.12:9000/var/lib/minio",
-          "http://10.17.0.13:9000/var/lib/minio",
-        ]
-        labels {
-          epl_loki_cluster = "main"
-        }
-      }
-
-      volume_mount {
-        volume = "v_1"
-        destination = "/var/lib/minio"
-      }
-
-      template {
-        destination = "secrets/admin_password"
-        perms = "644"
-        env = true
-        data = <<EOL
-MINIO_ROOT_PASSWORD={{ with secret "epl/data/minio/global" }}{{ .Data.data.admin_password }}{{ end }}
-EOL
-      }
-    }
-
-    task "epl-minio-global-1-lb" {
-      driver = "docker"
-      resources {
-        memory = 64
-        memory_max = 192
-      }
-      config {
-        image = "nginx@sha256:b8f2383a95879e1ae064940d9a200f67a6c79e710ed82ac42263397367e7cc4e"
-        network_mode = "host"
-        entrypoint = [
-          "/usr/sbin/nginx",
-          "-g",
-          "daemon off;",
-          "-c",
-          "/secrets/nginx.conf",
-        ]
-        labels {
-          epl_loki_cluster = "main"
-        }
-      }
-
-      template {
-        destination = "secrets/nginx.conf"
-        perms = "644"
-        data = <<EOL
-
-pcre_jit on;
-
-worker_processes auto;
-worker_rlimit_nofile 12288;
-
-events {
-    worker_connections  1024;
-}
-
-http {
-    include       /etc/nginx/mime.types;
-    default_type  application/octet-stream;
-
-    # Log in JSON Format
-    log_format nginxlog_json escape=json '{ "@timestamp": "$time_iso8601", '
-         '"remote_addr": "$remote_addr", '
-         '"body_bytes_sent": $body_bytes_sent, '
-         '"request_time": $request_time, '
-         '"response_status": $status, '
-         '"request": "$request", '
-         '"request_method": "$request_method", '
-         '"host": "$host",'
-         '"upstream_addr": "$upstream_addr",'
-         '"http_x_forwarded_for": "$http_x_forwarded_for",'
-         '"http_referrer": "$http_referer", '
-         '"http_user_agent": "$http_user_agent", '
-         '"http_version": "$server_protocol", '
-         '"server_port": "$server_port"}';
-    access_log /dev/stdout nginxlog_json;
-
-    sendfile        on;
-
-    keepalive_timeout  65;
-
-    include /secrets/site.conf;
-}
-EOL
-      }
-
-      template {
-        destination = "secrets/site.conf"
-        perms = "644"
-        data = <<EOL
-
-upstream minio {
-    least_conn;
-    server 10.17.0.10:9000;
-    server 10.17.0.11:9000;
-    server 10.17.0.12:9000;
-    server 10.17.0.13:9000;
-
-}
-
-server {
-    listen 10.17.0.10:9002;
-
-    ignore_invalid_headers off;
-    # Allow any size file to be uploaded.
-    # Set to a value such as 1000m; to restrict file size to a specific value
-    client_max_body_size 0;
-    # To disable buffering
-    proxy_buffering off;
-
-
-    location / {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header Host $http_host;
-
-        proxy_connect_timeout 300;
-        # Default is HTTP/1, keepalive is only enabled in HTTP/1.1
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        chunked_transfer_encoding off;
-
-        proxy_pass http://minio/;
-    }
-}
-EOL
-      }
-    }
-
     task "epl-minio-global-1-provision-buckets" {
       driver = "docker"
       resources {
@@ -489,6 +338,157 @@ mc admin policy set thisminio rw-tempo user=tempo_r1_tempo
 EOL
       }
     }
+
+    task "minio-global-daemon" {
+      driver = "docker"
+      resources {
+        memory = 1024
+        memory_max = 1152
+      }
+      env {
+        MINIO_PROMETHEUS_AUTH_TYPE = "public"
+        MINIO_ROOT_USER = "minio"
+      }
+      config {
+        image = "minio/minio@sha256:5db7e40b69f0c3ad5a878521ff5029468e3070ef146c084dc2540e2d492075c4"
+        network_mode = "host"
+        args = [
+          "server",
+          "--address=${meta.private_ip}:9000",
+          "--console-address=${meta.private_ip}:9001",
+          "http://10.17.0.10:9000/var/lib/minio",
+          "http://10.17.0.11:9000/var/lib/minio",
+          "http://10.17.0.12:9000/var/lib/minio",
+          "http://10.17.0.13:9000/var/lib/minio",
+        ]
+        labels {
+          epl_loki_cluster = "main"
+        }
+      }
+
+      volume_mount {
+        volume = "v_1"
+        destination = "/var/lib/minio"
+      }
+
+      template {
+        destination = "secrets/admin_password"
+        perms = "644"
+        env = true
+        data = <<EOL
+MINIO_ROOT_PASSWORD={{ with secret "epl/data/minio/global" }}{{ .Data.data.admin_password }}{{ end }}
+EOL
+      }
+    }
+
+    task "minio-global-lb" {
+      driver = "docker"
+      resources {
+        memory = 64
+        memory_max = 192
+      }
+      config {
+        image = "nginx@sha256:b8f2383a95879e1ae064940d9a200f67a6c79e710ed82ac42263397367e7cc4e"
+        network_mode = "host"
+        entrypoint = [
+          "/usr/sbin/nginx",
+          "-g",
+          "daemon off;",
+          "-c",
+          "/secrets/nginx.conf",
+        ]
+        labels {
+          epl_loki_cluster = "main"
+        }
+      }
+
+      template {
+        destination = "secrets/nginx.conf"
+        perms = "644"
+        data = <<EOL
+
+pcre_jit on;
+
+worker_processes auto;
+worker_rlimit_nofile 12288;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    # Log in JSON Format
+    log_format nginxlog_json escape=json '{ "@timestamp": "$time_iso8601", '
+         '"remote_addr": "$remote_addr", '
+         '"body_bytes_sent": $body_bytes_sent, '
+         '"request_time": $request_time, '
+         '"response_status": $status, '
+         '"request": "$request", '
+         '"request_method": "$request_method", '
+         '"host": "$host",'
+         '"upstream_addr": "$upstream_addr",'
+         '"http_x_forwarded_for": "$http_x_forwarded_for",'
+         '"http_referrer": "$http_referer", '
+         '"http_user_agent": "$http_user_agent", '
+         '"http_version": "$server_protocol", '
+         '"server_port": "$server_port"}';
+    access_log /dev/stdout nginxlog_json;
+
+    sendfile        on;
+
+    keepalive_timeout  65;
+
+    include /secrets/site.conf;
+}
+EOL
+      }
+
+      template {
+        destination = "secrets/site.conf"
+        perms = "644"
+        data = <<EOL
+
+upstream minio {
+    least_conn;
+    server 10.17.0.10:9000;
+    server 10.17.0.11:9000;
+    server 10.17.0.12:9000;
+    server 10.17.0.13:9000;
+
+}
+
+server {
+    listen 10.17.0.10:9002;
+
+    ignore_invalid_headers off;
+    # Allow any size file to be uploaded.
+    # Set to a value such as 1000m; to restrict file size to a specific value
+    client_max_body_size 0;
+    # To disable buffering
+    proxy_buffering off;
+
+
+    location / {
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+
+        proxy_connect_timeout 300;
+        # Default is HTTP/1, keepalive is only enabled in HTTP/1.1
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        chunked_transfer_encoding off;
+
+        proxy_pass http://minio/;
+    }
+}
+EOL
+      }
+    }
   }
 
   group "epl-minio-global-2" {
@@ -554,7 +554,7 @@ EOL
       }
     }
 
-    task "epl-minio-global-2-daemon" {
+    task "minio-global-daemon" {
       driver = "docker"
       resources {
         memory = 1024
@@ -596,7 +596,7 @@ EOL
       }
     }
 
-    task "epl-minio-global-2-lb" {
+    task "minio-global-lb" {
       driver = "docker"
       resources {
         memory = 64
@@ -769,7 +769,7 @@ EOL
       }
     }
 
-    task "epl-minio-global-3-daemon" {
+    task "minio-global-daemon" {
       driver = "docker"
       resources {
         memory = 1024
@@ -811,7 +811,7 @@ EOL
       }
     }
 
-    task "epl-minio-global-3-lb" {
+    task "minio-global-lb" {
       driver = "docker"
       resources {
         memory = 64
@@ -984,7 +984,7 @@ EOL
       }
     }
 
-    task "epl-minio-global-4-daemon" {
+    task "minio-global-daemon" {
       driver = "docker"
       resources {
         memory = 1024
@@ -1026,7 +1026,7 @@ EOL
       }
     }
 
-    task "epl-minio-global-4-lb" {
+    task "minio-global-lb" {
       driver = "docker"
       resources {
         memory = 64

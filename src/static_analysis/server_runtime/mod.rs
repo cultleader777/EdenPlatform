@@ -6,7 +6,7 @@ use regex::Regex;
 use crate::{database::{
     Database, TableRowPointerPgDeploymentSchemas, TableRowPointerPgDeploymentUnmanagedDb,
     TableRowPointerMinioBucket, TableRowPointerMonitoringCluster, TableRowPointerServer,
-    TableRowPointerServerVolume, TableRowPointerTld, TableRowPointerRegion, TableRowPointerLokiCluster, TableRowPointerServerKind, TableRowPointerDockerImage, TableRowPointerChDeploymentSchemas, TableRowPointerNomadNamespace,
+    TableRowPointerServerVolume, TableRowPointerTld, TableRowPointerRegion, TableRowPointerLokiCluster, TableRowPointerServerKind, TableRowPointerDockerImage, TableRowPointerChDeploymentSchemas, TableRowPointerNomadNamespace, TableRowPointerCustomSecret,
 }, codegen::{l1_provisioning::{consul::consul_tests, nomad::nomad_tests, vault::vault_tests}, CodegenSecrets}, static_analysis::get_global_settings};
 
 use super::{
@@ -21,7 +21,13 @@ pub struct VaultSecrets {
 }
 
 #[derive(Default)]
+pub struct CustomSecretUsageTypes {
+    pub used_in_env: bool,
+}
+
+#[derive(Default)]
 struct RegionRuntime {
+    secrets_from_yml: BTreeMap<TableRowPointerCustomSecret, CustomSecretUsageTypes>,
     vault_secrets: BTreeMap<String, VaultSecrets>,
     consul_services: BTreeMap<String, ConsulServiceState>,
     consul_kv_entries: BTreeMap<String, ConsulKvEntry>,
@@ -414,6 +420,9 @@ impl VaultSecretHandle {
         let key = &self.vault_secret_key;
         let left = &self.left;
         let right = &self.right;
+        //format!(
+        //    r#"{left}{{{{ with secret "{engine}/data/{name}" }}}}{{{{ .Data.data.{key} | toJSON }}}}{{{{ end }}}}{right}"#
+        //)
         format!(
             r#"{left}{{{{ with secret "{engine}/data/{name}" }}}}{{{{ .Data.data.{key} }}}}{{{{ end }}}}{right}"#
         )
@@ -729,6 +738,9 @@ pub enum VaultSecretRequest {
         handle: Box<VaultSecretHandle>,
         sprintf: Option<String>,
     },
+    SecretsYmlEntry {
+        key_name: String,
+    },
 }
 
 impl ServerRuntime {
@@ -754,6 +766,17 @@ impl ServerRuntime {
             server_kinds: l1proj.server_kinds.clone(),
             admin_dns_ingress_services: Default::default(),
         }
+    }
+
+    pub fn declare_region_custom_secret_needed_as_env(&mut self, region: TableRowPointerRegion, secret: TableRowPointerCustomSecret) {
+        let region_runtime = self.region_runtime.get_mut(&region).expect("Must have been initialized");
+        let e = region_runtime.secrets_from_yml.entry(secret).or_default();
+        e.used_in_env = true;
+    }
+
+    pub fn declare_region_custom_secret_needed_as_file(&mut self, region: TableRowPointerRegion, secret: TableRowPointerCustomSecret) {
+        let region_runtime = self.region_runtime.get_mut(&region).expect("Must have been initialized");
+        let _ = region_runtime.secrets_from_yml.entry(secret).or_default();
     }
 
     pub fn add_integration_test(&mut self, name: String, test: IntegrationTest) {
@@ -1039,6 +1062,10 @@ impl ServerRuntime {
 
     pub fn frontend_lb_routes(&self, region: TableRowPointerRegion) -> &BTreeMap<TableRowPointerTld, ExternalLbSubdomainRoutes> {
         &self.region_runtime.get(&region).unwrap().routes
+    }
+
+    pub fn region_secrets_from_yml(&self, region: TableRowPointerRegion) -> &BTreeMap<TableRowPointerCustomSecret, CustomSecretUsageTypes> {
+        &self.region_runtime.get(&region).unwrap().secrets_from_yml
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -2372,11 +2399,17 @@ pub enum TaskFileChangeMode {
     ReloadSignal { signal: ChangeSignal },
 }
 
+pub enum QuoteMode {
+    EOL,
+    Inline,
+}
+
 pub struct SecureNomadConfig {
     perms: String,
     contents: String,
     eval_as_env: bool,
     file_change_mode: TaskFileChangeMode,
+    quote_mode: QuoteMode,
 }
 
 pub struct ConsulNomadConfig {
@@ -3000,6 +3033,28 @@ impl NomadTask {
         abs_path
     }
 
+    pub fn add_vault_handle_as_file(&mut self, fname: String, handle: &VaultSecretHandle) -> String {
+        let abs_path = format!("/secrets/{fname}");
+        assert!(
+            // Allow everyone to access logs inside container, user may not be root
+            self.secure_configs
+                .insert(
+                    fname,
+                    SecureNomadConfig {
+                        perms: "644".to_string(),
+                        contents: handle.template_expression(),
+                        eval_as_env: false,
+                        file_change_mode: TaskFileChangeMode::RestartTask,
+                        quote_mode: QuoteMode::Inline,
+                    }
+                )
+                .is_none(),
+            "duplicate secure config detected"
+        );
+
+        abs_path
+    }
+
     /// Returns absolute path
     pub fn add_secure_config(&mut self, fname: String, contents: String) -> String {
         let abs_path = format!("/secrets/{fname}");
@@ -3018,6 +3073,7 @@ impl NomadTask {
                         contents,
                         eval_as_env: false,
                         file_change_mode: TaskFileChangeMode::RestartTask,
+                        quote_mode: QuoteMode::EOL,
                     }
                 )
                 .is_none(),
@@ -3042,6 +3098,7 @@ impl NomadTask {
                         contents,
                         eval_as_env: false,
                         file_change_mode: TaskFileChangeMode::ReloadSignal { signal: change_signal },
+                        quote_mode: QuoteMode::EOL,
                     }
                 )
                 .is_none(),
@@ -3098,6 +3155,7 @@ impl NomadTask {
                         contents,
                         eval_as_env: true,
                         file_change_mode: TaskFileChangeMode::RestartTask,
+                        quote_mode: QuoteMode::EOL,
                     }
                 )
                 .is_none(),
@@ -3330,6 +3388,10 @@ impl SecureNomadConfig {
     pub fn file_change_mode(&self) -> &TaskFileChangeMode {
         &self.file_change_mode
     }
+
+    pub fn quote_mode(&self) -> &QuoteMode {
+        &self.quote_mode
+    }
 }
 
 impl ConsulNomadConfig {
@@ -3384,7 +3446,7 @@ impl ValidSubdomain {
             pub static ref SUBDOMAIN_REGEX: Regex = Regex::new(r#"^[a-z0-9-]+$"#).unwrap();
         }
 
-        if !SUBDOMAIN_REGEX.is_match(input) {
+        if !input.is_empty() && !SUBDOMAIN_REGEX.is_match(input) {
             return Err(PlatformValidationError::InvalidSubdomainValue {
                 subdomain: input.to_string(),
             });

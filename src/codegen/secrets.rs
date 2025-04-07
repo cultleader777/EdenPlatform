@@ -338,7 +338,7 @@ impl SecretsStorage {
         }
     }
 
-    pub fn get_secret(&mut self, key: &String) -> Option<SecretValue> {
+    pub fn get_secret(&self, key: &String) -> Option<SecretValue> {
         self.map.get(key).map(|i| SecretValue {
             contents: i.contents.clone(),
         })
@@ -637,6 +637,50 @@ impl SecretsStorage {
     }
 }
 
+pub fn check_secrets_are_defined(checked: &crate::static_analysis::CheckedDB, storage: &SecretsStorage) -> Result<(), PlatformValidationError> {
+    let db = &checked.db;
+    for cs in db.custom_secret().rows_iter() {
+        let key = db.custom_secret().c_key(cs);
+        let key_wprefix = format!("custom_{key}");
+        let prefix = if db.custom_secret().c_is_file(cs) { "file" } else { "value" };
+        let prefix_uppercase = prefix.to_uppercase();
+        if !storage.contains_secret(&key_wprefix) {
+            return Err(
+                PlatformValidationError::CustomSecretIsUndefined {
+                    secret_key: key.to_string(),
+                    filename: "secrets.yml".to_string(),
+                    suggestion: format!("Please define secret with \"make define-secret_{prefix}_{key} SECRET_{prefix_uppercase}=xxxxxxx\""),
+                }
+            );
+        }
+    }
+
+    let secret_check_regex = regex::Regex::new(r"^[ -~]+$").unwrap();
+    for region in db.region().rows_iter() {
+        let secrets = checked.projections.server_runtime.region_secrets_from_yml(region);
+        for (sec, usages) in secrets {
+            if !usages.used_in_env {
+                continue;
+            }
+
+            let key = db.custom_secret().c_key(*sec);
+            let key_wprefix = format!("custom_{key}");
+            let the_secret = storage.get_secret(&key_wprefix).expect("We checked secrets exist already");
+            if !secret_check_regex.is_match(&the_secret.value()) {
+                return Err(
+                    PlatformValidationError::CustomSecretUsedInEnvironmentButHasSpecialCharacters {
+                        secret_key: key.to_string(),
+                        regex_check: secret_check_regex.to_string(),
+                        suggestion: "Secret doesn't pass regex check and cannot be used as an environment variable. Use it as file instead.".to_string(),
+                    }
+                );
+            }
+        }
+    }
+
+    Ok(())
+}
+
 #[cfg(test)]
 pub fn tls_cert_expiration_days(_sec_val: &SecretValue) -> u64 {
     // always valid for tests
@@ -649,8 +693,8 @@ pub fn tls_cert_expiration_days(sec_val: &SecretValue) -> u64 {
     let other_parsed = parsed.parse_x509().expect("Couldn't parse x509 cert");
     let seconds = other_parsed.validity()
                               .time_to_expiration()
-                              .expect("Can't get certificate TTL")
-                              .as_secs();
+                              .map(|i| i.as_secs())
+                              .unwrap_or(0);
     return seconds / (60 * 60 * 24);
 }
 

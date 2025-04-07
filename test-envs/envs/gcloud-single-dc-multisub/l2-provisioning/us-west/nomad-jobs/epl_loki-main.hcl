@@ -76,6 +76,7 @@ job "loki-main" {
           "-server.grpc-listen-port=3015",
           "-server.grpc-listen-address=${meta.private_ip}",
           "-legacy-read-mode=false",
+          "-memberlist.advertise-addr=${meta.private_ip}",
         ]
         labels {
           epl_loki_cluster = "main"
@@ -96,6 +97,7 @@ limits_config:
 common:
   replication_factor: 1
   ring:
+    instance_addr: {{ env "meta.private_ip" }}
     kvstore:
       store: consul
       prefix: nomad-loki/epl-loki-main-loki/
@@ -200,6 +202,7 @@ EOL
           "-ring.prefix=nomad-loki/epl-loki-main-loki/",
           "-legacy-read-mode=false",
           "-common.compactor-grpc-address=epl-loki-main-loki-backend.service.consul:3015",
+          "-memberlist.advertise-addr=${meta.private_ip}",
         ]
         labels {
           epl_loki_cluster = "main"
@@ -220,6 +223,7 @@ limits_config:
 common:
   replication_factor: 1
   ring:
+    instance_addr: {{ env "meta.private_ip" }}
     kvstore:
       store: consul
       prefix: nomad-loki/epl-loki-main-loki/
@@ -325,6 +329,7 @@ EOL
           "-ring.prefix=nomad-loki/epl-loki-main-loki/",
           "-legacy-read-mode=false",
           "-common.compactor-grpc-address=epl-loki-main-loki-backend.service.consul:3015",
+          "-memberlist.advertise-addr=${meta.private_ip}",
         ]
         labels {
           epl_loki_cluster = "main"
@@ -345,6 +350,7 @@ limits_config:
 common:
   replication_factor: 1
   ring:
+    instance_addr: {{ env "meta.private_ip" }}
     kvstore:
       store: consul
       prefix: nomad-loki/epl-loki-main-loki/

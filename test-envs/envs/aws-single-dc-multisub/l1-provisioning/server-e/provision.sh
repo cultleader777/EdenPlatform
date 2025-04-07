@@ -844,16 +844,16 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-client.crt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIIByDCCAW6gAwIBAgIUYbZ+8EQXnYa8c4lVfHRxKfjsMQgwCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjQwMTAyMDk0MjAwWhcNMjUwMTAxMDk0MjAw
-WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEeJxtEMp+7EcLhsOazM+S53BF
-b0qGj4tkmZqE0GUTygUEehSdYu94VJ7E8SAetmDuCR49pFqpcyG5Xi4+YZfIbKOB
+MIIBxzCCAW6gAwIBAgIUAd/STvXwak7SEljlKu6/tEAo8hAwCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjUwNDA3MTQ0MTAwWhcNMjYwNDA3MTQ0MTAw
+WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEbVfBaFhFUWXTu1ihs/bJiE5Z
+KAy6DK1NXP4fiWlKlNGJ7CT9eWaIZF5YvbLI6xSxj+5YMJXs38YQ7cmb5ONVIaOB
 tTCBsjAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUF
-BwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFAav5XWbUaaOoect9is4i0bmdM/7
+BwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFOC8eBx2nc/9KoT/4lYhzC+VY8pa
 MB8GA1UdIwQYMBaAFGHfFzU0Gqrdm5hEfuplV4scSHd6MDMGA1UdEQEB/wQpMCeC
 FGNsaWVudC51cy13ZXN0Lm5vbWFkgglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0E
-AwIDSAAwRQIgJ+bJU3e/pKXz8HhipmXOH+B/TKUxSVFnLtZxj8RhBgsCIQCM+SB2
-ggRdQriN3hUkabam3iwE/u8JS/FzvKjMcUWVSA==
+AwIDRwAwRAIgfzSvUYPIMYfcYO0foQgixj28ql+ojA+iuOuCU75/wVECIEgFtQhb
+cT+EJc22tGMHAzpameKIqCnVfgfIbToH8ypj
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -870,9 +870,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-client.key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIICpcy9CuROhrkFesSxTu7y5aNrNAHAc/j4mcQanjgqhoAoGCCqGSM49
-AwEHoUQDQgAEeJxtEMp+7EcLhsOazM+S53BFb0qGj4tkmZqE0GUTygUEehSdYu94
-VJ7E8SAetmDuCR49pFqpcyG5Xi4+YZfIbA==
+MHcCAQEEIHxvgjYbo5E+qO/KxHewSgaGw/g4fpn3sxSVx/CedhMdoAoGCCqGSM49
+AwEHoUQDQgAEbVfBaFhFUWXTu1ihs/bJiE5ZKAy6DK1NXP4fiWlKlNGJ7CT9eWaI
+ZF5YvbLI6xSxj+5YMJXs38YQ7cmb5ONVIQ==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -1603,7 +1603,7 @@ exec ${pkgs.consul}/bin/consul watch -type=key -key=epl-interdc-routes/dc1/10.17
 
        enable = true;
      };
-
+# NIX REGION custom_hardware START
     imports = [ "${modulesPath}/virtualisation/amazon-image.nix" ];
 
 
@@ -1638,7 +1638,7 @@ exec ${pkgs.consul}/bin/consul watch -type=key -key=epl-interdc-routes/dc1/10.17
 
 
     networking.usePredictableInterfaceNames = false;
-
+# NIX REGION custom_hardware END
     users.users.named.extraGroups = ["keys"];
     services.bind =
     {
@@ -2120,7 +2120,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"f5c90f609f536798f995cab55f00d4c2026f6f92c7059cf15b55b98c22ba54a0\",hostname=\"server-e\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"50a6853e62de5eacd2ede1dd5a90091f205aac0f80cecf0e8f0013d23486170b\",hostname=\"server-e\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE

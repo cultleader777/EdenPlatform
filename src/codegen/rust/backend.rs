@@ -1512,7 +1512,8 @@ fn generate_chq_block(
     for qa in &checked_query.full_query.args {
         let arg_name = &qa.name;
         if qa.the_type == clickhouse::ValidDbType::String {
-            write!(res, r#"                ("param_{arg_name}", {arg_name}),
+            // TODO: string formatting is nasty, maybe we can get rid of &{}.to_string()
+            write!(res, r#"                ("param_{arg_name}", &{arg_name}.to_string()),
 "#).unwrap();
         } else if qa.the_type == clickhouse::ValidDbType::DateTime {
             write!(res, r#"                ("param_{arg_name}", &{arg_name}.format("%Y-%m-%d %H:%M:%S")),

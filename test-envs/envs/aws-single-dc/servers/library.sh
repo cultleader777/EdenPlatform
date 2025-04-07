@@ -115,12 +115,40 @@ function maybe_unseal_vault() {
   FQDN=$2      # example: https://server-b.us-west.epl-infra.net:8200
   REGION=$3    # example: us-west
   EPL_EXECUTABLE=$4
+  METRICS_CLUSTER=$5 # skip unseal if metrics db tells us vault is now unsealed
+
+  if [ -n "$METRICS_CLUSTER" ]
+  then
+    METRICS_RESULTS=$( echo "
+      SELECT value
+      FROM metrics
+      WHERE metric_name = 'vault_sealed_clusters'
+      AND cluster = '$METRICS_CLUSTER'
+    " | sqlite3 ../prometheus/scraped_metrics.sqlite )
+
+    if [ -n "$METRICS_RESULTS" ]
+    then
+      IS_SEALED=$( echo "$METRICS_RESULTS" | jq '.data.result | length' )
+      if [ "$IS_SEALED" == "0" ]
+      then
+        # vault isn't sealed, return
+        return 0
+      else
+        echo "Some vault instances in $REGION are sealed, unsealing"
+      fi
+    else
+      echo "------------------------------------ WARNING ------------------------------------"
+      echo "vault_sealed_clusters metric is undefined in monitoring_cluster_scraped_metric for cluster $METRICS_CLUSTER"
+      echo "!!!!!!! AUTOMATIC CI VAULT UNSEALING WILL NOT WORK FOR REGION $REGION !!!!!!!"
+    fi
+  fi
+
   VAULT_BOOTSTRAP_KEYS=$( $EPL_EXECUTABLE get-secret --output-directory .. --key vault_region_${REGION}_initial_keys | base64 -w 0 )
   ssh admin@$SERVER -i aux/root_ssh_key \
       -o UserKnownHostsFile=/dev/null \
       -o StrictHostKeyChecking=false \
       -o ConnectTimeout=2 \
-      " epl-vault-operator-unseal $FQDN $VAULT_BOOTSTRAP_KEYS"
+      " consul members && epl-vault-operator-unseal $FQDN $VAULT_BOOTSTRAP_KEYS || echo 'Before unsealing vault perform L1 provisioning first on node $FQDN'"
 }
 
 function get_vault_root_token() {
@@ -254,12 +282,19 @@ function ensure_server_ready() {
 }
 
 function aws_bootstrap_private_node_internet() {
-  PRIVATE_IP=$1
-  NEW_GW_IP=$2
-  PUBLIC_IP_TO_PING=$3
-  DC_NETWORK=$4
-  DC_GW=$5
-  ENABLE_IP_FORWARD=$6
+  TARGET_HOSTNAME=$1
+  PRIVATE_IP=$2
+  NEW_GW_IP=$3
+  PUBLIC_IP_TO_PING=$4
+  DC_NETWORK=$5
+  DC_GW=$6
+  ENABLE_IP_FORWARD=$7
+
+  if [ -f ../markers/l1-bootstrapped/$TARGET_HOSTNAME ];
+  then
+    # node already bootstrapped
+    return 0
+  fi
 
   FWD_CMD=""
   if [ -n "$ENABLE_IP_FORWARD" ];
@@ -270,7 +305,7 @@ function aws_bootstrap_private_node_internet() {
   if ! ssh admin@$PRIVATE_IP -i aux/root_ssh_key \
             -o UserKnownHostsFile=/dev/null \
             -o StrictHostKeyChecking=false \
-            -o ConnectTimeout=2 "ping -W 1 -c 1 $PUBLIC_IP_TO_PING" &>/dev/null
+            -o ConnectTimeout=2 "ping -W 3 -c 1 $PUBLIC_IP_TO_PING" &>/dev/null
   then
     echo "Can't ping public ip addrsss $PUBLIC_IP_TO_PING, manually adjusting routes for an hour"
     ssh admin@$PRIVATE_IP -n -f -i aux/root_ssh_key \
@@ -298,7 +333,7 @@ function wait_until_ping_succeeds() {
   while ! ssh admin@$SSH_IP -i aux/root_ssh_key \
             -o UserKnownHostsFile=/dev/null \
             -o StrictHostKeyChecking=false \
-            -o ConnectTimeout=2 "ping -W 1 -c 1 $PINGEE_IP" &>/dev/null
+            -o ConnectTimeout=2 "ping -W 3 -c 1 $PINGEE_IP" &>/dev/null
   do
     sleep 1
   done
@@ -310,6 +345,7 @@ function wait_l1_provisioning_finished() {
   PROVISIONING_ID=$1
   SERVER_IP=$2
   SERVER_HOST=$3
+  SERVER_REGION=$4
 
   SQL_QUERY="select exit_code, is_finished from l1_provisionings where provisioning_id=$PROVISIONING_ID"
 
@@ -351,8 +387,8 @@ function wait_l1_provisioning_finished() {
       fi
       echo L1 provisioning $PROVISIONING_ID successful for $SERVER_HOST $SERVER_IP
       echo "
-        INSERT OR IGNORE INTO bootstrapped_servers(hostname)
-        VALUES('$SERVER_HOST')
+        INSERT OR IGNORE INTO bootstrapped_servers(hostname, region)
+        VALUES('$SERVER_HOST', '$SERVER_REGION')
       " | sqlite3 ../infra-state.sqlite || true
       exit $EXIT_CODE
     fi
@@ -394,12 +430,108 @@ function fast_l1_provisioning_for_region() {
 function init_infra_state_db() {
     echo '
         CREATE TABLE IF NOT EXISTS servers(
+          hostname TEXT PRIMARY KEY,
+          region TEXT,
+          expected_l1_hash TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS current_server_state(
+          hostname TEXT PRIMARY KEY,
+          hash TEXT,
+          last_boot_time INT
+        );
+
+        -- if hashes dont match and server is ready it goes here
+        CREATE TABLE IF NOT EXISTS servers_for_fast_l1_provision(
+          hostname TEXT PRIMARY KEY,
+          region TEXT
+        );
+
+        -- if server is not inside fast_l1 and hash mismatches or server state unknown it goes here
+        CREATE TABLE IF NOT EXISTS servers_for_slow_l1_provision(
           hostname TEXT PRIMARY KEY
         );
 
         CREATE TABLE IF NOT EXISTS bootstrapped_servers(
-          hostname TEXT PRIMARY KEY
+          hostname TEXT PRIMARY KEY,
+          region TEXT
         );
+
+        CREATE INDEX IF NOT EXISTS bootstrapped_by_region ON bootstrapped_servers(region);
     ' | sqlite3 ../infra-state.sqlite
+}
+
+function refresh_l1_provisioning_state() {
+    # servers from metrics db that have at least 30 minute timestamp
+    # matching boot time with matching last hash with the expected hash
+    echo "
+        ATTACH DATABASE '../prometheus/scraped_metrics.sqlite' AS scraped_metrics;
+        DELETE FROM main.current_server_state;
+        DELETE FROM main.servers_for_fast_l1_provision;
+        DELETE FROM main.servers_for_slow_l1_provision;
+        WITH last_hash_metric AS (
+            SELECT json_extract(value,'$.data.result') AS extracted
+            FROM scraped_metrics.metrics
+            WHERE metric_name = 'epl_l1_provisioning_last_hash'
+            AND timestamp > DATETIME('now', '-30 minute')
+        ), extracted_lh AS (
+            SELECT
+            json_extract(json_each.value, '$.metric.hash') AS hash,
+            json_extract(json_each.value, '$.metric.hostname') AS hostname,
+            json_extract(json_each.value, '$.value[1]') AS last_boot_time
+            FROM last_hash_metric, json_each(last_hash_metric.extracted)
+        ), node_boot_time_metric AS (
+            SELECT json_extract(value,'$.data.result') AS extracted
+            FROM scraped_metrics.metrics
+            WHERE metric_name = 'node_boot_time_seconds'
+            AND timestamp > DATETIME('now', '-30 minute')
+        ), extracted_boot_time AS (
+            SELECT
+            REPLACE(json_extract(json_each.value, '$.metric.instance'), ':9100', '') AS hostname,
+            json_extract(json_each.value, '$.value[1]') AS last_boot_time
+            FROM node_boot_time_metric, json_each(node_boot_time_metric.extracted)
+        )
+        INSERT INTO current_server_state
+        SELECT hostname, hash, last_boot_time
+        FROM extracted_lh
+        NATURAL JOIN extracted_boot_time;
+
+        -- all servers whose boot id matches
+        -- with fast l1 boot id and whose metrics
+        -- we know from last 30 minutes
+        WITH dataset AS (
+            SELECT hostname, region
+            FROM main.current_server_state
+            NATURAL JOIN main.servers
+            WHERE NOT hash = expected_l1_hash
+        )
+        INSERT INTO main.servers_for_fast_l1_provision
+        SELECT hostname, region FROM dataset;
+
+        -- all servers in expected, except fast l1 servers
+        -- and where hash mismatches, meaning it is null or value mismatch
+        WITH dataset AS (
+          SELECT s.hostname
+          FROM servers s
+          LEFT JOIN current_server_state css
+          ON css.hostname = s.hostname
+          WHERE (css.hash IS NULL OR NOT s.expected_l1_hash = css.hash)
+          AND css.hostname NOT IN (
+            SELECT hostname FROM main.servers_for_fast_l1_provision
+          )
+        )
+        INSERT INTO main.servers_for_slow_l1_provision
+        SELECT hostname FROM dataset;
+    " | sqlite3 ../infra-state.sqlite
+
+    # delete markers for all regions
+    rm -rf ../markers/fast-l1-needed
+
+    # create markers for all regions
+    mkdir -p ../markers/fast-l1-needed
+    for REGION in $( echo "SELECT DISTINCT region FROM servers_for_fast_l1_provision" | sqlite3 ../infra-state.sqlite )
+    do
+       touch ../markers/fast-l1-needed/$REGION
+    done
 }
 

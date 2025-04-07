@@ -70,7 +70,7 @@ DATA docker_image_pin {
     'sha256:22caa5cdd21d227145acf3cca49db63898152ba470744e2b6962eed7c3469f9e';
   };
   tempo_default WITH docker_image_pin_images {
-    'sha256:50fec6c2cf621141218edee9e23e8860b6158088d18fac54cf0c29df7fdf29db';
+    'sha256:4443be217c396b065ee34845534199c36fdba4dc619cb96550e228d73fba6e69';
   };
   minio_default WITH docker_image_pin_images {
     'sha256:5db7e40b69f0c3ad5a878521ff5029468e3070ef146c084dc2540e2d492075c4';
@@ -168,9 +168,9 @@ DATA STRUCT docker_image [
   },
   {
     image_set: grafana_tempo,
-    checksum: 'sha256:50fec6c2cf621141218edee9e23e8860b6158088d18fac54cf0c29df7fdf29db',
+    checksum: 'sha256:4443be217c396b065ee34845534199c36fdba4dc619cb96550e228d73fba6e69',
     repository: 'grafana/tempo',
-    tag: 2.4.0,
+    tag: 2.7.1,
     architecture: x86_64,
   },
   {

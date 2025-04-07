@@ -246,7 +246,11 @@ pub fn ingress_static_analysis(
     for (tld, doms) in &dns_table {
         let hosts = final_dns_table.entry(*tld).or_default();
         for (dom, dc) in doms {
-            let fqdn = format!("{}.{}.", dom, db.tld().c_domain(*tld));
+            let mut subdomain = "".to_string();
+            if !dom.is_empty() {
+                subdomain = format!("{}.", dom);
+            }
+            let fqdn = format!("{}{}.", subdomain, db.tld().c_domain(*tld));
             let _ = hosts.insert(fqdn, region_ingresses.get(dc).unwrap().clone());
         }
     }

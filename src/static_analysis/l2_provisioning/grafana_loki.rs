@@ -200,6 +200,7 @@ pub fn deploy_loki(
                 loki_backend_consul_service.service_fqdn(),
                 loki_backend_grpc_port,
             ),
+            "-memberlist.advertise-addr=${meta.private_ip}".to_string(),
         ]);
 
         let reader_tg = loki_job.fetch_task_group(format!("reader"));
@@ -238,6 +239,7 @@ pub fn deploy_loki(
                 loki_backend_consul_service.service_fqdn(),
                 loki_backend_grpc_port,
             ),
+            "-memberlist.advertise-addr=${meta.private_ip}".to_string(),
         ]);
 
         let backend_tg = loki_job.fetch_task_group(format!("backend"));
@@ -269,6 +271,7 @@ pub fn deploy_loki(
             format!("-server.grpc-listen-port={loki_backend_grpc_port}"),
             "-server.grpc-listen-address=${meta.private_ip}".to_string(),
             "-legacy-read-mode=false".to_string(),
+            "-memberlist.advertise-addr=${meta.private_ip}".to_string(),
         ]);
 
         loki_tests(db, l1proj, runtime, loki_cluster);
@@ -408,6 +411,7 @@ limits_config:
 common:
   replication_factor: 1
   ring:
+    instance_addr: {{{{ env "meta.private_ip" }}}}
     kvstore:
       store: consul
       prefix: {kv_prefix}/

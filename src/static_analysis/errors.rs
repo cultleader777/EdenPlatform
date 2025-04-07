@@ -2804,6 +2804,113 @@ pub enum PlatformValidationError {
     DnsNoSlaveRegionSpecified {
         explanation: String,
     },
+    DnsForbiddenMiscTxtRecord {
+        record_type: String,
+        tld: String,
+        subdomain: String,
+        reserved_values: Vec<String>,
+    },
+    DnsInvalidMiscTxtRecordSubdomain {
+        tld: String,
+        subdomain: String,
+        failed_regex_check: String,
+    },
+    DnsMiscTxtRecordNoValues {
+        tld: String,
+        subdomain: String,
+        values_found: usize,
+        values_min: usize,
+    },
+    DnsMiscTxtRecordTooManyValues {
+        tld: String,
+        subdomain: String,
+        values_found: usize,
+        values_max: usize,
+    },
+    DnsMiscTxtRecordInvalidValue {
+        tld: String,
+        subdomain: String,
+        value: String,
+        failed_regex_check: String,
+    },
+    DnsInvalidMiscCnameRecordSubdomain {
+        tld: String,
+        subdomain: String,
+        failed_regex_check: String,
+    },
+    DnsForbiddenMiscCnameRecordSubdomain {
+        tld: String,
+        subdomain: String,
+        forbidden_value: String,
+    },
+    DnsMiscCnameRecordClashSubdomain {
+        tld: String,
+        subdomain: String,
+        previous_source: String,
+    },
+    DnsMiscCnameRecordReservedPrefix {
+        tld: String,
+        subdomain: String,
+        forbidden_prefix: String,
+    },
+    DnsMiscCnameRecordNoValues {
+        tld: String,
+        subdomain: String,
+        values_found: usize,
+        values_min: usize,
+    },
+    DnsMiscCnameRecordTooManyValues {
+        tld: String,
+        subdomain: String,
+        values_found: usize,
+        values_max: usize,
+    },
+    DnsMiscCnameRecordInvalidValue {
+        tld: String,
+        subdomain: String,
+        value: String,
+        failed_regex_check: String,
+    },
+    DnsMiscCnameRecordWithAtLeastTwoPeriodsMustBeFqdn {
+        tld: String,
+        subdomain: String,
+        value: String,
+        periods_found: usize,
+        value_expected_at_the_end: String,
+    },
+    DnsMiscMxRecordNoValues {
+        tld: String,
+        subdomain: String,
+        values_found: usize,
+        values_min: usize,
+    },
+    DnsMiscMxRecordTooManyValues {
+        tld: String,
+        subdomain: String,
+        values_found: usize,
+        values_max: usize,
+    },
+    DnsMiscMxRecordInvalidValue {
+        tld: String,
+        subdomain: String,
+        priority: i64,
+        value: String,
+        failed_regex_check: String,
+    },
+    DnsMiscMxRecordWithAtLeastTwoPeriodsMustBeFqdn {
+        tld: String,
+        subdomain: String,
+        value: String,
+        periods_found: usize,
+        value_expected_at_the_end: String,
+    },
+    // so it is not confusing that we never want tld at the end
+    DnsMiscSubdomainFullTldIsRedundant {
+        tld: String,
+        record_type: String,
+        subdomain: String,
+        explanation: String,
+    },
     // 4 minimum is because MinIO per datacenter
     RegionWithDeploymentsHasLessThanFourServers {
         region: String,
@@ -3922,5 +4029,15 @@ pub enum PlatformValidationError {
         difference: usize,
         maximum_allowed_difference: usize,
         application_servers_buckets: BTreeMap<String, Vec<String>>,
+    },
+    CustomSecretIsUndefined {
+        secret_key: String,
+        filename: String,
+        suggestion: String,
+    },
+    CustomSecretUsedInEnvironmentButHasSpecialCharacters {
+        secret_key: String,
+        regex_check: String,
+        suggestion: String,
     },
 }

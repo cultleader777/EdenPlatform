@@ -50,16 +50,10 @@ pub fn deploy_external_lb(
         .find(|n| db.network().c_network_name(*n) == "lan")
         .map(|i| db.network().c_cidr(i).clone())
         .unwrap_or_else(|| "127.0.0.1".to_string());
-    let tlds = db
-        .tld()
-        .rows_iter()
-        .map(|i| db.tld().c_domain(i).clone())
-        .collect::<Vec<_>>()
-        .join(" ");
 
     let mut basic_auth_files = Vec::new();
     let site_config_file = generate_lb_site_conf(
-        db, &tlds, gs.admin_tld,
+        db, gs.admin_tld,
         "/local/admin_htpasswd_file",
         runtime, region,
         &mut basic_auth_files,
@@ -363,7 +357,6 @@ fn generate_admin_site(runtime: &ServerRuntime) -> String {
 
 fn generate_lb_site_conf(
     db: &Database,
-    tlds: &str,
     admin_tld: TableRowPointerTld,
     admin_htpasswd_file_path: &str,
     runtime: &ServerRuntime,
@@ -387,26 +380,6 @@ server {{
     listen 80;{maybe_ipv6_http}
     server_name _;
     return 301 https://$host$request_uri;
-}}
-
-server {{
-    listen 80;{maybe_ipv6_http}
-    server_name {tlds};
-    return 301 https://$host$request_uri;
-}}
-
-server {{
-    resolver 127.0.0.1:53 valid=10s;
-
-    listen 443 ssl;{maybe_ipv6_https}
-
-    add_header Access-Control-Allow-Origin "*";
-
-    server_name {tlds};
-
-    ssl_ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256;
-    ssl_certificate /etc/ssl/public_tls_cert.pem;
-    ssl_certificate_key /etc/ssl/public_tls_key.pem;
 }}
 "#
     );
@@ -469,22 +442,25 @@ server {{
     ssl_certificate_key /etc/ssl/public_tls_key.pem;
 "#.to_string()
             };
+            let subdomain = if !subd.subdomain.is_empty() {
+                format!("{}.", subd.subdomain)
+            } else { "".to_string() };
             write!(&mut res, r#"
 server {{
     listen 80;{maybe_ipv6_http}
-    server_name {}.{};
+    server_name {}{};
     return 301 https://$host$request_uri;
 }}
 
-"#, subd.subdomain, db.tld().c_domain(*k)).unwrap();
+"#, subdomain, db.tld().c_domain(*k)).unwrap();
             res += "server {\n";
             res += "    resolver 127.0.0.1:53 valid=10s;\n";
             res += "    listen 443 ssl;";
             res += maybe_ipv6_https;
             res += "\n";
             res += &format!(
-                "    server_name {}.{};\n",
-                subd.subdomain,
+                "    server_name {}{};\n",
+                subdomain,
                 db.tld().c_domain(*k)
             );
             // grafana has its own auth

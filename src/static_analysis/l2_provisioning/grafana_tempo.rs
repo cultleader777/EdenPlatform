@@ -117,9 +117,9 @@ pub fn deploy_tempo(
             name.as_str(),
             &consul_service_fqdn,
             &format!(
-                "http://epl-mon-{}.service.consul:{}",
+                "http://epl-mon-{}-victoriametrics.service.consul:{}",
                 db.monitoring_cluster().c_cluster_name(monitoring_cluster),
-                db.monitoring_cluster().c_prometheus_port(monitoring_cluster),
+                db.monitoring_cluster().c_victoriametrics_port(monitoring_cluster),
             ),
             minio_bucket_name.as_str(),
             &format!("epl-minio-{minio_cluster_name}.service.consul:{minio_port}"),
@@ -238,6 +238,8 @@ server:
   grpc_listen_address: {{{{ env "meta.private_ip" }}}}
 
 distributor:
+  ring:
+    instance_addr: {{{{ env "meta.private_ip" }}}}
   receivers:
     otlp:
       protocols:
@@ -250,6 +252,8 @@ ingester:
   max_block_duration: 5m
 
 compactor:
+  ring:
+    instance_addr: {{{{ env "meta.private_ip" }}}}
   compaction:
     block_retention: {trace_retention_h}h
 
@@ -263,6 +267,8 @@ memberlist:
   - {service_dns_name}:{p2p_port}
 
 metrics_generator:
+  ring:
+    instance_addr: {{{{ env "meta.private_ip" }}}}
   registry:
     external_labels:
       source: tempo

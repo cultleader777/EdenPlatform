@@ -96,7 +96,7 @@ job "pg-testdb" {
       }
     }
 
-    task "epl-pg-testdb-1-haproxy" {
+    task "pg-testdb-1-haproxy" {
       driver = "docker"
       resources {
         memory = 32
@@ -165,7 +165,7 @@ EOL
       }
     }
 
-    task "epl-pg-testdb-1-patroni" {
+    task "pg-testdb-1-patroni" {
       driver = "docker"
       resources {
         memory = 464
@@ -277,7 +277,7 @@ EOL
       }
     }
 
-    task "epl-pg-testdb-1-prom-exp" {
+    task "pg-testdb-1-prom-exp" {
       driver = "docker"
       resources {
         memory = 32
@@ -393,7 +393,7 @@ EOL
       }
     }
 
-    task "epl-pg-testdb-2-haproxy" {
+    task "pg-testdb-2-haproxy" {
       driver = "docker"
       resources {
         memory = 32
@@ -462,7 +462,7 @@ EOL
       }
     }
 
-    task "epl-pg-testdb-2-patroni" {
+    task "pg-testdb-2-patroni" {
       driver = "docker"
       resources {
         memory = 464
@@ -574,7 +574,7 @@ EOL
       }
     }
 
-    task "epl-pg-testdb-2-prom-exp" {
+    task "pg-testdb-2-prom-exp" {
       driver = "docker"
       resources {
         memory = 32

@@ -58,6 +58,16 @@ TABLE blackbox_deployment_local_file {
     CHECK { mode == '644' or mode == '755' },
 }
 
+TABLE blackbox_deployment_secret_file {
+    filename TEXT PRIMARY KEY CHILD OF blackbox_deployment_task,
+    contents REF custom_secret,
+
+    // need this because this will be a vault key
+    // TODO: check that replacements to replace say, periods with underscores
+    // don't cause clashes
+    CHECK { isSnakeCase(filename) }
+}
+
 TABLE blackbox_deployment_service_registration {
     service_name TEXT PRIMARY KEY CHILD OF blackbox_deployment,
     scrape_prometheus_metrics BOOL DEFAULT false,

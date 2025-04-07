@@ -98,6 +98,7 @@ function ensure_vault_policy_for_kv_exists() {
                             can_deploy = false;
                         }
                     },
+                    crate::static_analysis::server_runtime::VaultSecretRequest::SecretsYmlEntry { .. } => {},
                 }
             }
 
@@ -180,6 +181,11 @@ function ensure_vault_policy_for_kv_exists() {
                 crate::static_analysis::server_runtime::VaultSecretRequest::Pem => {
                     // nothing to generate we get from nginx
                 },
+                crate::static_analysis::server_runtime::VaultSecretRequest::SecretsYmlEntry { key_name } => {
+                    // just assume it this environment variable exists
+                    let upper_key = &key_name.to_uppercase();
+                    write!(&mut sd, "$(echo \"$CUSTOM_SECRET_{upper_key}\" | base64 -d | jq -R -s '.' | sed 's/^\"//; s/\"$//')").unwrap();
+                }
                 crate::static_analysis::server_runtime::VaultSecretRequest::ExistingVaultSecret { handle, sprintf } => {
                     let maybe_sprintf = if let Some(form) = sprintf {
                         assert!(!form.contains('\''), "Sprintf form cannot contain single quotes");
@@ -247,6 +253,7 @@ fi
                 crate::static_analysis::server_runtime::VaultSecretRequest::AwsSecretKey => {},
                 crate::static_analysis::server_runtime::VaultSecretRequest::Pem => {},
                 crate::static_analysis::server_runtime::VaultSecretRequest::ExistingVaultSecret { .. } => {},
+                crate::static_analysis::server_runtime::VaultSecretRequest::SecretsYmlEntry { .. } => {},
             }
         }
     }

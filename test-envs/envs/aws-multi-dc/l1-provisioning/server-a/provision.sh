@@ -1787,12 +1787,24 @@ function update_dns_file() {
   echo ";CHECKSUM $SOURCE_CHECKSUM" >> $TARGET_FILE
   chown named:named $TARGET_FILE
   chmod 644 $TARGET_FILE
+  touch /run/restart-bind
 }
 
 function maybe_update_dns_file() {
   SOURCE_BASE64=$1
   TARGET_FILE=$2
   CHECKSUM=$( echo $SOURCE_BASE64 | base64 -d | sha256sum | awk '{print $1}' )
+
+  # bind journalfile will clash with zone file, we have the source
+  # so journalfile is irrelevant for us
+  if [ -f "$TARGET_FILE.jnl" ]
+  then
+    # just delete journal file as under normal circumstances it is not needed
+    # only for acme update keys
+    rm -f $TARGET_FILE.jnl
+    touch /run/restart-bind
+  fi
+
   if [ ! -f $TARGET_FILE ]
   then
      echo zone target $TARGET_FILE doesnt exist, installing to $TARGET_FILE
@@ -1804,16 +1816,6 @@ function maybe_update_dns_file() {
      echo Source file changed, installing to $TARGET_FILE
      update_dns_file $SOURCE_BASE64 $TARGET_FILE $CHECKSUM
      return 0
-  fi
-  # bind journalfile will clash with zone file, we have the source
-  # so journalfile is irrelevant for us
-  if [ -f "$TARGET_FILE.jnl" ]
-  then
-    if [ "$TARGET_FILE" -nt "$TARGET_FILE.jnl" ]
-    then
-      echo "Deleting older journalfile $TARGET_FILE.jnl"
-      rm -f $TARGET_FILE.jnl
-    fi
   fi
 }
 
@@ -3459,12 +3461,24 @@ function update_dns_file() {
   echo ";CHECKSUM $SOURCE_CHECKSUM" >> $TARGET_FILE
   chown named:named $TARGET_FILE
   chmod 644 $TARGET_FILE
+  touch /run/restart-bind
 }
 
 function maybe_update_dns_file() {
   SOURCE_BASE64=$1
   TARGET_FILE=$2
   CHECKSUM=$( echo $SOURCE_BASE64 | base64 -d | sha256sum | awk '{print $1}' )
+
+  # bind journalfile will clash with zone file, we have the source
+  # so journalfile is irrelevant for us
+  if [ -f "$TARGET_FILE.jnl" ]
+  then
+    # just delete journal file as under normal circumstances it is not needed
+    # only for acme update keys
+    rm -f $TARGET_FILE.jnl
+    touch /run/restart-bind
+  fi
+
   if [ ! -f $TARGET_FILE ]
   then
      echo zone target $TARGET_FILE doesnt exist, installing to $TARGET_FILE
@@ -3476,16 +3490,6 @@ function maybe_update_dns_file() {
      echo Source file changed, installing to $TARGET_FILE
      update_dns_file $SOURCE_BASE64 $TARGET_FILE $CHECKSUM
      return 0
-  fi
-  # bind journalfile will clash with zone file, we have the source
-  # so journalfile is irrelevant for us
-  if [ -f "$TARGET_FILE.jnl" ]
-  then
-    if [ "$TARGET_FILE" -nt "$TARGET_FILE.jnl" ]
-    then
-      echo "Deleting older journalfile $TARGET_FILE.jnl"
-      rm -f $TARGET_FILE.jnl
-    fi
   fi
 }
 
@@ -3690,6 +3694,13 @@ maybe_update_dns_file JFRUTCAzNjAwCmluLWFkZHIuYXJwYS4JSU4JU09BCW5zMS5lcGwtaW5mcm
 # to detect if zone files changed later
 /run/current-system/sw/bin/systemctl reload bind.service || true
 
+# zone file changed, reload will not reload it
+if [ -f /run/restart-bind ]
+then
+  rm -f /run/restart-bind
+  /run/current-system/sw/bin/systemctl restart bind.service || true
+fi
+
 
 cp -pu /run/keys/K10-in-addr-arpa--015-05457-private /run/dnsseckeys/K10.in-addr.arpa.+015+05457.private
 cp -pu /run/keys/K10-in-addr-arpa--015-29000-private /run/dnsseckeys/K10.in-addr.arpa.+015+29000.private
@@ -3804,7 +3815,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"845437ec784a1a86cc4a7ad732c75e261db75a22fb0fc6ed801e551ee9e68442\",hostname=\"server-a\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"0b80de1ce76a3007887b26ed0e8e0c35a308769f0b6f6fa1532d94a62e22137f\",hostname=\"server-a\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE
@@ -3812,12 +3823,12 @@ epl_l1_provisioning_last_hash{hash=\"845437ec784a1a86cc4a7ad732c75e261db75a22fb0
   # l1 expected hash
   METRICS_FILE=/var/lib/node_exporter/epl_l1_expected_hash.prom
   echo '
-epl_l1_provisioning_expected_hash{hash="845437ec784a1a86cc4a7ad732c75e261db75a22fb0fc6ed801e551ee9e68442",hostname="server-a"} 1
-epl_l1_provisioning_expected_hash{hash="f66d542d6ca22fce1a277f13cd51edd3b2b53065f22b6312591d324f1be6d5e4",hostname="server-b"} 1
-epl_l1_provisioning_expected_hash{hash="b947426e113ebae376c6eba0198a6166436e8fdd3c3ea6657c27e8123ef5469c",hostname="server-c"} 1
+epl_l1_provisioning_expected_hash{hash="0b80de1ce76a3007887b26ed0e8e0c35a308769f0b6f6fa1532d94a62e22137f",hostname="server-a"} 1
+epl_l1_provisioning_expected_hash{hash="b0edbe15dbf79c55f588c30e39284545c0c6e8ece0e5ddd7cb2317e891fb2638",hostname="server-b"} 1
+epl_l1_provisioning_expected_hash{hash="aab6da9e697c22a5c35df1b6d4c7ab8c9b781d6729cdce388d67bdf754e180ca",hostname="server-c"} 1
 epl_l1_provisioning_expected_hash{hash="2bdcfb0232f6f9d0e8b40b094ddfce9c0559dae0eecf1479eefb8c7bc9b5c69d",hostname="server-d"} 1
 epl_l1_provisioning_expected_hash{hash="af5e12f13c9111349f8f080bbe5f49e5b0c5dadc64c6a981d80582631a99acff",hostname="server-e"} 1
-epl_l1_provisioning_expected_hash{hash="829b42c5fce1fc5e0778c4c5ceaa942339b5e1e8d3166eaec23aa313b7298ca1",hostname="server-f"} 1
+epl_l1_provisioning_expected_hash{hash="7ec582b961b00f136286834441ad97581bea6d25435c703efc5424941ac81b97",hostname="server-f"} 1
 
 ' > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp

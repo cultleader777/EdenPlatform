@@ -55,6 +55,7 @@ in
     system.stateVersion = "23.11";
 
     environment.sessionVariables = {
+      HISTCONTROL = "ignoreboth";
       NOMAD_ADDR = "https://nomad-servers.service.consul:4646";
       VAULT_ADDR = "https://vault.service.consul:8200";
     };
@@ -331,8 +332,6 @@ ip route del 0.0.0.0/0
 
             nomad acl policy apply -description "Anonymous policy" anonymous /tmp/epl-nomad-anonymous-policy.hcl
 
-            nomad namespace apply -description "Eden platform" epl
-
         '';
         epl-nomad-consul-acl-bootstrap = pkgs.writeShellScriptBin "epl-nomad-consul-acl-bootstrap" ''
 
@@ -574,6 +573,14 @@ do
   sleep 3
 done
 
+# in case we need to restart due to raft logs
+if sudo journalctl -u vault.service --since "$(systemctl show vault.service -p ExecMainStartTimestamp | cut -d= -f2)" | grep 'no TLS config found' &>/dev/null
+then
+  echo "Restarting vault and waiting 10 seconds"
+  sudo systemctl restart vault.service
+  sleep 10
+fi
+
 if curl -s $VAULT_ADDR/v1/sys/seal-status | grep '"sealed":true'
 then
   for UK in $(seq 1 3)
@@ -747,7 +754,7 @@ done
 
        enable = true;
      };
-
+# NIX REGION custom_hardware START
     imports = [ "${modulesPath}/virtualisation/amazon-image.nix" ];
 
 
@@ -782,7 +789,7 @@ done
 
 
     networking.usePredictableInterfaceNames = false;
-
+# NIX REGION custom_hardware END
     users.users.named.extraGroups = ["keys"];
     services.bind =
     {
@@ -867,6 +874,7 @@ zone "17.10.in-addr.arpa." {
 
 view internet {
           match-clients { any; };
+          recursion no;
 zone "epl-infra.net." {
   type slave;
   file "/run/named/public-epl-infra.net.zone.signed";

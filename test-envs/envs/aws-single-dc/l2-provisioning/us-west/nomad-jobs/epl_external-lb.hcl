@@ -60,7 +60,7 @@ job "external-lb" {
       }
     }
 
-    task "epl-external-lb" {
+    task "external-lb" {
       driver = "docker"
       resources {
         memory = 64

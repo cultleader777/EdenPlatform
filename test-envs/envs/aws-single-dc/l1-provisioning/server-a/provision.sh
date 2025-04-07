@@ -114,6 +114,9 @@ cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
   "encrypt": "ym3++1rmzzwsffgh8EnMkSDkq9wX6FPG4b8dE+lRQ9I=",
   "encrypt_verify_incoming": true,
   "encrypt_verify_outgoing": true,
+  "limits": {
+    "rpc_max_conns_per_client": 1000
+  },
   "log_level": "INFO",
   "log_rotate_bytes": 0,
   "log_rotate_duration": "24h",
@@ -902,21 +905,21 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_consul-tls-server-cert.pem START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIICwjCCAmmgAwIBAgIQK6gMUM63pRL2WSgKL6NzqDAKBggqhkjOPQQDAjCBuDEL
+MIICwjCCAmmgAwIBAgIQMK6V2rDsfeghwqBOlH8zWzAKBggqhkjOPQQDAjCBuDEL
 MAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1TYW4gRnJhbmNpc2Nv
 MRowGAYDVQQJExExMDEgU2Vjb25kIFN0cmVldDEOMAwGA1UEERMFOTQxMDUxFzAV
 BgNVBAoTDkhhc2hpQ29ycCBJbmMuMT8wPQYDVQQDEzZDb25zdWwgQWdlbnQgQ0Eg
-NTY1ODg4MDM0NjIzOTk0MzIzNTI2NTI2NTAzMDk4NDAzNDk3NDQwHhcNMjMwOTEy
-MTUxOTQ3WhcNMjQwOTExMTUxOTQ3WjAgMR4wHAYDVQQDExVzZXJ2ZXIudXMtd2Vz
-dC5jb25zdWwwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAATIgF4NCXShgLCcIJM5
-hVIsrQE/eYoCqo6V5xxJZaKycs8oFbD789I4fAXxTA/jlOA90+TdrQo19lZptcwv
-dZ/jo4HrMIHoMA4GA1UdDwEB/wQEAwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDAQYI
-KwYBBQUHAwIwDAYDVR0TAQH/BAIwADApBgNVHQ4EIgQgxsa+UYg0mOeT4qT/60tP
-CwzyQwPMFLMFhpvzzYVkVnMwKwYDVR0jBCQwIoAg/mtrQQ0SkAIzZ4ZC/HfnuGdk
+NTY1ODg4MDM0NjIzOTk0MzIzNTI2NTI2NTAzMDk4NDAzNDk3NDQwHhcNMjUwNDA3
+MTQ0NjEyWhcNMjYwNDA3MTQ0NjEyWjAgMR4wHAYDVQQDExVzZXJ2ZXIudXMtd2Vz
+dC5jb25zdWwwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQT03cHWK98S1V2RV8s
+V6gO6fBl5gAQWzRNbj2dCRfwIbmrKRpEK2UUUFG/yWEK5xgrx0W0I/THVgjqXYVV
+hxxUo4HrMIHoMA4GA1UdDwEB/wQEAwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDAQYI
+KwYBBQUHAwIwDAYDVR0TAQH/BAIwADApBgNVHQ4EIgQgR2VXZBgncQ7HgQGYG33l
+lPDMYrrXUB1aCKu+5mmRLV8wKwYDVR0jBCQwIoAg/mtrQQ0SkAIzZ4ZC/HfnuGdk
 4E44KiX1pSdOrkI2LMUwUQYDVR0RBEowSIIec2VydmVyLWEuc2VydmVyLnVzLXdl
 c3QuY29uc3VsghVzZXJ2ZXIudXMtd2VzdC5jb25zdWyCCWxvY2FsaG9zdIcEfwAA
-ATAKBggqhkjOPQQDAgNHADBEAiA7QjLsrB/JUF3x1peP/u+c5JQzIe5huSjFqlqr
-StOuDgIgPBRC8q/zYItczWUjhi/mpOpatPksaFboQo4SivIkCWU=
+ATAKBggqhkjOPQQDAgNHADBEAiBxhQCdVdLliOdn7hOUNtNH4mJBmkN9Nt9MYsk2
+jnB2cgIgEHXBlW2buQRTCGPRN0ZAWgvCMNRiJbf5q+YnCJMS68g=
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -935,9 +938,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_consul-tls-server-pkey.pem START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIGMfBFX3w1XVQrBKJQZ4nY3+E+Wytq3pSSwTRyA7E8xkoAoGCCqGSM49
-AwEHoUQDQgAEyIBeDQl0oYCwnCCTOYVSLK0BP3mKAqqOleccSWWisnLPKBWw+/PS
-OHwF8UwP45TgPdPk3a0KNfZWabXML3Wf4w==
+MHcCAQEEIBofLJ+GLZtN4LoqZExD6DTWkw/7ZgDjWiVxGFZsv3xfoAoGCCqGSM49
+AwEHoUQDQgAEE9N3B1ivfEtVdkVfLFeoDunwZeYAEFs0TW49nQkX8CG5qykaRCtl
+FFBRv8lhCucYK8dFtCP0x1YI6l2FVYccVA==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -1070,17 +1073,17 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-server.crt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIIB5zCCAYygAwIBAgIUPC5Lx0g1EU7ATRp9qJgeKDgq28AwCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjMwOTEyMTUxNTAwWhcNMjQwOTExMTUxNTAw
-WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFYjIKyNNanLu83lnNq/egoLM
-jaGqN6KUhUKjXacKHsflIzFXjpA1iGjWVNOJUdKqW2cK1iI9O7tHFWoIUbtojaOB
+MIIB5jCCAYygAwIBAgIUXj5hiuMZ4QZz6lYIIklf7M9gZVcwCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjUwNDA3MTQ0MTAwWhcNMjYwNDA3MTQ0MTAw
+WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEcaT/AZNfFftsjQzZ2kbo92oJ
+997vZATzMT0612FWBwiUZzMNB4sn+efOyZ0kFCAJtFxjjiw8VDdL8mIgj2jw+KOB
 0zCB0DAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUF
-BwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFDBjxRoAoBxtgcHwFCX6Zz+Nlcem
+BwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFMxosQPUxYyUpEMZAY12XdS3dj2q
 MB8GA1UdIwQYMBaAFHhGDO3ODzfV/m6f+P4y9Bbcl2s2MFEGA1UdEQEB/wRHMEWC
 FHNlcnZlci51cy13ZXN0Lm5vbWFkghxub21hZC1zZXJ2ZXJzLnNlcnZpY2UuY29u
-c3Vsgglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0EAwIDSQAwRgIhAMDgFUpp22Ih
-+LuN/8n6uhTtPEdjbMXVqt3vDX2OkMfiAiEAzqBh3NOwCBYbzLgh8bwDeSAU9GAM
-4h2VHY/amqbKizY=
+c3Vsgglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0EAwIDSAAwRQIgZr8J5zU4GW8H
+2DAWy+uPX52nhchKsP3mo1CCJKa8tvkCIQCbpMRr6xpn415wpWW1xXic7DmaCij/
+cjUOVcwOHUcXmQ==
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -1097,9 +1100,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-server.key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIDqlnoTiWw/8VlPFqx5g+eKd2RpFrdf1FznTnDX4WydboAoGCCqGSM49
-AwEHoUQDQgAEFYjIKyNNanLu83lnNq/egoLMjaGqN6KUhUKjXacKHsflIzFXjpA1
-iGjWVNOJUdKqW2cK1iI9O7tHFWoIUbtojQ==
+MHcCAQEEIOTYES8xwWDwcskTLeTKkZRMnny2u/MHLn0XHd+CxWFooAoGCCqGSM49
+AwEHoUQDQgAEcaT/AZNfFftsjQzZ2kbo92oJ997vZATzMT0612FWBwiUZzMNB4sn
++efOyZ0kFCAJtFxjjiw8VDdL8mIgj2jw+A==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -1116,15 +1119,15 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-cli.crt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIIBkTCCATegAwIBAgIUP2PC2CN8jnZlzOp93K+i09Obg+wwCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjMwOTEyMTUxNTAwWhcNMjQwOTExMTUxNTAw
-WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8ivg6hMYDVAwQx94Rfv7l1if
-WN1hsLsyLDQmS/GDdPn5bLqel5NVv921cMPvQsdeE27/9n+K5HMM0ORXjTGOKKN/
+MIIBkTCCATegAwIBAgIUKDGOOcnG4oNJ8enTfykOPyHR5nkwCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjUwNDA3MTQ0MTAwWhcNMjYwNDA3MTQ0MTAw
+WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEsr3zorw2esIrdS1C0z5hWeIi
+xRD2dysS3/h6Ob0Wak8ClIQJQrUlWWEFsBJFrLWjbgqoFV8lnIJ9Ol19fR1AQKN/
 MH0wDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcD
-AjAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBQrCMD9hxzwzCOgzlCtNgKBg1L1nTAf
+AjAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBSMMPNPj0MuVIA9XIME7SlgZOkscjAf
 BgNVHSMEGDAWgBR4Rgztzg831f5un/j+MvQW3JdrNjAKBggqhkjOPQQDAgNIADBF
-AiBXtjCP6cMfJ3zBxZOeRyJFEiWQ9nidnG0DQe2xdCinVAIhAMQVa/qJpeWnnLuE
-TGM5xiGLr/jC4MJ7kQhur/tMDCkA
+AiEAlAqhSR7DH8Kl6LHl/CF6+ed8TumkFCzfaLwdT1Z8/UcCIHor0Z9MDksVkb1p
+3KoXsBT2P1m2jbjdiSWGu0lpXXvp
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -1141,9 +1144,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-cli.key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIGgEmh28eS/bwLngyyVtPc6497Sx9Iy6N/b6Y8tew9QqoAoGCCqGSM49
-AwEHoUQDQgAE8ivg6hMYDVAwQx94Rfv7l1ifWN1hsLsyLDQmS/GDdPn5bLqel5NV
-v921cMPvQsdeE27/9n+K5HMM0ORXjTGOKA==
+MHcCAQEEIAWwzuBvgpPgtGV/WpE+aF2FRWxgg2KFGuydLQlZvKakoAoGCCqGSM49
+AwEHoUQDQgAEsr3zorw2esIrdS1C0z5hWeIixRD2dysS3/h6Ob0Wak8ClIQJQrUl
+WWEFsBJFrLWjbgqoFV8lnIJ9Ol19fR1AQA==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -1370,6 +1373,7 @@ in
     system.stateVersion = "23.11";
 
     environment.sessionVariables = {
+      HISTCONTROL = "ignoreboth";
       NOMAD_ADDR = "https://nomad-servers.service.consul:4646";
       VAULT_ADDR = "https://vault.service.consul:8200";
     };
@@ -1439,6 +1443,11 @@ Ytpm8Qlf0liWTW3yOqJx/IESsgAakE+m
 
                 cat > /tmp/epl-acme-vault-policy.hcl<<EOL
                 path "epl/data/certs/*" {
+                    capabilities = ["read", "list", "create", "patch", "update", "delete"]
+                }
+
+                # allow updating external load balancer as well
+                path "epl/data/ext-lb" {
                     capabilities = ["read", "list", "create", "patch", "update", "delete"]
                 }
 
@@ -1686,8 +1695,6 @@ rm -f /run/keys/consul-vrrp-token-dc1.txt
             EOL
 
             nomad acl policy apply -description "Anonymous policy" anonymous /tmp/epl-nomad-anonymous-policy.hcl
-
-            nomad namespace apply -description "Eden platform" epl
 
         '';
         epl-nomad-consul-acl-bootstrap = pkgs.writeShellScriptBin "epl-nomad-consul-acl-bootstrap" ''
@@ -2056,7 +2063,7 @@ exec ${pkgs.consul}/bin/consul watch -type=key -key=epl-interdc-routes/dc1/10.17
 
        enable = true;
      };
-
+# NIX REGION custom_hardware START
     imports = [ "${modulesPath}/virtualisation/amazon-image.nix" ];
 
 
@@ -2091,7 +2098,7 @@ exec ${pkgs.consul}/bin/consul watch -type=key -key=epl-interdc-routes/dc1/10.17
 
 
     networking.usePredictableInterfaceNames = false;
-
+# NIX REGION custom_hardware END
     users.users.named.extraGroups = ["keys"];
     services.bind =
     {
@@ -2444,42 +2451,6 @@ cp /run/keys/public_tls_cert.pem /run/sec_volumes/ssl_certs/
 
 # ------------- DNS START ---------------
 
-function update_dns_file() {
-  SOURCE_BASE64=$1
-  TARGET_FILE=$2
-  SOURCE_CHECKSUM=$3
-  # Serial replacement will work only until exhausting
-  # last number of 32 bit space for 42 years
-  # we cannot provision more often than every
-  # minute for different serials. We win time by subtracting
-  # 23 years - year of when this line was written
-  DATE=$( date +%y%m%d%H%M -d '23 years ago' )
-  echo $SOURCE_BASE64 | \
-    base64 -d | \
-    sed "s/SERIAL_TO_REPLACE/$DATE/g" > $TARGET_FILE
-  echo ";CHECKSUM $SOURCE_CHECKSUM" >> $TARGET_FILE
-  chown named:named $TARGET_FILE
-  chmod 644 $TARGET_FILE
-}
-
-function maybe_update_dns_file() {
-  SOURCE_BASE64=$1
-  TARGET_FILE=$2
-  CHECKSUM=$( echo $SOURCE_BASE64 | base64 -d | sha256sum | awk '{print $1}' )
-  if [ ! -f $TARGET_FILE ]
-  then
-     echo zone target $TARGET_FILE doesnt exist, installing to $TARGET_FILE
-     update_dns_file $SOURCE_BASE64 $TARGET_FILE $CHECKSUM
-     return 0
-  fi
-  if ! grep ";CHECKSUM $CHECKSUM" $TARGET_FILE
-  then
-     echo Source file changed, installing to $TARGET_FILE
-     update_dns_file $SOURCE_BASE64 $TARGET_FILE $CHECKSUM
-     return 0
-  fi
-}
-
 
 
 # in first provisioning might not work
@@ -2602,3 +2573,28 @@ chmod 700 /run/epl-l1-prov
 echo "SELECT 'running provisioning id is unfinished', provisioning_id FROM l1_provisionings WHERE is_finished = 0;" | sqlite3 /var/lib/epl-l1-prov/provisionings.sqlite | grep unfinished && exit 27 || true
 echo 'INSERT INTO l1_provisionings(provisioning_id) VALUES (L1_EPL_PROVISIONING_ID);' | sqlite3 /var/lib/epl-l1-prov/provisionings.sqlite
 tmux new-session -d '/run/epl-l1-prov |& tee /var/log/epl-l1-prov/L1_EPL_PROVISIONING_ID.log'
+
+if [ -d /var/lib/node_exporter ]
+then
+  # l1 last hash
+  METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
+  BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
+  echo "
+epl_l1_provisioning_last_hash{hash=\"6dbbafb49c0353c07922b115b76c57a7adfb4315f7e2b8cbe0141013b2481331\",hostname=\"server-a\"} $BOOT_TIME
+" > $METRICS_FILE.tmp
+  chmod 644 $METRICS_FILE.tmp
+  mv -f $METRICS_FILE.tmp $METRICS_FILE
+
+  # l1 expected hash
+  METRICS_FILE=/var/lib/node_exporter/epl_l1_expected_hash.prom
+  echo '
+epl_l1_provisioning_expected_hash{hash="6dbbafb49c0353c07922b115b76c57a7adfb4315f7e2b8cbe0141013b2481331",hostname="server-a"} 1
+epl_l1_provisioning_expected_hash{hash="807c2d5f40357c638a0932294fbf43f221746246650122cc5f5c5c724b53fa40",hostname="server-b"} 1
+epl_l1_provisioning_expected_hash{hash="d3a24edc5ffad8a8d7b672510149237c4af7b257776766252718de64eb728ed7",hostname="server-c"} 1
+epl_l1_provisioning_expected_hash{hash="88f5958d138125835bb809ee21e387176e7474cc9bea0e415a40be3dc6fbff56",hostname="server-d"} 1
+
+' > $METRICS_FILE.tmp
+  chmod 644 $METRICS_FILE.tmp
+  mv -f $METRICS_FILE.tmp $METRICS_FILE
+
+fi

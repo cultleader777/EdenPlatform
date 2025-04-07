@@ -6,6 +6,35 @@ TABLE tld {
   CHECK { isValidTld(domain) },
 }
 
+TABLE tld_txt_record {
+  subdomain TEXT PRIMARY KEY CHILD OF tld,
+}
+
+TABLE tld_txt_record_value {
+  value TEXT PRIMARY KEY CHILD OF tld_txt_record,
+}
+
+TABLE tld_mx_record {
+  subdomain TEXT PRIMARY KEY CHILD OF tld,
+}
+
+TABLE tld_mx_record_value {
+  value TEXT PRIMARY KEY CHILD OF tld_mx_record,
+  priority INT,
+
+  -- valid is up to 65k but you shouldn't use that anyway
+  CHECK { priority >= 0 and priority <= 100 }
+}
+
+TABLE tld_cname_record {
+  subdomain TEXT PRIMARY KEY CHILD OF tld,
+}
+
+TABLE tld_cname_record_value {
+  value TEXT PRIMARY KEY CHILD OF tld_cname_record
+}
+
+
 TABLE region {
   region_name TEXT PRIMARY KEY,
   availability_mode TEXT DEFAULT single_dc,

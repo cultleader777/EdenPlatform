@@ -53,7 +53,7 @@ job "mon-default" {
       }
     }
 
-    task "epl-mon-default-1-am" {
+    task "mon-default-am" {
       driver = "docker"
       resources {
         memory = 64
@@ -165,7 +165,7 @@ EOL
       }
     }
 
-    task "epl-mon-default-2-am" {
+    task "mon-default-am" {
       driver = "docker"
       resources {
         memory = 64
@@ -277,7 +277,7 @@ EOL
       }
     }
 
-    task "epl-mon-default-3-am" {
+    task "mon-default-am" {
       driver = "docker"
       resources {
         memory = 64
@@ -412,7 +412,7 @@ EOL
       }
     }
 
-    task "epl-mon-default-1-prometheus" {
+    task "mon-default-prometheus" {
       driver = "docker"
       resources {
         memory = 768
@@ -543,7 +543,7 @@ EOL
       }
     }
 
-    task "epl-mon-default-1-vm" {
+    task "mon-default-vm" {
       driver = "docker"
       resources {
         memory = 256
@@ -629,7 +629,7 @@ EOL
       }
     }
 
-    task "epl-mon-default-2-prometheus" {
+    task "mon-default-prometheus" {
       driver = "docker"
       resources {
         memory = 768
@@ -760,7 +760,7 @@ EOL
       }
     }
 
-    task "epl-mon-default-2-vm" {
+    task "mon-default-vm" {
       driver = "docker"
       resources {
         memory = 256

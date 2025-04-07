@@ -83,7 +83,7 @@ job "tempo-us-west" {
         memory_max = 256
       }
       config {
-        image = "grafana/tempo@sha256:50fec6c2cf621141218edee9e23e8860b6158088d18fac54cf0c29df7fdf29db"
+        image = "grafana/tempo@sha256:4443be217c396b065ee34845534199c36fdba4dc619cb96550e228d73fba6e69"
         network_mode = "host"
         args = [
           "-target=scalable-single-binary",
@@ -109,6 +109,8 @@ server:
   grpc_listen_address: {{ env "meta.private_ip" }}
 
 distributor:
+  ring:
+    instance_addr: {{ env "meta.private_ip" }}
   receivers:
     otlp:
       protocols:
@@ -121,6 +123,8 @@ ingester:
   max_block_duration: 5m
 
 compactor:
+  ring:
+    instance_addr: {{ env "meta.private_ip" }}
   compaction:
     block_retention: 720h
 
@@ -134,6 +138,8 @@ memberlist:
   - epl-tempo-us-west.service.consul:4312
 
 metrics_generator:
+  ring:
+    instance_addr: {{ env "meta.private_ip" }}
   registry:
     external_labels:
       source: tempo
@@ -141,7 +147,7 @@ metrics_generator:
   storage:
     path: /tmp/tempo/generator/wal
     remote_write:
-      - url: http://epl-mon-default.service.consul:9090/api/v1/write
+      - url: http://epl-mon-default-victoriametrics.service.consul:9091/api/v1/write
         send_exemplars: true
 
 storage:

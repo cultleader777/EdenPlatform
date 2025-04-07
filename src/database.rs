@@ -69,6 +69,9 @@ pub struct TableRowPointerBlackboxDeploymentLocalFile(usize);
 pub struct TableRowPointerBlackboxDeploymentPort(usize);
 
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
+pub struct TableRowPointerBlackboxDeploymentSecretFile(usize);
+
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
 pub struct TableRowPointerBlackboxDeploymentServiceInstance(usize);
 
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
@@ -118,6 +121,9 @@ pub struct TableRowPointerChSchema(usize);
 
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
 pub struct TableRowPointerChTestDataset(usize);
+
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
+pub struct TableRowPointerCustomSecret(usize);
 
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
 pub struct TableRowPointerDatacenter(usize);
@@ -340,6 +346,24 @@ pub struct TableRowPointerTempoCluster(usize);
 
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
 pub struct TableRowPointerTld(usize);
+
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
+pub struct TableRowPointerTldCnameRecord(usize);
+
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
+pub struct TableRowPointerTldCnameRecordValue(usize);
+
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
+pub struct TableRowPointerTldMxRecord(usize);
+
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
+pub struct TableRowPointerTldMxRecordValue(usize);
+
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
+pub struct TableRowPointerTldTxtRecord(usize);
+
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
+pub struct TableRowPointerTldTxtRecordValue(usize);
 
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
 pub struct TableRowPointerUniqueApplicationNames(usize);
@@ -574,6 +598,13 @@ pub struct TableRowBlackboxDeploymentPort {
 }
 
 #[derive(Debug)]
+pub struct TableRowBlackboxDeploymentSecretFile {
+    pub filename: ::std::string::String,
+    pub contents: TableRowPointerCustomSecret,
+    pub parent: TableRowPointerBlackboxDeploymentTask,
+}
+
+#[derive(Debug)]
 pub struct TableRowBlackboxDeploymentServiceInstance {
     pub service_registration: TableRowPointerBlackboxDeploymentServiceRegistration,
     pub port: TableRowPointerBlackboxDeploymentPort,
@@ -604,6 +635,7 @@ pub struct TableRowBlackboxDeploymentTask {
     pub children_blackbox_deployment_task_mount: Vec<TableRowPointerBlackboxDeploymentTaskMount>,
     pub children_blackbox_deployment_env_variable: Vec<TableRowPointerBlackboxDeploymentEnvVariable>,
     pub children_blackbox_deployment_local_file: Vec<TableRowPointerBlackboxDeploymentLocalFile>,
+    pub children_blackbox_deployment_secret_file: Vec<TableRowPointerBlackboxDeploymentSecretFile>,
 }
 
 #[derive(Debug)]
@@ -753,6 +785,13 @@ pub struct TableRowChTestDataset {
     pub parent: TableRowPointerChSchema,
     pub referrers_ch_query_test__test_dataset: Vec<TableRowPointerChQueryTest>,
     pub referrers_ch_mutator_test__test_dataset: Vec<TableRowPointerChMutatorTest>,
+}
+
+#[derive(Debug)]
+pub struct TableRowCustomSecret {
+    pub key: ::std::string::String,
+    pub is_file: bool,
+    pub referrers_blackbox_deployment_secret_file__contents: Vec<TableRowPointerBlackboxDeploymentSecretFile>,
 }
 
 #[derive(Debug)]
@@ -1586,10 +1625,53 @@ pub struct TableRowTld {
     pub domain: ::std::string::String,
     pub automatic_certificates: bool,
     pub dnssec_enabled: bool,
+    pub children_tld_txt_record: Vec<TableRowPointerTldTxtRecord>,
+    pub children_tld_mx_record: Vec<TableRowPointerTldMxRecord>,
+    pub children_tld_cname_record: Vec<TableRowPointerTldCnameRecord>,
     pub referrers_global_settings__admin_tld: Vec<TableRowPointerGlobalSettings>,
     pub referrers_backend_application_deployment_ingress__tld: Vec<TableRowPointerBackendApplicationDeploymentIngress>,
     pub referrers_frontend_application_deployment_ingress__tld: Vec<TableRowPointerFrontendApplicationDeploymentIngress>,
     pub referrers_blackbox_deployment_ingress__tld: Vec<TableRowPointerBlackboxDeploymentIngress>,
+}
+
+#[derive(Debug)]
+pub struct TableRowTldCnameRecord {
+    pub subdomain: ::std::string::String,
+    pub parent: TableRowPointerTld,
+    pub children_tld_cname_record_value: Vec<TableRowPointerTldCnameRecordValue>,
+}
+
+#[derive(Debug)]
+pub struct TableRowTldCnameRecordValue {
+    pub value: ::std::string::String,
+    pub parent: TableRowPointerTldCnameRecord,
+}
+
+#[derive(Debug)]
+pub struct TableRowTldMxRecord {
+    pub subdomain: ::std::string::String,
+    pub parent: TableRowPointerTld,
+    pub children_tld_mx_record_value: Vec<TableRowPointerTldMxRecordValue>,
+}
+
+#[derive(Debug)]
+pub struct TableRowTldMxRecordValue {
+    pub value: ::std::string::String,
+    pub priority: i64,
+    pub parent: TableRowPointerTldMxRecord,
+}
+
+#[derive(Debug)]
+pub struct TableRowTldTxtRecord {
+    pub subdomain: ::std::string::String,
+    pub parent: TableRowPointerTld,
+    pub children_tld_txt_record_value: Vec<TableRowPointerTldTxtRecordValue>,
+}
+
+#[derive(Debug)]
+pub struct TableRowTldTxtRecordValue {
+    pub value: ::std::string::String,
+    pub parent: TableRowPointerTldTxtRecord,
 }
 
 #[derive(Debug)]
@@ -1847,6 +1929,13 @@ pub struct TableDefinitionBlackboxDeploymentPort {
     c_referrers_blackbox_deployment_service_instance__port: Vec<Vec<TableRowPointerBlackboxDeploymentServiceInstance>>,
 }
 
+pub struct TableDefinitionBlackboxDeploymentSecretFile {
+    rows: Vec<TableRowBlackboxDeploymentSecretFile>,
+    c_filename: Vec<::std::string::String>,
+    c_contents: Vec<TableRowPointerCustomSecret>,
+    c_parent: Vec<TableRowPointerBlackboxDeploymentTask>,
+}
+
 pub struct TableDefinitionBlackboxDeploymentServiceInstance {
     rows: Vec<TableRowBlackboxDeploymentServiceInstance>,
     c_service_registration: Vec<TableRowPointerBlackboxDeploymentServiceRegistration>,
@@ -1878,6 +1967,7 @@ pub struct TableDefinitionBlackboxDeploymentTask {
     c_children_blackbox_deployment_task_mount: Vec<Vec<TableRowPointerBlackboxDeploymentTaskMount>>,
     c_children_blackbox_deployment_env_variable: Vec<Vec<TableRowPointerBlackboxDeploymentEnvVariable>>,
     c_children_blackbox_deployment_local_file: Vec<Vec<TableRowPointerBlackboxDeploymentLocalFile>>,
+    c_children_blackbox_deployment_secret_file: Vec<Vec<TableRowPointerBlackboxDeploymentSecretFile>>,
 }
 
 pub struct TableDefinitionBlackboxDeploymentTaskMount {
@@ -2027,6 +2117,13 @@ pub struct TableDefinitionChTestDataset {
     c_parent: Vec<TableRowPointerChSchema>,
     c_referrers_ch_query_test__test_dataset: Vec<Vec<TableRowPointerChQueryTest>>,
     c_referrers_ch_mutator_test__test_dataset: Vec<Vec<TableRowPointerChMutatorTest>>,
+}
+
+pub struct TableDefinitionCustomSecret {
+    rows: Vec<TableRowCustomSecret>,
+    c_key: Vec<::std::string::String>,
+    c_is_file: Vec<bool>,
+    c_referrers_blackbox_deployment_secret_file__contents: Vec<Vec<TableRowPointerBlackboxDeploymentSecretFile>>,
 }
 
 pub struct TableDefinitionDatacenter {
@@ -2860,10 +2957,53 @@ pub struct TableDefinitionTld {
     c_domain: Vec<::std::string::String>,
     c_automatic_certificates: Vec<bool>,
     c_dnssec_enabled: Vec<bool>,
+    c_children_tld_txt_record: Vec<Vec<TableRowPointerTldTxtRecord>>,
+    c_children_tld_mx_record: Vec<Vec<TableRowPointerTldMxRecord>>,
+    c_children_tld_cname_record: Vec<Vec<TableRowPointerTldCnameRecord>>,
     c_referrers_global_settings__admin_tld: Vec<Vec<TableRowPointerGlobalSettings>>,
     c_referrers_backend_application_deployment_ingress__tld: Vec<Vec<TableRowPointerBackendApplicationDeploymentIngress>>,
     c_referrers_frontend_application_deployment_ingress__tld: Vec<Vec<TableRowPointerFrontendApplicationDeploymentIngress>>,
     c_referrers_blackbox_deployment_ingress__tld: Vec<Vec<TableRowPointerBlackboxDeploymentIngress>>,
+}
+
+pub struct TableDefinitionTldCnameRecord {
+    rows: Vec<TableRowTldCnameRecord>,
+    c_subdomain: Vec<::std::string::String>,
+    c_parent: Vec<TableRowPointerTld>,
+    c_children_tld_cname_record_value: Vec<Vec<TableRowPointerTldCnameRecordValue>>,
+}
+
+pub struct TableDefinitionTldCnameRecordValue {
+    rows: Vec<TableRowTldCnameRecordValue>,
+    c_value: Vec<::std::string::String>,
+    c_parent: Vec<TableRowPointerTldCnameRecord>,
+}
+
+pub struct TableDefinitionTldMxRecord {
+    rows: Vec<TableRowTldMxRecord>,
+    c_subdomain: Vec<::std::string::String>,
+    c_parent: Vec<TableRowPointerTld>,
+    c_children_tld_mx_record_value: Vec<Vec<TableRowPointerTldMxRecordValue>>,
+}
+
+pub struct TableDefinitionTldMxRecordValue {
+    rows: Vec<TableRowTldMxRecordValue>,
+    c_value: Vec<::std::string::String>,
+    c_priority: Vec<i64>,
+    c_parent: Vec<TableRowPointerTldMxRecord>,
+}
+
+pub struct TableDefinitionTldTxtRecord {
+    rows: Vec<TableRowTldTxtRecord>,
+    c_subdomain: Vec<::std::string::String>,
+    c_parent: Vec<TableRowPointerTld>,
+    c_children_tld_txt_record_value: Vec<Vec<TableRowPointerTldTxtRecordValue>>,
+}
+
+pub struct TableDefinitionTldTxtRecordValue {
+    rows: Vec<TableRowTldTxtRecordValue>,
+    c_value: Vec<::std::string::String>,
+    c_parent: Vec<TableRowPointerTldTxtRecord>,
 }
 
 pub struct TableDefinitionUniqueApplicationNames {
@@ -2931,6 +3071,7 @@ pub struct Database {
     blackbox_deployment_ingress: TableDefinitionBlackboxDeploymentIngress,
     blackbox_deployment_local_file: TableDefinitionBlackboxDeploymentLocalFile,
     blackbox_deployment_port: TableDefinitionBlackboxDeploymentPort,
+    blackbox_deployment_secret_file: TableDefinitionBlackboxDeploymentSecretFile,
     blackbox_deployment_service_instance: TableDefinitionBlackboxDeploymentServiceInstance,
     blackbox_deployment_service_registration: TableDefinitionBlackboxDeploymentServiceRegistration,
     blackbox_deployment_task: TableDefinitionBlackboxDeploymentTask,
@@ -2948,6 +3089,7 @@ pub struct Database {
     ch_query_test: TableDefinitionChQueryTest,
     ch_schema: TableDefinitionChSchema,
     ch_test_dataset: TableDefinitionChTestDataset,
+    custom_secret: TableDefinitionCustomSecret,
     datacenter: TableDefinitionDatacenter,
     disk_kind: TableDefinitionDiskKind,
     docker_image: TableDefinitionDockerImage,
@@ -3022,6 +3164,12 @@ pub struct Database {
     telegram_channel: TableDefinitionTelegramChannel,
     tempo_cluster: TableDefinitionTempoCluster,
     tld: TableDefinitionTld,
+    tld_cname_record: TableDefinitionTldCnameRecord,
+    tld_cname_record_value: TableDefinitionTldCnameRecordValue,
+    tld_mx_record: TableDefinitionTldMxRecord,
+    tld_mx_record_value: TableDefinitionTldMxRecordValue,
+    tld_txt_record: TableDefinitionTldTxtRecord,
+    tld_txt_record_value: TableDefinitionTldTxtRecordValue,
     unique_application_names: TableDefinitionUniqueApplicationNames,
     unique_deployment_names: TableDefinitionUniqueDeploymentNames,
     valid_server_labels: TableDefinitionValidServerLabels,
@@ -3116,6 +3264,10 @@ impl Database {
         &self.blackbox_deployment_port
     }
 
+    pub fn blackbox_deployment_secret_file(&self) -> &TableDefinitionBlackboxDeploymentSecretFile {
+        &self.blackbox_deployment_secret_file
+    }
+
     pub fn blackbox_deployment_service_instance(&self) -> &TableDefinitionBlackboxDeploymentServiceInstance {
         &self.blackbox_deployment_service_instance
     }
@@ -3182,6 +3334,10 @@ impl Database {
 
     pub fn ch_test_dataset(&self) -> &TableDefinitionChTestDataset {
         &self.ch_test_dataset
+    }
+
+    pub fn custom_secret(&self) -> &TableDefinitionCustomSecret {
+        &self.custom_secret
     }
 
     pub fn datacenter(&self) -> &TableDefinitionDatacenter {
@@ -3478,6 +3634,30 @@ impl Database {
 
     pub fn tld(&self) -> &TableDefinitionTld {
         &self.tld
+    }
+
+    pub fn tld_cname_record(&self) -> &TableDefinitionTldCnameRecord {
+        &self.tld_cname_record
+    }
+
+    pub fn tld_cname_record_value(&self) -> &TableDefinitionTldCnameRecordValue {
+        &self.tld_cname_record_value
+    }
+
+    pub fn tld_mx_record(&self) -> &TableDefinitionTldMxRecord {
+        &self.tld_mx_record
+    }
+
+    pub fn tld_mx_record_value(&self) -> &TableDefinitionTldMxRecordValue {
+        &self.tld_mx_record_value
+    }
+
+    pub fn tld_txt_record(&self) -> &TableDefinitionTldTxtRecord {
+        &self.tld_txt_record
+    }
+
+    pub fn tld_txt_record_value(&self) -> &TableDefinitionTldTxtRecordValue {
+        &self.tld_txt_record_value
     }
 
     pub fn unique_application_names(&self) -> &TableDefinitionUniqueApplicationNames {
@@ -4114,6 +4294,25 @@ impl Database {
             });
         }
 
+        let blackbox_deployment_secret_file_filename: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let blackbox_deployment_secret_file_contents: Vec<TableRowPointerCustomSecret> = ::bincode::deserialize_from(&mut cursor)?;
+        let blackbox_deployment_secret_file_parent: Vec<TableRowPointerBlackboxDeploymentTask> = ::bincode::deserialize_from(&mut cursor)?;
+
+        let blackbox_deployment_secret_file_len = blackbox_deployment_secret_file_parent.len();
+
+        assert_eq!(blackbox_deployment_secret_file_len, blackbox_deployment_secret_file_filename.len());
+        assert_eq!(blackbox_deployment_secret_file_len, blackbox_deployment_secret_file_contents.len());
+
+        let mut rows_blackbox_deployment_secret_file: Vec<TableRowBlackboxDeploymentSecretFile> = Vec::with_capacity(blackbox_deployment_secret_file_len);
+        #[allow(clippy::needless_range_loop)]
+        for row in 0..blackbox_deployment_secret_file_len {
+            rows_blackbox_deployment_secret_file.push(TableRowBlackboxDeploymentSecretFile {
+                filename: blackbox_deployment_secret_file_filename[row].clone(),
+                contents: blackbox_deployment_secret_file_contents[row],
+                parent: blackbox_deployment_secret_file_parent[row],
+            });
+        }
+
         let blackbox_deployment_service_instance_service_registration: Vec<TableRowPointerBlackboxDeploymentServiceRegistration> = ::bincode::deserialize_from(&mut cursor)?;
         let blackbox_deployment_service_instance_port: Vec<TableRowPointerBlackboxDeploymentPort> = ::bincode::deserialize_from(&mut cursor)?;
         let blackbox_deployment_service_instance_parent: Vec<TableRowPointerBlackboxDeploymentGroup> = ::bincode::deserialize_from(&mut cursor)?;
@@ -4175,8 +4374,9 @@ impl Database {
         let blackbox_deployment_task_children_blackbox_deployment_task_mount: Vec<Vec<TableRowPointerBlackboxDeploymentTaskMount>> = ::bincode::deserialize_from(&mut cursor)?;
         let blackbox_deployment_task_children_blackbox_deployment_env_variable: Vec<Vec<TableRowPointerBlackboxDeploymentEnvVariable>> = ::bincode::deserialize_from(&mut cursor)?;
         let blackbox_deployment_task_children_blackbox_deployment_local_file: Vec<Vec<TableRowPointerBlackboxDeploymentLocalFile>> = ::bincode::deserialize_from(&mut cursor)?;
+        let blackbox_deployment_task_children_blackbox_deployment_secret_file: Vec<Vec<TableRowPointerBlackboxDeploymentSecretFile>> = ::bincode::deserialize_from(&mut cursor)?;
 
-        let blackbox_deployment_task_len = blackbox_deployment_task_children_blackbox_deployment_local_file.len();
+        let blackbox_deployment_task_len = blackbox_deployment_task_children_blackbox_deployment_secret_file.len();
 
         assert_eq!(blackbox_deployment_task_len, blackbox_deployment_task_task_name.len());
         assert_eq!(blackbox_deployment_task_len, blackbox_deployment_task_docker_image.len());
@@ -4188,6 +4388,7 @@ impl Database {
         assert_eq!(blackbox_deployment_task_len, blackbox_deployment_task_parent.len());
         assert_eq!(blackbox_deployment_task_len, blackbox_deployment_task_children_blackbox_deployment_task_mount.len());
         assert_eq!(blackbox_deployment_task_len, blackbox_deployment_task_children_blackbox_deployment_env_variable.len());
+        assert_eq!(blackbox_deployment_task_len, blackbox_deployment_task_children_blackbox_deployment_local_file.len());
 
         let mut rows_blackbox_deployment_task: Vec<TableRowBlackboxDeploymentTask> = Vec::with_capacity(blackbox_deployment_task_len);
         #[allow(clippy::needless_range_loop)]
@@ -4204,6 +4405,7 @@ impl Database {
                 children_blackbox_deployment_task_mount: blackbox_deployment_task_children_blackbox_deployment_task_mount[row].clone(),
                 children_blackbox_deployment_env_variable: blackbox_deployment_task_children_blackbox_deployment_env_variable[row].clone(),
                 children_blackbox_deployment_local_file: blackbox_deployment_task_children_blackbox_deployment_local_file[row].clone(),
+                children_blackbox_deployment_secret_file: blackbox_deployment_task_children_blackbox_deployment_secret_file[row].clone(),
             });
         }
 
@@ -4623,6 +4825,25 @@ impl Database {
                 parent: ch_test_dataset_parent[row],
                 referrers_ch_query_test__test_dataset: ch_test_dataset_referrers_ch_query_test__test_dataset[row].clone(),
                 referrers_ch_mutator_test__test_dataset: ch_test_dataset_referrers_ch_mutator_test__test_dataset[row].clone(),
+            });
+        }
+
+        let custom_secret_key: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let custom_secret_is_file: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
+        let custom_secret_referrers_blackbox_deployment_secret_file__contents: Vec<Vec<TableRowPointerBlackboxDeploymentSecretFile>> = ::bincode::deserialize_from(&mut cursor)?;
+
+        let custom_secret_len = custom_secret_referrers_blackbox_deployment_secret_file__contents.len();
+
+        assert_eq!(custom_secret_len, custom_secret_key.len());
+        assert_eq!(custom_secret_len, custom_secret_is_file.len());
+
+        let mut rows_custom_secret: Vec<TableRowCustomSecret> = Vec::with_capacity(custom_secret_len);
+        #[allow(clippy::needless_range_loop)]
+        for row in 0..custom_secret_len {
+            rows_custom_secret.push(TableRowCustomSecret {
+                key: custom_secret_key[row].clone(),
+                is_file: custom_secret_is_file[row],
+                referrers_blackbox_deployment_secret_file__contents: custom_secret_referrers_blackbox_deployment_secret_file__contents[row].clone(),
             });
         }
 
@@ -6961,6 +7182,9 @@ impl Database {
         let tld_domain: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
         let tld_automatic_certificates: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let tld_dnssec_enabled: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_children_tld_txt_record: Vec<Vec<TableRowPointerTldTxtRecord>> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_children_tld_mx_record: Vec<Vec<TableRowPointerTldMxRecord>> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_children_tld_cname_record: Vec<Vec<TableRowPointerTldCnameRecord>> = ::bincode::deserialize_from(&mut cursor)?;
         let tld_referrers_global_settings__admin_tld: Vec<Vec<TableRowPointerGlobalSettings>> = ::bincode::deserialize_from(&mut cursor)?;
         let tld_referrers_backend_application_deployment_ingress__tld: Vec<Vec<TableRowPointerBackendApplicationDeploymentIngress>> = ::bincode::deserialize_from(&mut cursor)?;
         let tld_referrers_frontend_application_deployment_ingress__tld: Vec<Vec<TableRowPointerFrontendApplicationDeploymentIngress>> = ::bincode::deserialize_from(&mut cursor)?;
@@ -6971,6 +7195,9 @@ impl Database {
         assert_eq!(tld_len, tld_domain.len());
         assert_eq!(tld_len, tld_automatic_certificates.len());
         assert_eq!(tld_len, tld_dnssec_enabled.len());
+        assert_eq!(tld_len, tld_children_tld_txt_record.len());
+        assert_eq!(tld_len, tld_children_tld_mx_record.len());
+        assert_eq!(tld_len, tld_children_tld_cname_record.len());
         assert_eq!(tld_len, tld_referrers_global_settings__admin_tld.len());
         assert_eq!(tld_len, tld_referrers_backend_application_deployment_ingress__tld.len());
         assert_eq!(tld_len, tld_referrers_frontend_application_deployment_ingress__tld.len());
@@ -6982,10 +7209,121 @@ impl Database {
                 domain: tld_domain[row].clone(),
                 automatic_certificates: tld_automatic_certificates[row],
                 dnssec_enabled: tld_dnssec_enabled[row],
+                children_tld_txt_record: tld_children_tld_txt_record[row].clone(),
+                children_tld_mx_record: tld_children_tld_mx_record[row].clone(),
+                children_tld_cname_record: tld_children_tld_cname_record[row].clone(),
                 referrers_global_settings__admin_tld: tld_referrers_global_settings__admin_tld[row].clone(),
                 referrers_backend_application_deployment_ingress__tld: tld_referrers_backend_application_deployment_ingress__tld[row].clone(),
                 referrers_frontend_application_deployment_ingress__tld: tld_referrers_frontend_application_deployment_ingress__tld[row].clone(),
                 referrers_blackbox_deployment_ingress__tld: tld_referrers_blackbox_deployment_ingress__tld[row].clone(),
+            });
+        }
+
+        let tld_cname_record_subdomain: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_cname_record_parent: Vec<TableRowPointerTld> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_cname_record_children_tld_cname_record_value: Vec<Vec<TableRowPointerTldCnameRecordValue>> = ::bincode::deserialize_from(&mut cursor)?;
+
+        let tld_cname_record_len = tld_cname_record_children_tld_cname_record_value.len();
+
+        assert_eq!(tld_cname_record_len, tld_cname_record_subdomain.len());
+        assert_eq!(tld_cname_record_len, tld_cname_record_parent.len());
+
+        let mut rows_tld_cname_record: Vec<TableRowTldCnameRecord> = Vec::with_capacity(tld_cname_record_len);
+        #[allow(clippy::needless_range_loop)]
+        for row in 0..tld_cname_record_len {
+            rows_tld_cname_record.push(TableRowTldCnameRecord {
+                subdomain: tld_cname_record_subdomain[row].clone(),
+                parent: tld_cname_record_parent[row],
+                children_tld_cname_record_value: tld_cname_record_children_tld_cname_record_value[row].clone(),
+            });
+        }
+
+        let tld_cname_record_value_value: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_cname_record_value_parent: Vec<TableRowPointerTldCnameRecord> = ::bincode::deserialize_from(&mut cursor)?;
+
+        let tld_cname_record_value_len = tld_cname_record_value_parent.len();
+
+        assert_eq!(tld_cname_record_value_len, tld_cname_record_value_value.len());
+
+        let mut rows_tld_cname_record_value: Vec<TableRowTldCnameRecordValue> = Vec::with_capacity(tld_cname_record_value_len);
+        #[allow(clippy::needless_range_loop)]
+        for row in 0..tld_cname_record_value_len {
+            rows_tld_cname_record_value.push(TableRowTldCnameRecordValue {
+                value: tld_cname_record_value_value[row].clone(),
+                parent: tld_cname_record_value_parent[row],
+            });
+        }
+
+        let tld_mx_record_subdomain: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_mx_record_parent: Vec<TableRowPointerTld> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_mx_record_children_tld_mx_record_value: Vec<Vec<TableRowPointerTldMxRecordValue>> = ::bincode::deserialize_from(&mut cursor)?;
+
+        let tld_mx_record_len = tld_mx_record_children_tld_mx_record_value.len();
+
+        assert_eq!(tld_mx_record_len, tld_mx_record_subdomain.len());
+        assert_eq!(tld_mx_record_len, tld_mx_record_parent.len());
+
+        let mut rows_tld_mx_record: Vec<TableRowTldMxRecord> = Vec::with_capacity(tld_mx_record_len);
+        #[allow(clippy::needless_range_loop)]
+        for row in 0..tld_mx_record_len {
+            rows_tld_mx_record.push(TableRowTldMxRecord {
+                subdomain: tld_mx_record_subdomain[row].clone(),
+                parent: tld_mx_record_parent[row],
+                children_tld_mx_record_value: tld_mx_record_children_tld_mx_record_value[row].clone(),
+            });
+        }
+
+        let tld_mx_record_value_value: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_mx_record_value_priority: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_mx_record_value_parent: Vec<TableRowPointerTldMxRecord> = ::bincode::deserialize_from(&mut cursor)?;
+
+        let tld_mx_record_value_len = tld_mx_record_value_parent.len();
+
+        assert_eq!(tld_mx_record_value_len, tld_mx_record_value_value.len());
+        assert_eq!(tld_mx_record_value_len, tld_mx_record_value_priority.len());
+
+        let mut rows_tld_mx_record_value: Vec<TableRowTldMxRecordValue> = Vec::with_capacity(tld_mx_record_value_len);
+        #[allow(clippy::needless_range_loop)]
+        for row in 0..tld_mx_record_value_len {
+            rows_tld_mx_record_value.push(TableRowTldMxRecordValue {
+                value: tld_mx_record_value_value[row].clone(),
+                priority: tld_mx_record_value_priority[row],
+                parent: tld_mx_record_value_parent[row],
+            });
+        }
+
+        let tld_txt_record_subdomain: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_txt_record_parent: Vec<TableRowPointerTld> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_txt_record_children_tld_txt_record_value: Vec<Vec<TableRowPointerTldTxtRecordValue>> = ::bincode::deserialize_from(&mut cursor)?;
+
+        let tld_txt_record_len = tld_txt_record_children_tld_txt_record_value.len();
+
+        assert_eq!(tld_txt_record_len, tld_txt_record_subdomain.len());
+        assert_eq!(tld_txt_record_len, tld_txt_record_parent.len());
+
+        let mut rows_tld_txt_record: Vec<TableRowTldTxtRecord> = Vec::with_capacity(tld_txt_record_len);
+        #[allow(clippy::needless_range_loop)]
+        for row in 0..tld_txt_record_len {
+            rows_tld_txt_record.push(TableRowTldTxtRecord {
+                subdomain: tld_txt_record_subdomain[row].clone(),
+                parent: tld_txt_record_parent[row],
+                children_tld_txt_record_value: tld_txt_record_children_tld_txt_record_value[row].clone(),
+            });
+        }
+
+        let tld_txt_record_value_value: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_txt_record_value_parent: Vec<TableRowPointerTldTxtRecord> = ::bincode::deserialize_from(&mut cursor)?;
+
+        let tld_txt_record_value_len = tld_txt_record_value_parent.len();
+
+        assert_eq!(tld_txt_record_value_len, tld_txt_record_value_value.len());
+
+        let mut rows_tld_txt_record_value: Vec<TableRowTldTxtRecordValue> = Vec::with_capacity(tld_txt_record_value_len);
+        #[allow(clippy::needless_range_loop)]
+        for row in 0..tld_txt_record_value_len {
+            rows_tld_txt_record_value.push(TableRowTldTxtRecordValue {
+                value: tld_txt_record_value_value[row].clone(),
+                parent: tld_txt_record_value_parent[row],
             });
         }
 
@@ -7295,6 +7633,12 @@ impl Database {
                 c_parent: blackbox_deployment_port_parent,
                 c_referrers_blackbox_deployment_service_instance__port: blackbox_deployment_port_referrers_blackbox_deployment_service_instance__port,
             },
+            blackbox_deployment_secret_file: TableDefinitionBlackboxDeploymentSecretFile {
+                rows: rows_blackbox_deployment_secret_file,
+                c_filename: blackbox_deployment_secret_file_filename,
+                c_contents: blackbox_deployment_secret_file_contents,
+                c_parent: blackbox_deployment_secret_file_parent,
+            },
             blackbox_deployment_service_instance: TableDefinitionBlackboxDeploymentServiceInstance {
                 rows: rows_blackbox_deployment_service_instance,
                 c_service_registration: blackbox_deployment_service_instance_service_registration,
@@ -7324,6 +7668,7 @@ impl Database {
                 c_children_blackbox_deployment_task_mount: blackbox_deployment_task_children_blackbox_deployment_task_mount,
                 c_children_blackbox_deployment_env_variable: blackbox_deployment_task_children_blackbox_deployment_env_variable,
                 c_children_blackbox_deployment_local_file: blackbox_deployment_task_children_blackbox_deployment_local_file,
+                c_children_blackbox_deployment_secret_file: blackbox_deployment_task_children_blackbox_deployment_secret_file,
             },
             blackbox_deployment_task_mount: TableDefinitionBlackboxDeploymentTaskMount {
                 rows: rows_blackbox_deployment_task_mount,
@@ -7459,6 +7804,12 @@ impl Database {
                 c_parent: ch_test_dataset_parent,
                 c_referrers_ch_query_test__test_dataset: ch_test_dataset_referrers_ch_query_test__test_dataset,
                 c_referrers_ch_mutator_test__test_dataset: ch_test_dataset_referrers_ch_mutator_test__test_dataset,
+            },
+            custom_secret: TableDefinitionCustomSecret {
+                rows: rows_custom_secret,
+                c_key: custom_secret_key,
+                c_is_file: custom_secret_is_file,
+                c_referrers_blackbox_deployment_secret_file__contents: custom_secret_referrers_blackbox_deployment_secret_file__contents,
             },
             datacenter: TableDefinitionDatacenter {
                 rows: rows_datacenter,
@@ -8218,10 +8569,47 @@ impl Database {
                 c_domain: tld_domain,
                 c_automatic_certificates: tld_automatic_certificates,
                 c_dnssec_enabled: tld_dnssec_enabled,
+                c_children_tld_txt_record: tld_children_tld_txt_record,
+                c_children_tld_mx_record: tld_children_tld_mx_record,
+                c_children_tld_cname_record: tld_children_tld_cname_record,
                 c_referrers_global_settings__admin_tld: tld_referrers_global_settings__admin_tld,
                 c_referrers_backend_application_deployment_ingress__tld: tld_referrers_backend_application_deployment_ingress__tld,
                 c_referrers_frontend_application_deployment_ingress__tld: tld_referrers_frontend_application_deployment_ingress__tld,
                 c_referrers_blackbox_deployment_ingress__tld: tld_referrers_blackbox_deployment_ingress__tld,
+            },
+            tld_cname_record: TableDefinitionTldCnameRecord {
+                rows: rows_tld_cname_record,
+                c_subdomain: tld_cname_record_subdomain,
+                c_parent: tld_cname_record_parent,
+                c_children_tld_cname_record_value: tld_cname_record_children_tld_cname_record_value,
+            },
+            tld_cname_record_value: TableDefinitionTldCnameRecordValue {
+                rows: rows_tld_cname_record_value,
+                c_value: tld_cname_record_value_value,
+                c_parent: tld_cname_record_value_parent,
+            },
+            tld_mx_record: TableDefinitionTldMxRecord {
+                rows: rows_tld_mx_record,
+                c_subdomain: tld_mx_record_subdomain,
+                c_parent: tld_mx_record_parent,
+                c_children_tld_mx_record_value: tld_mx_record_children_tld_mx_record_value,
+            },
+            tld_mx_record_value: TableDefinitionTldMxRecordValue {
+                rows: rows_tld_mx_record_value,
+                c_value: tld_mx_record_value_value,
+                c_priority: tld_mx_record_value_priority,
+                c_parent: tld_mx_record_value_parent,
+            },
+            tld_txt_record: TableDefinitionTldTxtRecord {
+                rows: rows_tld_txt_record,
+                c_subdomain: tld_txt_record_subdomain,
+                c_parent: tld_txt_record_parent,
+                c_children_tld_txt_record_value: tld_txt_record_children_tld_txt_record_value,
+            },
+            tld_txt_record_value: TableDefinitionTldTxtRecordValue {
+                rows: rows_tld_txt_record_value,
+                c_value: tld_txt_record_value_value,
+                c_parent: tld_txt_record_value_parent,
             },
             unique_application_names: TableDefinitionUniqueApplicationNames {
                 rows: rows_unique_application_names,
@@ -9132,6 +9520,35 @@ impl TableDefinitionBlackboxDeploymentPort {
 
 }
 
+impl TableDefinitionBlackboxDeploymentSecretFile {
+    pub fn len(&self) -> usize {
+        self.rows.len()
+    }
+
+    pub fn rows_iter(&self) -> impl ::std::iter::Iterator<Item = TableRowPointerBlackboxDeploymentSecretFile> {
+        (0..self.rows.len()).map(|idx| {
+            TableRowPointerBlackboxDeploymentSecretFile(idx)
+        })
+    }
+
+    pub fn row(&self, ptr: TableRowPointerBlackboxDeploymentSecretFile) -> &TableRowBlackboxDeploymentSecretFile {
+        &self.rows[ptr.0]
+    }
+
+    pub fn c_filename(&self, ptr: TableRowPointerBlackboxDeploymentSecretFile) -> &::std::string::String {
+        &self.c_filename[ptr.0]
+    }
+
+    pub fn c_contents(&self, ptr: TableRowPointerBlackboxDeploymentSecretFile) -> TableRowPointerCustomSecret {
+        self.c_contents[ptr.0]
+    }
+
+    pub fn c_parent(&self, ptr: TableRowPointerBlackboxDeploymentSecretFile) -> TableRowPointerBlackboxDeploymentTask {
+        self.c_parent[ptr.0]
+    }
+
+}
+
 impl TableDefinitionBlackboxDeploymentServiceInstance {
     pub fn len(&self) -> usize {
         self.rows.len()
@@ -9263,6 +9680,10 @@ impl TableDefinitionBlackboxDeploymentTask {
 
     pub fn c_children_blackbox_deployment_local_file(&self, ptr: TableRowPointerBlackboxDeploymentTask) -> &[TableRowPointerBlackboxDeploymentLocalFile] {
         &self.c_children_blackbox_deployment_local_file[ptr.0]
+    }
+
+    pub fn c_children_blackbox_deployment_secret_file(&self, ptr: TableRowPointerBlackboxDeploymentTask) -> &[TableRowPointerBlackboxDeploymentSecretFile] {
+        &self.c_children_blackbox_deployment_secret_file[ptr.0]
     }
 
 }
@@ -9873,6 +10294,35 @@ impl TableDefinitionChTestDataset {
 
     pub fn c_referrers_ch_mutator_test__test_dataset(&self, ptr: TableRowPointerChTestDataset) -> &[TableRowPointerChMutatorTest] {
         &self.c_referrers_ch_mutator_test__test_dataset[ptr.0]
+    }
+
+}
+
+impl TableDefinitionCustomSecret {
+    pub fn len(&self) -> usize {
+        self.rows.len()
+    }
+
+    pub fn rows_iter(&self) -> impl ::std::iter::Iterator<Item = TableRowPointerCustomSecret> {
+        (0..self.rows.len()).map(|idx| {
+            TableRowPointerCustomSecret(idx)
+        })
+    }
+
+    pub fn row(&self, ptr: TableRowPointerCustomSecret) -> &TableRowCustomSecret {
+        &self.rows[ptr.0]
+    }
+
+    pub fn c_key(&self, ptr: TableRowPointerCustomSecret) -> &::std::string::String {
+        &self.c_key[ptr.0]
+    }
+
+    pub fn c_is_file(&self, ptr: TableRowPointerCustomSecret) -> bool {
+        self.c_is_file[ptr.0]
+    }
+
+    pub fn c_referrers_blackbox_deployment_secret_file__contents(&self, ptr: TableRowPointerCustomSecret) -> &[TableRowPointerBlackboxDeploymentSecretFile] {
+        &self.c_referrers_blackbox_deployment_secret_file__contents[ptr.0]
     }
 
 }
@@ -13281,6 +13731,18 @@ impl TableDefinitionTld {
         self.c_dnssec_enabled[ptr.0]
     }
 
+    pub fn c_children_tld_txt_record(&self, ptr: TableRowPointerTld) -> &[TableRowPointerTldTxtRecord] {
+        &self.c_children_tld_txt_record[ptr.0]
+    }
+
+    pub fn c_children_tld_mx_record(&self, ptr: TableRowPointerTld) -> &[TableRowPointerTldMxRecord] {
+        &self.c_children_tld_mx_record[ptr.0]
+    }
+
+    pub fn c_children_tld_cname_record(&self, ptr: TableRowPointerTld) -> &[TableRowPointerTldCnameRecord] {
+        &self.c_children_tld_cname_record[ptr.0]
+    }
+
     pub fn c_referrers_global_settings__admin_tld(&self, ptr: TableRowPointerTld) -> &[TableRowPointerGlobalSettings] {
         &self.c_referrers_global_settings__admin_tld[ptr.0]
     }
@@ -13295,6 +13757,172 @@ impl TableDefinitionTld {
 
     pub fn c_referrers_blackbox_deployment_ingress__tld(&self, ptr: TableRowPointerTld) -> &[TableRowPointerBlackboxDeploymentIngress] {
         &self.c_referrers_blackbox_deployment_ingress__tld[ptr.0]
+    }
+
+}
+
+impl TableDefinitionTldCnameRecord {
+    pub fn len(&self) -> usize {
+        self.rows.len()
+    }
+
+    pub fn rows_iter(&self) -> impl ::std::iter::Iterator<Item = TableRowPointerTldCnameRecord> {
+        (0..self.rows.len()).map(|idx| {
+            TableRowPointerTldCnameRecord(idx)
+        })
+    }
+
+    pub fn row(&self, ptr: TableRowPointerTldCnameRecord) -> &TableRowTldCnameRecord {
+        &self.rows[ptr.0]
+    }
+
+    pub fn c_subdomain(&self, ptr: TableRowPointerTldCnameRecord) -> &::std::string::String {
+        &self.c_subdomain[ptr.0]
+    }
+
+    pub fn c_parent(&self, ptr: TableRowPointerTldCnameRecord) -> TableRowPointerTld {
+        self.c_parent[ptr.0]
+    }
+
+    pub fn c_children_tld_cname_record_value(&self, ptr: TableRowPointerTldCnameRecord) -> &[TableRowPointerTldCnameRecordValue] {
+        &self.c_children_tld_cname_record_value[ptr.0]
+    }
+
+}
+
+impl TableDefinitionTldCnameRecordValue {
+    pub fn len(&self) -> usize {
+        self.rows.len()
+    }
+
+    pub fn rows_iter(&self) -> impl ::std::iter::Iterator<Item = TableRowPointerTldCnameRecordValue> {
+        (0..self.rows.len()).map(|idx| {
+            TableRowPointerTldCnameRecordValue(idx)
+        })
+    }
+
+    pub fn row(&self, ptr: TableRowPointerTldCnameRecordValue) -> &TableRowTldCnameRecordValue {
+        &self.rows[ptr.0]
+    }
+
+    pub fn c_value(&self, ptr: TableRowPointerTldCnameRecordValue) -> &::std::string::String {
+        &self.c_value[ptr.0]
+    }
+
+    pub fn c_parent(&self, ptr: TableRowPointerTldCnameRecordValue) -> TableRowPointerTldCnameRecord {
+        self.c_parent[ptr.0]
+    }
+
+}
+
+impl TableDefinitionTldMxRecord {
+    pub fn len(&self) -> usize {
+        self.rows.len()
+    }
+
+    pub fn rows_iter(&self) -> impl ::std::iter::Iterator<Item = TableRowPointerTldMxRecord> {
+        (0..self.rows.len()).map(|idx| {
+            TableRowPointerTldMxRecord(idx)
+        })
+    }
+
+    pub fn row(&self, ptr: TableRowPointerTldMxRecord) -> &TableRowTldMxRecord {
+        &self.rows[ptr.0]
+    }
+
+    pub fn c_subdomain(&self, ptr: TableRowPointerTldMxRecord) -> &::std::string::String {
+        &self.c_subdomain[ptr.0]
+    }
+
+    pub fn c_parent(&self, ptr: TableRowPointerTldMxRecord) -> TableRowPointerTld {
+        self.c_parent[ptr.0]
+    }
+
+    pub fn c_children_tld_mx_record_value(&self, ptr: TableRowPointerTldMxRecord) -> &[TableRowPointerTldMxRecordValue] {
+        &self.c_children_tld_mx_record_value[ptr.0]
+    }
+
+}
+
+impl TableDefinitionTldMxRecordValue {
+    pub fn len(&self) -> usize {
+        self.rows.len()
+    }
+
+    pub fn rows_iter(&self) -> impl ::std::iter::Iterator<Item = TableRowPointerTldMxRecordValue> {
+        (0..self.rows.len()).map(|idx| {
+            TableRowPointerTldMxRecordValue(idx)
+        })
+    }
+
+    pub fn row(&self, ptr: TableRowPointerTldMxRecordValue) -> &TableRowTldMxRecordValue {
+        &self.rows[ptr.0]
+    }
+
+    pub fn c_value(&self, ptr: TableRowPointerTldMxRecordValue) -> &::std::string::String {
+        &self.c_value[ptr.0]
+    }
+
+    pub fn c_priority(&self, ptr: TableRowPointerTldMxRecordValue) -> i64 {
+        self.c_priority[ptr.0]
+    }
+
+    pub fn c_parent(&self, ptr: TableRowPointerTldMxRecordValue) -> TableRowPointerTldMxRecord {
+        self.c_parent[ptr.0]
+    }
+
+}
+
+impl TableDefinitionTldTxtRecord {
+    pub fn len(&self) -> usize {
+        self.rows.len()
+    }
+
+    pub fn rows_iter(&self) -> impl ::std::iter::Iterator<Item = TableRowPointerTldTxtRecord> {
+        (0..self.rows.len()).map(|idx| {
+            TableRowPointerTldTxtRecord(idx)
+        })
+    }
+
+    pub fn row(&self, ptr: TableRowPointerTldTxtRecord) -> &TableRowTldTxtRecord {
+        &self.rows[ptr.0]
+    }
+
+    pub fn c_subdomain(&self, ptr: TableRowPointerTldTxtRecord) -> &::std::string::String {
+        &self.c_subdomain[ptr.0]
+    }
+
+    pub fn c_parent(&self, ptr: TableRowPointerTldTxtRecord) -> TableRowPointerTld {
+        self.c_parent[ptr.0]
+    }
+
+    pub fn c_children_tld_txt_record_value(&self, ptr: TableRowPointerTldTxtRecord) -> &[TableRowPointerTldTxtRecordValue] {
+        &self.c_children_tld_txt_record_value[ptr.0]
+    }
+
+}
+
+impl TableDefinitionTldTxtRecordValue {
+    pub fn len(&self) -> usize {
+        self.rows.len()
+    }
+
+    pub fn rows_iter(&self) -> impl ::std::iter::Iterator<Item = TableRowPointerTldTxtRecordValue> {
+        (0..self.rows.len()).map(|idx| {
+            TableRowPointerTldTxtRecordValue(idx)
+        })
+    }
+
+    pub fn row(&self, ptr: TableRowPointerTldTxtRecordValue) -> &TableRowTldTxtRecordValue {
+        &self.rows[ptr.0]
+    }
+
+    pub fn c_value(&self, ptr: TableRowPointerTldTxtRecordValue) -> &::std::string::String {
+        &self.c_value[ptr.0]
+    }
+
+    pub fn c_parent(&self, ptr: TableRowPointerTldTxtRecordValue) -> TableRowPointerTldTxtRecord {
+        self.c_parent[ptr.0]
     }
 
 }

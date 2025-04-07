@@ -15,6 +15,8 @@ jobs+=( provision-vault-secrets.sh )
 scripts/provision-vault-secrets.sh 2>&1 | ts '[%Y-%m-%dT%H:%M:%.SZ] 010 provision-vault-secrets.sh      |' | tee $PROVISIONING_LOG_DIR/010_provision-vault-secrets.sh.log & stage_pids+=( $! )
 jobs+=( provision-consul-resources.sh )
 scripts/provision-consul-resources.sh 2>&1 | ts '[%Y-%m-%dT%H:%M:%.SZ] 010 provision-consul-resources.sh   |' | tee $PROVISIONING_LOG_DIR/010_provision-consul-resources.sh.log & stage_pids+=( $! )
+jobs+=( provision-nomad-namespaces.sh )
+scripts/provision-nomad-namespaces.sh 2>&1 | ts '[%Y-%m-%dT%H:%M:%.SZ] 010 provision-nomad-namespaces.sh   |' | tee $PROVISIONING_LOG_DIR/010_provision-nomad-namespaces.sh.log & stage_pids+=( $! )
 
 job_idx=0
 for pid in "${stage_pids[@]}"; do
@@ -30,8 +32,6 @@ done
 stage=20
 jobs=( )
 stage_pids=( )
-jobs+=( provision-nomad-namespaces.sh )
-scripts/provision-nomad-namespaces.sh 2>&1 | ts '[%Y-%m-%dT%H:%M:%.SZ] 020 provision-nomad-namespaces.sh   |' | tee $PROVISIONING_LOG_DIR/020_provision-nomad-namespaces.sh.log & stage_pids+=( $! )
 jobs+=( schedule-nomad-system-jobs.sh )
 scripts/schedule-nomad-system-jobs.sh 2>&1 | ts '[%Y-%m-%dT%H:%M:%.SZ] 020 schedule-nomad-system-jobs.sh   |' | tee $PROVISIONING_LOG_DIR/020_schedule-nomad-system-jobs.sh.log & stage_pids+=( $! )
 
@@ -135,4 +135,4 @@ for pid in "${stage_pids[@]}"; do
 done
 
 # create log summary
-cat $PROVISIONING_LOG_DIR/010_provision-vault-secrets.sh.log $PROVISIONING_LOG_DIR/010_provision-consul-resources.sh.log $PROVISIONING_LOG_DIR/020_provision-nomad-namespaces.sh.log $PROVISIONING_LOG_DIR/020_schedule-nomad-system-jobs.sh.log $PROVISIONING_LOG_DIR/030_provision-pg-instances.sh.log $PROVISIONING_LOG_DIR/030_provision-ch-instances.sh.log $PROVISIONING_LOG_DIR/030_provision-nats-resources.sh.log $PROVISIONING_LOG_DIR/040_build-epl-apps.sh.log $PROVISIONING_LOG_DIR/050_dr-push-epl-apps.sh.log $PROVISIONING_LOG_DIR/060_schedule-nomad-app-jobs.sh.log $PROVISIONING_LOG_DIR/070_provision-grafana-dashboards.sh.log | sort > $PROVISIONING_LOG_DIR/_combined.log
+cat $PROVISIONING_LOG_DIR/010_provision-vault-secrets.sh.log $PROVISIONING_LOG_DIR/010_provision-consul-resources.sh.log $PROVISIONING_LOG_DIR/010_provision-nomad-namespaces.sh.log $PROVISIONING_LOG_DIR/020_schedule-nomad-system-jobs.sh.log $PROVISIONING_LOG_DIR/030_provision-pg-instances.sh.log $PROVISIONING_LOG_DIR/030_provision-ch-instances.sh.log $PROVISIONING_LOG_DIR/030_provision-nats-resources.sh.log $PROVISIONING_LOG_DIR/040_build-epl-apps.sh.log $PROVISIONING_LOG_DIR/050_dr-push-epl-apps.sh.log $PROVISIONING_LOG_DIR/060_schedule-nomad-app-jobs.sh.log $PROVISIONING_LOG_DIR/070_provision-grafana-dashboards.sh.log | sort > $PROVISIONING_LOG_DIR/_combined.log
