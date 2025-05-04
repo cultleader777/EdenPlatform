@@ -1684,7 +1684,7 @@ DATA STRUCT versioned_type {
         version: 8,
         snapshot_source: "{
             bozo @0 :{
-                foo @0 :I64
+                foo @0 :I64,
                 bozo @1 :I64?
             },
         }"
