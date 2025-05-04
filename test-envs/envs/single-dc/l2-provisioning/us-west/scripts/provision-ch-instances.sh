@@ -49,7 +49,7 @@ wait
 echo Provisioning NATS consumers...
 echo "CREATE TABLE IF NOT EXISTS nats_ch_imp_queue_stream_import ( some_field Int64, some_text String ) ENGINE = NATS settings nats_url = 'epl-nats-main-nats.service.consul:4222', nats_queue_group = 'ch_imp_stream_import', nats_subjects = 'ch_imp.testch.chdb_a.stream_import', nats_format = 'JSONEachRow' " | \
   curl --data-binary @- -s --fail-with-body $CH_URL/?database=chdb_a
-echo "CREATE MATERIALIZED VIEW IF NOT EXISTS nats_consumer_stream_import TO imp_table AS SELECT * FROM nats_ch_imp_queue_stream_import " | \
+echo "CREATE MATERIALIZED VIEW IF NOT EXISTS nats_consumer_stream_import TO imp_table AS SELECT some_field, some_text FROM nats_ch_imp_queue_stream_import " | \
   curl --data-binary @- -s --fail-with-body $CH_URL/?database=chdb_a
 wait
 echo All migrations ran successfully

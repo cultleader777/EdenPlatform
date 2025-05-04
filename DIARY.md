@@ -5522,3 +5522,9 @@ TODO: allow non snake case files and make sure it doesn't clash with epl-env-sec
 DONE: if secret is one template expression and one line just put it in quotes
 
 TODO: update telegram secret api key to use custom secrets
+
+TODO: `cargo build` on compiler environment refreshes dependencies in non destructive manner as compared to `generate-lockfile`
+
+* 2025-05-04
+
+TODO: compile environment generate lockfile corrupts working builds on all apps

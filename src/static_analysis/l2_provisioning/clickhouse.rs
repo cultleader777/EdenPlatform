@@ -866,19 +866,37 @@ set -e
                 let stream_type = db.nats_jetstream_stream().c_stream_type(nats_stream);
                 let vtype = l1proj.versioned_types.value(stream_type);
                 let last_type = vtype.last().unwrap();
-                let types = last_type.the_type().fields.iter().filter_map(|(fname, ftype)| {
+                struct ColumnMap {
+                    table_column: String,
+                    expression_mapping: String,
+                }
+                let c_maps = last_type.the_type().fields.iter().filter_map(|(fname, ftype)| {
                     let ch_type = match &ftype.field_type {
                         ValidVersionedStructType::Bool => "Bool",
                         ValidVersionedStructType::F64 => "Float64",
                         ValidVersionedStructType::I64 => "Int64",
                         ValidVersionedStructType::String => "String",
-                        _other => {
+                        // get String from nats queue, use conversion later to convert to DateTime(9)
+                        ValidVersionedStructType::DateTime => "String",
+                        ValidVersionedStructType::UUID => "UUID",
+                        ValidVersionedStructType::Array(_) | ValidVersionedStructType::Struct(_) | ValidVersionedStructType::Option(_) => {
                             // unsupported type, this will be checked later after async checks
                             return None;
                         }
                     };
-                    return Some(format!("{fname} {ch_type}"));
-                }).collect::<Vec<_>>().join(", ");
+                    // explicitly map columns in case we have some nasty custom sql parsing going on
+                    let expression_mapping = if ftype.field_type == ValidVersionedStructType::DateTime {
+                        format!("parseDateTime64BestEffort({fname}, 9) AS {fname}")
+                    } else {
+                        fname.clone()
+                    };
+                    return Some(ColumnMap {
+                        table_column: format!("{fname} {ch_type}"),
+                        expression_mapping,
+                    });
+                }).collect::<Vec<_>>();
+                let types = c_maps.iter().map(|i| i.table_column.as_str()).collect::<Vec<_>>().join(", ");
+                let maps = c_maps.iter().map(|i| i.expression_mapping.as_str()).collect::<Vec<_>>().join(", ");
                 let nats_cluster = db.nats_jetstream_stream().c_parent(nats_stream);
                 let cluster_name = db.nats_cluster().c_cluster_name(nats_cluster);
                 let nats_port = db.nats_cluster().c_nats_clients_port(nats_cluster);
@@ -888,7 +906,7 @@ set -e
                 writeln!(&mut res, "echo \"CREATE TABLE IF NOT EXISTS nats_ch_imp_queue_{consumer_name} ( {types} ) ENGINE = NATS settings nats_url = '{consul_fqdn}', nats_queue_group = 'ch_imp_{consumer_name}', nats_subjects = '{nats_subject}', nats_format = 'JSONEachRow' \" | \\").unwrap();
                 writeln!(&mut res, "  curl --data-binary @- -s --fail-with-body $CH_URL/?database={db_name}").unwrap();
                 // mat view
-                writeln!(&mut res, "echo \"CREATE MATERIALIZED VIEW IF NOT EXISTS nats_consumer_{consumer_name} TO {target_table} AS SELECT * FROM nats_ch_imp_queue_{consumer_name} \" | \\").unwrap();
+                writeln!(&mut res, "echo \"CREATE MATERIALIZED VIEW IF NOT EXISTS nats_consumer_{consumer_name} TO {target_table} AS SELECT {maps} FROM nats_ch_imp_queue_{consumer_name} \" | \\").unwrap();
                 writeln!(&mut res, "  curl --data-binary @- -s --fail-with-body $CH_URL/?database={db_name}").unwrap();
             }
         }

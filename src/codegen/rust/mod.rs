@@ -491,18 +491,29 @@ fn generate_inner_fields_from_migration(
     });
 
     let needs_quotes = fval == &ValidVersionedStructType::String;
+    let is_datetime = fval == &ValidVersionedStructType::DateTime;
+    let is_uuid = fval == &ValidVersionedStructType::UUID;
     match fval {
         ValidVersionedStructType::String
         | ValidVersionedStructType::I64
         | ValidVersionedStructType::F64
+        | ValidVersionedStructType::DateTime
+        | ValidVersionedStructType::UUID
         | ValidVersionedStructType::Bool => {
             match found_mig {
                 Some(mig) => {
                     match mig {
                         crate::static_analysis::bw_compat_types::parser::MigrationMutatorGeneric::AddField { default_value, .. } => {
+                            // ugly but whatever
+                            if is_datetime { *output += "::chrono::DateTime::<::chrono::FixedOffset>::parse_from_rfc3339(\"" };
                             if needs_quotes { *output += "r#\""};
+                            if is_uuid { *output += "::uuid::Uuid::parse_str(\"" };
                             *output += default_value.as_ref().unwrap();
                             if needs_quotes { *output += "\"#.to_string()"};
+                            // we check beforehand if value is parseable
+                            if is_datetime { *output += "\").unwrap().to_utc()"};
+                            // we check valid uuid default
+                            if is_uuid { *output += "\").unwrap()" };
                             *output += ",\n";
                         },
                         crate::static_analysis::bw_compat_types::parser::MigrationMutatorGeneric::RenameField { from_path, .. } => {
@@ -773,6 +784,12 @@ fn bw_type_to_rust_type(
         }
         ValidVersionedStructType::Bool => {
             output.push_str("bool");
+        }
+        ValidVersionedStructType::DateTime => {
+            output.push_str("::chrono::DateTime<::chrono::Utc>");
+        }
+        ValidVersionedStructType::UUID => {
+            output.push_str("::uuid::Uuid");
         }
         ValidVersionedStructType::Option(inner) => {
             output.push_str("Option<");

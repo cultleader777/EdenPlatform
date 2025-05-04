@@ -109,6 +109,14 @@ ingester:
   # https://github.com/grafana/loki/issues/8615
   autoforget_unhealthy: true
 
+frontend:
+  scheduler_address: epl-loki-main-loki-backend.service.consul:3015
+  address: {{ env "meta.private_ip" }}
+  port: 3013
+
+frontend_worker:
+  scheduler_address: epl-loki-main-loki-backend.service.consul:3015
+
 schema_config:
   configs:
   - from: 2020-05-15
@@ -233,6 +241,14 @@ common:
 ingester:
   # https://github.com/grafana/loki/issues/8615
   autoforget_unhealthy: true
+
+frontend:
+  scheduler_address: epl-loki-main-loki-backend.service.consul:3015
+  address: {{ env "meta.private_ip" }}
+  port: 3013
+
+frontend_worker:
+  scheduler_address: epl-loki-main-loki-backend.service.consul:3015
 
 schema_config:
   configs:
@@ -359,6 +375,14 @@ common:
 ingester:
   # https://github.com/grafana/loki/issues/8615
   autoforget_unhealthy: true
+
+frontend:
+  scheduler_address: epl-loki-main-loki-backend.service.consul:3015
+  address: {{ env "meta.private_ip" }}
+  port: 3013
+
+frontend_worker:
+  scheduler_address: epl-loki-main-loki-backend.service.consul:3015
 
 schema_config:
   configs:

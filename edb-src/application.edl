@@ -385,10 +385,16 @@ DATA STRUCT rust_compilation_environment {
         {
             crate_name: chrono,
             version: 0.4.38,
+            features: serde,
         },
         {
             crate_name: num256,
             version: 0.5.2,
+        },
+        {
+            crate_name: uuid,
+            version: 1.16.0,
+            features: serde,
         },
     ]
 }

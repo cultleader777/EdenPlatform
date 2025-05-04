@@ -214,6 +214,16 @@ fn check_nats_streams_compatibility(db: &Database, schemas: &HashMap<TableRowPoi
                             equivalent_ch_type = Some("String");
                             None
                         }
+                        ValidVersionedStructType::DateTime => {
+                            // DateTime in ch is only 1 second resolution
+                            equivalent_ch_type = Some("DateTime64(9)");
+                            None
+                        }
+                        ValidVersionedStructType::UUID => {
+                            // DateTime in ch is only 1 second resolution
+                            equivalent_ch_type = Some("UUID");
+                            None
+                        }
                     };
 
                 if let Some((msg, the_type)) = error_msg {

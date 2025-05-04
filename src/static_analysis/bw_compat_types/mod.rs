@@ -749,6 +749,34 @@ fn validate_parsed_snapshot(
 
         match (&mut field.field_type, &field.default_value) {
             (ValidVersionedStructType::String, _) => {}
+            (ValidVersionedStructType::DateTime, Some(dv)) => {
+                if let Err(e) = chrono::DateTime::<chrono::FixedOffset>::parse_from_rfc3339(dv.as_str()) {
+                    return Err(
+                        PlatformValidationError::BwTypeSnapshotCannotParseDefaultValueForType {
+                            type_name: type_name.to_string(),
+                            version: type_version,
+                            field_name: fname.clone(),
+                            the_type: "DateTime".to_string(),
+                            default_value: dv.clone(),
+                            parsing_error: e.to_string(),
+                        },
+                    );
+                }
+            }
+            (ValidVersionedStructType::UUID, Some(dv)) => {
+                if let Err(e) = uuid::Uuid::parse_str(dv) {
+                    return Err(
+                        PlatformValidationError::BwTypeSnapshotCannotParseDefaultValueForType {
+                            type_name: type_name.to_string(),
+                            version: type_version,
+                            field_name: fname.clone(),
+                            the_type: "UUID".to_string(),
+                            default_value: dv.clone(),
+                            parsing_error: e.to_string(),
+                        },
+                    );
+                }
+            }
             (ValidVersionedStructType::I64, Some(dv)) => {
                 if let Err(e) = dv.parse::<i64>() {
                     return Err(

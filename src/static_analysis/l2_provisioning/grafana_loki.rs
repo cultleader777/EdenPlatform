@@ -149,6 +149,9 @@ pub fn deploy_loki(
             &format!("epl-minio-{minio_cluster_name}.service.consul:{minio_port}"),
             &minio_user,
             &minio_password,
+            &name,
+            loki_reader_grpc_port,
+            loki_backend_grpc_port,
         );
 
         let loki_job = runtime.fetch_nomad_job(
@@ -397,6 +400,9 @@ fn generate_loki_config(
     minio_url: &str,
     minio_user: &str,
     minio_password: &VaultSecretHandle,
+    cluster_name: &str,
+    reader_port: i64,
+    backend_port: i64,
 ) -> String {
     let consul_acl_token = consul_acl_token.template_expression();
     let minio_password = minio_password.template_expression();
@@ -422,6 +428,14 @@ common:
 ingester:
   # https://github.com/grafana/loki/issues/8615
   autoforget_unhealthy: true
+
+frontend:
+  scheduler_address: epl-loki-{cluster_name}-loki-backend.service.consul:{backend_port}
+  address: {{{{ env "meta.private_ip" }}}}
+  port: {reader_port}
+
+frontend_worker:
+  scheduler_address: epl-loki-{cluster_name}-loki-backend.service.consul:{backend_port}
 
 schema_config:
   configs:

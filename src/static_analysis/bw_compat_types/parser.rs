@@ -5,7 +5,7 @@ use nom::{
     branch::alt,
     bytes::complete::{escaped, tag, take_while1},
     character::complete::{char, digit1, multispace0, multispace1, none_of, one_of},
-    combinator::{cut, opt},
+    combinator::{cut, opt, all_consuming},
     multi::{many0, many1, many_m_n, separated_list1},
     sequence::{delimited, tuple},
     Parser,
@@ -62,6 +62,8 @@ pub enum ValidVersionedStructType {
     I64,
     F64,
     Bool,
+    DateTime,
+    UUID,
     Option(Box<ValidVersionedStructType>),
     Array(Box<ValidVersionedStructType>),
     Struct(VersionedStructGeneric<ValidVersionedStructType>),
@@ -105,11 +107,14 @@ fn valid_field_name(input: Span) -> IResult<Span, Span> {
 }
 
 pub fn valid_base_type_name(input: Span) -> IResult<Span, ValidVersionedStructType> {
+    // TODO: parse just what could be the type and say if we support it
     let (tail, btype) = alt((
         tag("String").map(|_| ValidVersionedStructType::String),
         tag("I64").map(|_| ValidVersionedStructType::I64),
         tag("F64").map(|_| ValidVersionedStructType::F64),
         tag("Bool").map(|_| ValidVersionedStructType::Bool),
+        tag("DateTime").map(|_| ValidVersionedStructType::DateTime),
+        tag("UUID").map(|_| ValidVersionedStructType::UUID),
     ))
     .parse(input)?;
 
@@ -252,7 +257,10 @@ pub(crate) fn parse_migration_snapshot(input: Span) -> IResult<Span, VersionedTy
 fn parse_migration_struct(input: Span) -> IResult<Span, VersionedTypeUnvalidated> {
     let (tail, res) = curly_braces_expression.parse(input)?;
 
-    let (_, fields) = parse_migration_fields(res)?;
+    // TODO: nice error instead of cryptic stuff
+    let (le_tail, fields) = all_consuming(parse_migration_fields)(res)?;
+
+    assert!(le_tail.is_empty(), "Should have been empty");
 
     Ok((tail, VersionedTypeUnvalidated { fields }))
 }
