@@ -91,10 +91,10 @@ DATA docker_image_pin {
     'sha256:8b57b33434c062bfdfc2e8993bfac0158db1c351929a3c69419a30e39fb95713';
   };
   nats_default WITH docker_image_pin_images {
-    'sha256:3ba544a6bbef5767fb28be2737308833ea6f6fbddcb36cc0c8f42bef58ebaf33';
+    'sha256:110974826bc2099b037c3324e47e5bdd743472bff304920ab92c881646d656e3';
   };
   nats_exporter_default WITH docker_image_pin_images {
-    'sha256:31c02aac089a0e9bc5cd9bd1726064f8c6bfa771acbef85a8be88a687e87daba';
+    'sha256:26c826662ac8424597cc9bdf89ea5b606eb66e3c11db9b1215c27d2076bbb01b';
   };
   clickhouse_default WITH docker_image_pin_images {
     'sha256:2e6587b81a267c6152cf2112c3532516424d3eaa36f1b150d5b8847c0e3d5b01';
@@ -217,16 +217,16 @@ DATA STRUCT docker_image [
   },
   {
     image_set: nats,
-    checksum: 'sha256:3ba544a6bbef5767fb28be2737308833ea6f6fbddcb36cc0c8f42bef58ebaf33',
+    checksum: 'sha256:110974826bc2099b037c3324e47e5bdd743472bff304920ab92c881646d656e3',
     repository: 'nats',
-    tag: '2.9.11',
+    tag: '2.11.10',
     architecture: x86_64,
   },
   {
     image_set: nats_exporter,
-    checksum: 'sha256:31c02aac089a0e9bc5cd9bd1726064f8c6bfa771acbef85a8be88a687e87daba',
+    checksum: 'sha256:26c826662ac8424597cc9bdf89ea5b606eb66e3c11db9b1215c27d2076bbb01b',
     repository: 'natsio/prometheus-nats-exporter',
-    tag: '0.11.0',
+    tag: '0.17.3',
     architecture: x86_64,
   },
   {

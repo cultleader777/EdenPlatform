@@ -74,11 +74,14 @@ TABLE pg_deployment_unmanaged_db {
 TABLE pg_deployment_instance {
     instance_id INT PRIMARY KEY CHILD OF pg_deployment,
     pg_server REF FOREIGN CHILD server_volume,
+    // 0 priority means node can't failover to the node
+    failover_priority INT DEFAULT 100,
 
     UNIQUE(pg_server, deployment_name),
     UNIQUE(instance_id, deployment_name),
 
     CHECK { instance_id > 0 },
+    CHECK { failover_priority >= 0 and failover_priority <= 1000 },
 }
 
 TABLE pg_schema {
@@ -104,6 +107,14 @@ TABLE pg_query {
     seqscan_ok BOOL DEFAULT false,
     opt_fields TEXT DEFAULT '',
     CHECK { isSnakeCase(query_name) },
+}
+
+// to communicate via NOTIFY/LISTEN in a typesafe manner
+TABLE pg_channel {
+    channel_name TEXT PRIMARY KEY CHILD OF pg_schema,
+    // could be empty type by default or reference to versioned_type
+    payload_type TEXT DEFAULT '',
+    CHECK { isSnakeCase(channel_name) },
 }
 
 TABLE pg_query_test {

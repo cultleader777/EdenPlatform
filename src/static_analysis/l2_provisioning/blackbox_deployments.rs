@@ -278,9 +278,16 @@ pub fn deploy_blackbox_deployments(
                         let server_host = db.server().c_hostname(db.server_volume().c_parent(server_vol));
                         let mountpoint = db.blackbox_deployment_task_mount().c_target_path(*mnt);
                         let vol_locks_grp = volume_locks.entry(*grp).or_default();
-                        let vol_lock = server_data.server_volume_write_lock(
-                            db, server_vol, format!("Blackbox deployment {depl_name}>{group_name}>{task_name} at server {server_host} volume {vol_name} with mountpoint {mountpoint}")
-                        )?;
+                        let read_only = db.blackbox_deployment_task_mount().c_read_only(*mnt);
+                        let vol_lock = if !read_only {
+                           server_data.server_volume_write_lock(
+                             db, server_vol, format!("Blackbox deployment {depl_name}>{group_name}>{task_name} at server {server_host} volume {vol_name} with mountpoint {mountpoint}")
+                           )?
+                        } else {
+                           server_data.server_volume_read_lock(
+                             db, server_vol, format!("Blackbox deployment {depl_name}>{group_name}>{task_name} at server {server_host} read only volume {vol_name} with mountpoint {mountpoint}")
+                           )?
+                        };
                         assert!(vol_locks_grp.insert(*mnt, vol_lock).is_none());
                     }
                 }

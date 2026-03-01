@@ -3,6 +3,7 @@ use std::fmt::Write;
 
 use convert_case::{Case, Casing};
 
+use crate::database::TableRowPointerPgChannel;
 use crate::{
     codegen::Directory,
     database::{
@@ -499,6 +500,7 @@ fn rust_app_generated_part(
     res += "\n";
 
     res += r#"
+#[derive(Clone)]
 struct AppServicerApi {
     r: ::std::sync::Arc<AppResources>,
     app_implementation: ::std::sync::Arc<dyn AppRequirements + Send + Sync>,
@@ -597,6 +599,7 @@ impl AppApi {
     generate_pg_queries(checked, app, &mut pg_types_needed, &mut res, cgen_context);
     generate_pg_mutators(checked, app, &mut pg_types_needed, &mut res, cgen_context);
     generate_pg_transaction_scripts(checked, app, &mut pg_types_needed, &mut res, cgen_context);
+    generate_pg_notifiers(checked, app, &mut pg_types_needed, &mut res, cgen_context);
     generate_ch_queries(checked, app, &mut ch_types_needed, &mut res, cgen_context);
     generate_ch_mutators(checked, app, &mut ch_types_needed, &mut res, cgen_context);
     generate_ch_inserters(checked, app, &mut ch_types_needed, &mut res, cgen_context);
@@ -656,6 +659,8 @@ struct TransactionState {
         res += ", Box<dyn ::std::error::Error + Send + Sync>>;\n";
     }
 
+    let mut stream_extra_types = String::new();
+
     for stream_ptr in checked
         .db
         .backend_application()
@@ -682,14 +687,41 @@ struct TransactionState {
                 .rust_versioned_type_snippets
                 .value(stream_type);
             let enable_subjects = checked.db.backend_application_nats_stream().c_enable_subjects(*stream_ptr);
-            let input_struct_name = &snippet.nominal_type_name;
+            let mut input_struct_name = snippet.nominal_type_name.to_string();
+            let is_batch = checked.db.backend_application_nats_stream().c_is_batch_consumer(*stream_ptr);
+            let consumer_needs_seq_id = checked.db.backend_application_nats_stream().c_consumer_needs_seq_id(*stream_ptr);
+            let consumer_needs_stream_name = checked.db.backend_application_nats_stream().c_consumer_needs_stream_name(*stream_ptr);
+
+            if is_batch && consumer_needs_seq_id {
+                let stream_name_pascal = stream_name.to_case(Case::Pascal);
+                let wrapper_struct_name = format!("{stream_name_pascal}ConsumerPayload");
+                write!(&mut stream_extra_types, r#"
+pub struct {wrapper_struct_name} {{
+  pub seq_id: u64,
+  pub msg: {input_struct_name},
+}}
+"#).unwrap();
+                input_struct_name = wrapper_struct_name;
+            }
 
             res += "    async fn jetstream_consume_";
             res += stream_name;
             res += "(&self, api: &AppApi, payload: ";
-            res += input_struct_name;
+            if is_batch {
+                res += "Vec<";
+            }
+            res += &input_struct_name;
+            if is_batch {
+                res += ">";
+            }
             if enable_subjects {
                 res += ", subject: &str";
+            }
+            if consumer_needs_stream_name {
+                res += ", stream_name: &str";
+            }
+            if !is_batch && consumer_needs_seq_id {
+                res += ", seq_id: u64"
             }
             res += ") -> Result<(), Box<dyn ::std::error::Error + Send + Sync>>;\n";
         }
@@ -701,8 +733,25 @@ struct TransactionState {
         writeln!(&mut res, "    async fn bg_job_{bg_job_name}(&self, api: AppApi) -> Result<(), Box<dyn ::std::error::Error + Send + Sync>>;").unwrap();
     }
 
+    // postgres notification consumers
+    for pg_shard in checked.db.backend_application().c_children_backend_application_pg_shard(app) {
+        let shard_name = checked.db.backend_application_pg_shard().c_shard_name(*pg_shard);
+        let queries = checked.projections.application_pg_shard_queries.value(*pg_shard);
+        for channel in &queries.consumer_channels {
+            let ech = checked.projections.enriched_pg_channels.value(*channel);
+            let channel_name = checked.db.pg_channel().c_channel_name(*channel);
+            let maybe_payload = ech.payload_type.map(|t| {
+                let snippets = checked.projections.rust_versioned_type_snippets.value(t);
+                format!(", payload: {}", snippets.nominal_type_name)
+            }).unwrap_or_default();
+            writeln!(&mut res, "    async fn pg_listen_{shard_name}_{channel_name}(&self, api: AppApi{maybe_payload}) -> Result<(), Box<dyn ::std::error::Error + Send + Sync>>;").unwrap();
+        }
+    }
+
     res += "}\n";
     res += "\n";
+
+    res += &stream_extra_types;
 
     let used_types = checked.projections.application_used_bw_types.value(app);
     let mut binary_deser_types_needed = false;
@@ -791,7 +840,8 @@ struct TransactionState {
         res += &http_src.rust_endpoint_declaration;
     }
 
-    res += &generate_jetstream_setup_function(cgen_context, checked, app);
+    generate_jetstream_setup_function(&mut res, cgen_context, checked, app);
+    generate_pg_listen_setup_function(&mut res, cgen_context, checked, app);
 
     if !cgen_context.prom_variables.is_empty() {
         res += "\n";
@@ -847,6 +897,7 @@ fn generate_nats_jetstream_publishers(
                 .projections
                 .rust_versioned_type_snippets
                 .value(stream_type);
+            let enable_message_id = checked.db.backend_application_nats_stream().c_enable_message_id(*stream_ptr);
             let enable_subjects = checked.db.backend_application_nats_stream().c_enable_subjects(*stream_ptr);
             let input_struct_name = &snippet.nominal_type_name;
 
@@ -854,6 +905,9 @@ fn generate_nats_jetstream_publishers(
             qargs.push(format!("input: &{}", input_struct_name));
             if enable_subjects {
                 qargs.push("subject: &str".to_string());
+            }
+            if enable_message_id {
+                qargs.push("message_id: &str".to_string());
             }
 
             *res += "\n";
@@ -895,6 +949,9 @@ fn generate_nats_jetstream_publishers(
             *res += "        let payload_size = payload.len();\n";
             *res += "        let mut headers = ::async_nats::HeaderMap::new();\n";
             *res += "        headers.insert(\"trace-id\", trace_id.as_str());\n";
+            if enable_message_id {
+                *res += "        headers.insert(\"Nats-Msg-Id\", message_id);\n";
+            }
             if enable_subjects {
                 writeln!(res, "        let subject = format!(\"{{}}.{{}}\", self.r.nats_stream_{}, subject);", stream_name).unwrap();
             } else {
@@ -1245,7 +1302,14 @@ fn generate_ch_inserters(
             }} else {{ payload += "DEFAULT" }}
 "#).unwrap();
                         }
-                        "Int32" | "Int64" | "Int128" | "Int256" | "Float32" | "Float64" | "Bool" => {
+                        "DateTime64(9)" => {
+                            write!(res, r#"
+            if let Some(row_val) = &row.{fname} {{
+                write!(&mut payload, "'{{}}'", row_val.format("%Y-%m-%d %H:%M:%S%.f")).unwrap();
+            }} else {{ payload += "DEFAULT" }}
+"#).unwrap();
+                        }
+                        "Int32" | "Int64" | "Int128" | "Int256" | "Float32" | "Float64" | "Bool" | "UUID" => {
                             write!(res, r#"
             if let Some(row_val) = &row.{fname} {{
                 write!(&mut payload, "{{}}", row_val).unwrap();
@@ -1253,7 +1317,7 @@ fn generate_ch_inserters(
 "#).unwrap();
                         }
                         other => {
-                            panic!("Unepected type for inserter: {other}")
+                            panic!("Unexpected type for inserter: {other}")
                         }
                     }
                 } else {
@@ -1276,13 +1340,24 @@ fn generate_ch_inserters(
             write!(&mut payload, "'{{}}'", row.{fname}.format("%Y-%m-%d %H:%M:%S")).unwrap();
 "#).unwrap();
                         }
+                        "DateTime64(9)" => {
+                            write!(res, r#"
+            write!(&mut payload, "'{{}}'", row.{fname}.format("%Y-%m-%d %H:%M:%S%.f")).unwrap();
+"#).unwrap();
+                        }
+                        // UUID needs to be quoted but we don't need base64 encoding
+                        "UUID" => {
+                            write!(res, r#"
+            write!(&mut payload, "'{{}}'", row.{fname}).unwrap();
+"#).unwrap();
+                        }
                         "Int32" | "Int64" | "Float32" | "Float64" | "Bool" => {
                             write!(res, r#"
             write!(&mut payload, "{{}}", row.{fname}).unwrap();
 "#).unwrap();
                         }
                         other => {
-                            panic!("Unepected type for inserter: {other}")
+                            panic!("Unexpected type for inserter: {other}")
                         }
                     }
                 }
@@ -1622,7 +1697,7 @@ fn generate_chq_block(
                 if field.optional {
                     format!(r#"
                 let {field_name} = if line_spl[{idx}] == "\\N" {{ None }} else {{
-                    Some(::chrono::NaiveDateTime::parse_from_str(line_spl[{idx}], "%Y-%m-%d %H:%M:%S").map_err(|e| {{
+                    Some(::chrono::NaiveDateTime::parse_from_str(line_spl[{idx}], "%Y-%m-%d %H:%M:%S%.f").map_err(|e| {{
                         span.set_status(::opentelemetry::trace::Status::error(e.to_string()));
                         ChInteractionError::ColumnParseErrorError {{
                             error: e.to_string(),
@@ -1636,7 +1711,7 @@ fn generate_chq_block(
 "#)
                 } else {
                     format!(r#"
-                let {field_name} = ::chrono::NaiveDateTime::parse_from_str(line_spl[{idx}], "%Y-%m-%d %H:%M:%S").map_err(|e| {{
+                let {field_name} = ::chrono::NaiveDateTime::parse_from_str(line_spl[{idx}], "%Y-%m-%d %H:%M:%S%.f").map_err(|e| {{
                     span.set_status(::opentelemetry::trace::Status::error(e.to_string()));
                     ChInteractionError::ColumnParseErrorError {{
                         error: e.to_string(),
@@ -1791,6 +1866,7 @@ fn generate_pg_queries(
                     postgres::ValidDbType::DOUBLE => "f64",
                     postgres::ValidDbType::BOOL => "bool",
                     postgres::ValidDbType::TEXT => "&str",
+                    postgres::ValidDbType::TIMESTAMP => "::chrono::DateTime<::chrono::Utc>",
                 };
                 qargs.push(format!("{}: {}", fq.name, arg_t));
             }
@@ -1881,6 +1957,7 @@ fn generate_pg_mutators(
                     postgres::ValidDbType::DOUBLE => "f64",
                     postgres::ValidDbType::BOOL => "bool",
                     postgres::ValidDbType::TEXT => "&str",
+                    postgres::ValidDbType::TIMESTAMP => "::chrono::DateTime<::chrono::Utc>",
                 };
                 qargs.push(format!("{}: {}", fq.name, arg_t));
             }
@@ -2095,6 +2172,7 @@ fn generate_pg_transaction_scripts(
                                 return_ref: false,
                             });
                         }
+                        crate::static_analysis::databases::postgres::DbQueryOrMutator::Notification(_) => {}
                     }
                 }
 
@@ -2139,6 +2217,7 @@ fn generate_pg_transaction_scripts(
                                 postgres::ValidDbType::DOUBLE => "f64",
                                 postgres::ValidDbType::BOOL => "bool",
                                 postgres::ValidDbType::TEXT => "&str",
+                                postgres::ValidDbType::TIMESTAMP => "::chrono::DateTime<::chrono::Utc>",
                             };
                             qargs.push(format!("{}: {}", fq.name, arg_t));
                         }
@@ -2249,6 +2328,7 @@ fn generate_pg_transaction_scripts(
                                 postgres::ValidDbType::DOUBLE => "f64",
                                 postgres::ValidDbType::BOOL => "bool",
                                 postgres::ValidDbType::TEXT => "&str",
+                                postgres::ValidDbType::TIMESTAMP => "::chrono::DateTime<::chrono::Utc>",
                             };
                             qargs.push(format!("{}: {}", fq.name, arg_t));
                         }
@@ -2284,6 +2364,98 @@ fn generate_pg_transaction_scripts(
                             src += "            ";
                             src += &new_fname;
                             src += ": res,\n";
+
+                            for af in &accumulated_state {
+                                if af.field_name == new_fname {
+                                    continue;
+                                }
+
+                                src += "            ";
+                                src += &af.field_name;
+                                src += ": self.";
+                                src += &af.field_name;
+                                src += ",\n";
+                            }
+
+                            src += "        })\n";
+                        } else {
+                            src += "        Ok(res)\n";
+                        }
+
+                        src += "    }\n";
+
+                        if step.is_multi {
+                            src += "\n";
+                            src += "    pub fn advance(self) -> ";
+                            src += &trx_next_struct_name;
+                            src += " {\n";
+                            src += "        ";
+                            src += &trx_next_struct_name;
+                            src += " {\n";
+                            for af in &accumulated_state {
+                                src += "            ";
+                                src += &af.field_name;
+                                src += ": self.";
+                                src += &af.field_name;
+                                src += ",\n";
+                            }
+                            src += "        }\n";
+                            src += "    }\n";
+                        }
+
+                        src += "\n";
+
+                        new_fname
+                    }
+                    crate::static_analysis::databases::postgres::DbQueryOrMutator::Notification(n) => {
+                        src += "    pub async fn pgn_";
+                        src += checked.db.pg_channel().c_channel_name(*n);
+                        src += "(";
+
+                        let mut qargs = Vec::new();
+                        if !step.is_multi {
+                            qargs.push("self".to_string());
+                        } else {
+                            qargs.push("&mut self".to_string());
+                        }
+
+                        let enriched_channel = checked
+                            .projections
+                            .enriched_pg_channels
+                            .value(*n);
+
+                        if let Some(pt) = enriched_channel.payload_type {
+                            let snippets = checked.projections.rust_versioned_type_snippets.value(pt);
+                            qargs.push(format!("payload: {}", snippets.nominal_type_name));
+                        }
+
+                        src += &qargs.join(", ");
+
+                        src += ") -> Result<";
+                        if !step.is_multi {
+                            src += &trx_next_struct_name;
+                        } else {
+                            src += "()";
+                        };
+                        src += ", PgInteractionError> {\n";
+
+                        generate_pgn_block(
+                            checked,
+                            &mut src,
+                            cgen_context,
+                            app,
+                            *n,
+                            QueryGenContext::InTransaction,
+                            Some(trx_name.as_str()),
+                        );
+
+                        src += "\n";
+
+                        let new_fname = format!("r_{}", checked.db.pg_channel().c_channel_name(*n));
+                        if !step.is_multi {
+                            src += "        Ok(";
+                            src += &trx_next_struct_name;
+                            src += " {\n";
 
                             for af in &accumulated_state {
                                 if af.field_name == new_fname {
@@ -2486,6 +2658,87 @@ fn generate_pg_transaction_scripts(
     }
 }
 
+fn generate_pg_notifiers(
+    checked: &CheckedDB,
+    app: TableRowPointerBackendApplication,
+    pg_types_needed: &mut bool,
+    res: &mut String,
+    cgen_context: &mut RustCodegenContext,
+) {
+    for shard in checked
+        .db
+        .backend_application()
+        .c_children_backend_application_pg_shard(app)
+    {
+        let shard_name = checked
+            .db
+            .backend_application_pg_shard()
+            .c_shard_name(*shard);
+        let queries = checked.projections.application_pg_shard_queries.value(*shard);
+
+
+        for producer in &queries.producer_channels {
+            *pg_types_needed = true;
+            let channel = producer;
+            let channel_name = checked.db.pg_channel().c_channel_name(*producer);
+            *res += "\n";
+            *res += "    pub async fn pgn_";
+            *res += shard_name;
+            *res += "_";
+            *res += channel_name;
+            *res += "(";
+
+            let mut qargs = vec!["&self".to_string()];
+
+            let ech = checked.projections.enriched_pg_channels.value(*producer);
+            if let Some(bwt) = ech.payload_type {
+                let type_data = checked.projections.rust_versioned_type_snippets.value(bwt);
+                qargs.push(format!("payload: {}", type_data.nominal_type_name));
+            }
+
+            *res += &qargs.join(", ");
+
+            *res += ") -> Result<(), PgInteractionError> {\n";
+            *res += "        let pre = ::std::time::Instant::now();\n";
+            writeln!(res, "        let mut span = self.span(\"pg_conn_get\");").unwrap();
+            *res += &format!(
+                r#"        let conn = self.r.pg_conn_{shard_name}.get().await.map_err(|e| {{
+                span.set_status(::opentelemetry::trace::Status::error(e.to_string()));
+                PgInteractionError::ConnectionPoolError(e)
+            }})?;"#
+            );
+            *res += "\n";
+            writeln!(res, "        drop(span);").unwrap();
+
+            let prom_variable = format!("METRIC_PG_CONN_{}", shard_name.to_uppercase());
+            cgen_context.register_prom_variable(
+                prom_variable.clone(),
+                prometheus_conn_pool_metric(
+                    &prom_variable,
+                    checked.db.backend_application().c_application_name(app),
+                    shard_name.as_str(),
+                ),
+            );
+            *res += "        ";
+            *res += &prom_variable;
+            *res += ".observe((::std::time::Instant::now() - pre).as_secs_f64());\n";
+
+            generate_pgn_block(
+                checked,
+                res,
+                cgen_context,
+                app,
+                *channel,
+                QueryGenContext::Standalone,
+                None,
+            );
+
+            *res += "        Ok(())\n";
+            *res += "    }\n";
+        }
+    }
+}
+
 enum QueryGenContext {
     Standalone,
     InTransaction,
@@ -2512,6 +2765,76 @@ impl QueryGenContext {
             QueryGenContext::InTransaction => "TRX_PGQ",
         }
     }
+
+    fn prom_var_notification_prefix(&self) -> &'static str {
+        match self {
+            QueryGenContext::Standalone => "PGN",
+            QueryGenContext::InTransaction => "TRX_PGN",
+        }
+    }
+}
+
+fn generate_pgn_block(
+    checked: &CheckedDB,
+    res: &mut String,
+    cgen_context: &mut RustCodegenContext,
+    app: TableRowPointerBackendApplication,
+    channel: TableRowPointerPgChannel,
+    context: QueryGenContext,
+    transaction: Option<&str>,
+) {
+    let producer = checked.projections.enriched_pg_channels.value(channel);
+    let db = checked.db.pg_channel().c_parent(channel);
+    let channel_name = checked.db.pg_channel().c_channel_name(channel);
+    let span_prefix = "pgn_";
+    *res += "        let pre = ::std::time::Instant::now();\n";
+    match context {
+        QueryGenContext::Standalone => {
+            writeln!(res, "        let mut span = self.span(\"{span_prefix}{channel_name}\");").unwrap();
+        }
+        QueryGenContext::InTransaction => {
+            writeln!(res, "        let mut span = self.state._r.tracer.start_with_context(\"{span_prefix}{channel_name}\", &self.state.context);").unwrap();
+        }
+    }
+    if let Some(bwt) = producer.payload_type {
+        let type_data = checked.projections.rust_versioned_type_snippets.value(bwt);
+        *res += "        let serialized_payload = ";
+        *res += &type_data.json_serialization_function.function_name;
+        *res += "(&payload);\n";
+    }
+    *res += "        let _ = ";
+    *res += context.conn_object();
+    *res += ".execute(\"SELECT pg_notify($1, $2)\", &[&\"";
+    *res += &channel_name;
+    *res += "\"";
+    if producer.payload_type.is_some() {
+        *res += ", &serialized_payload";
+    } else {
+        *res += ", &\"\"";
+    }
+    *res += "]).await.map_err(|e| { span.set_status(::opentelemetry::trace::Status::error(e.to_string())); PgInteractionError::PostgresError(e) })?;\n";
+    let prom_variable = format!(
+        "METRIC_{}_{}_{}",
+        context.prom_var_notification_prefix(),
+        checked.db.pg_schema().c_schema_name(db).to_uppercase(),
+        channel_name.to_uppercase()
+    );
+    cgen_context.register_prom_variable(
+        prom_variable.clone(),
+        prometheus_pg_query_metric(
+            &prom_variable,
+            checked.db.backend_application().c_application_name(app),
+            checked.db.pg_schema().c_schema_name(db),
+            &channel_name,
+            true,
+            false,
+            transaction,
+        ),
+    );
+    *res += "        ";
+    *res += &prom_variable;
+    *res += ".observe((::std::time::Instant::now() - pre).as_secs_f64());\n";
+    // for the returner
 }
 
 fn generate_pgq_block(
@@ -2572,18 +2895,25 @@ fn generate_pgq_block(
             postgres::ValidDbType::FLOAT => format!("&{}", fq.name),
             postgres::ValidDbType::DOUBLE => format!("&{}", fq.name),
             postgres::ValidDbType::BOOL => format!("&{}", fq.name),
-            postgres::ValidDbType::TEXT => fq.name.clone(),
+            postgres::ValidDbType::TEXT => format!("&{}", fq.name),
+            // tokio-postgres accepts naive datetime only
+            postgres::ValidDbType::TIMESTAMP => format!("&{}.naive_utc()", fq.name),
         };
         qargs2.push(arg_n);
     }
     *res += &qargs2.join(", ");
     *res += "]).await.map_err(|e| { span.set_status(::opentelemetry::trace::Status::error(e.to_string())); PgInteractionError::PostgresError(e) })?;\n";
     *res += "        let mut res = Vec::with_capacity(rows.len());\n";
+    let qname_prom = if let Some(trx) = &transaction {
+        format!("{trx}_{qname}")
+    } else {
+        qname.to_string()
+    };
     let prom_variable = format!(
         "METRIC_{}_{}_{}",
         context.prom_var_query_prefix(),
         checked.db.pg_schema().c_schema_name(db).to_uppercase(),
-        qname.to_uppercase()
+        qname_prom.to_uppercase()
     );
     cgen_context.register_prom_variable(
         prom_variable.clone(),
@@ -2611,12 +2941,24 @@ fn generate_pgq_block(
         if oc.optional {
             *res += "Option<";
         }
-        *res += super::pg_db_type_to_rust_type(&oc.the_type);
+        *res += match oc.the_type {
+            postgres::ValidDbType::INT => "i32",
+            postgres::ValidDbType::BIGINT => "i64",
+            postgres::ValidDbType::FLOAT => "f32",
+            postgres::ValidDbType::DOUBLE => "f64",
+            postgres::ValidDbType::BOOL => "bool",
+            postgres::ValidDbType::TEXT => "String",
+            postgres::ValidDbType::TIMESTAMP => "::chrono::NaiveDateTime",
+        };
         if oc.optional {
             *res += ">";
         }
         *res += ">(";
         *res += &idx.to_string();
+        if oc.the_type == postgres::ValidDbType::TIMESTAMP {
+            // cast to UTC for the user, postgres library only accepts NaiveDateTime
+            *res += ").map(|t| t.and_utc()";
+        }
         *res += ").map_err(|e| { span.set_status(::opentelemetry::trace::Status::error(e.to_string())); PgInteractionError::DeserializationError(e.to_string()) })?,\n";
     }
     *res += "            });\n";
@@ -2672,17 +3014,24 @@ fn generate_pgm_block(
             postgres::ValidDbType::FLOAT => format!("&{}", fq.name),
             postgres::ValidDbType::DOUBLE => format!("&{}", fq.name),
             postgres::ValidDbType::BOOL => format!("&{}", fq.name),
-            postgres::ValidDbType::TEXT => fq.name.clone(),
+            postgres::ValidDbType::TEXT => format!("&{}", fq.name),
+            // tokio-postgres accepts naive datetime only
+            postgres::ValidDbType::TIMESTAMP => format!("&{}.naive_utc()", fq.name),
         };
         qargs2.push(arg_n);
     }
     *res += &qargs2.join(", ");
     *res += "]).await.map_err(|e| { span.set_status(::opentelemetry::trace::Status::error(e.to_string())); PgInteractionError::PostgresError(e) })?;\n";
+    let mut_prom = if let Some(trx) = &transaction {
+        format!("{trx}_{mutator_name}")
+    } else {
+        mutator_name.to_string()
+    };
     let prom_variable = format!(
         "METRIC_{}_{}_{}",
         context.prom_var_mutator_prefix(),
         checked.db.pg_schema().c_schema_name(db).to_uppercase(),
-        mutator_name.to_uppercase()
+        mut_prom.to_uppercase()
     );
     cgen_context.register_prom_variable(
         prom_variable.clone(),
@@ -2819,6 +3168,29 @@ fn prometheus_nats_processor_latency_metric(
             "application".to_string() => "{app_name}".to_string(),
             "nats_stream".to_string() => EPL_NATS_STREAM_{nats_stream}.clone(),
             "app_stream".to_string() => "{app_stream}".to_string(),
+        }},
+    )).unwrap();
+"#
+    )
+}
+
+fn prometheus_pg_notify_processor_latency_metric(
+    var_name: &str,
+    app_name: &str,
+    database_name: &str,
+    channel: &str,
+) -> String {
+    format!(
+        r#"
+    static ref {var_name}: ::prometheus::Histogram = ::prometheus::register_histogram!(::prometheus::histogram_opts!(
+        "epl_pg_notify_message_process_time",
+        "Time in which LISTEN message from database was processed in user consumer function",
+        vec![0.001, 0.0025, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0],
+        ::prometheus::labels! {{
+            "deployment_name".to_string() => ::std::env::var("EPL_DEPLOYMENT_NAME").expect("Mandatory environment variable EPL_DEPLOYMENT_NAME is not configured"),
+            "application".to_string() => "{app_name}".to_string(),
+            "database".to_string() => "{database_name}".to_string(),
+            "channel".to_string() => "{channel}".to_string(),
         }},
     )).unwrap();
 "#
@@ -3192,7 +3564,10 @@ fn generate_rust_backend_flake(app_name: &str, nixpkgs_rev: &str) -> String {
           clippy
           trunk
           rust-analyzer
+
         ];
+
+        RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
       };
     });
 }
@@ -3242,6 +3617,22 @@ pub fn generated_main() {
             ::log::error!(\"Failed to schedule jetstream consumers, exiting: {}\", e.to_string());
             ::std::process::exit(7);
         }";
+    }
+
+    for pg_shard in db.db.backend_application().c_children_backend_application_pg_shard(app) {
+        let queries = db.projections.application_pg_shard_queries.value(*pg_shard);
+        if !queries.consumer_channels.is_empty() {
+            res += "
+        let servicer_api = crate::generated::AppServicerApi {
+            r: resources.clone(),
+            app_implementation: app_implementation.clone(),
+        };
+        if let Err(e) = setup_pg_listen_consumers(servicer_api).await {
+            ::log::error!(\"Failed to schedule pg listen consumers, exiting: {}\", e.to_string());
+            ::std::process::exit(7);
+        }";
+            break;
+        }
     }
 
     let bg_jobs = db.db.backend_application().c_children_backend_application_background_job(app);
@@ -3343,12 +3734,11 @@ fn otel_resource() -> ::opentelemetry_sdk::Resource {{
 }
 
 fn generate_jetstream_setup_function(
+    res: &mut String,
     cgen_context: &mut RustCodegenContext,
     db: &CheckedDB,
     app: TableRowPointerBackendApplication,
-) -> String {
-    let mut res = String::new();
-
+) {
     if !db
         .db
         .backend_application()
@@ -3358,7 +3748,7 @@ fn generate_jetstream_setup_function(
         let mut initialized_streams: HashSet<String> = HashSet::new();
         let app_name = db.db.backend_application().c_application_name(app);
 
-        res += r#"
+        *res += r#"
 async fn setup_jetstream_consumers_and_publishers(servicer_data: AppServicerApi) -> Result<(), ::async_nats::Error> {
     use ::futures_util::StreamExt;
 "#;
@@ -3381,7 +3771,7 @@ async fn setup_jetstream_consumers_and_publishers(servicer_data: AppServicerApi)
                 .backend_application_nats_stream()
                 .c_stream_name(*producer);
             if !initialized_streams.contains(stream_name) {
-                res += &format!(
+                *res += &format!(
                     r#"
     // initialize not yet initialized producer stream
     let _ = servicer_data.r.nats_conns[servicer_data.r.nats_conn_id_{stream_name}].get_or_create_stream(::async_nats::jetstream::stream::Config {{
@@ -3421,42 +3811,16 @@ async fn setup_jetstream_consumers_and_publishers(servicer_data: AppServicerApi)
                 .to_case(convert_case::Case::Snake);
 
             let enable_subjects = db.db.backend_application_nats_stream().c_enable_subjects(*stream);
+            let consumer_needs_seq_id = db.db.backend_application_nats_stream().c_consumer_needs_seq_id(*stream);
+            let consumer_needs_stream_name = db.db.backend_application_nats_stream().c_consumer_needs_stream_name(*stream);
 
             initialized_streams.insert(stream_name.clone());
 
-            res += r#"
+            *res += r#"
     {
 "#;
-            res += "        ";
-            res += "let stream_name = &servicer_data.r.nats_stream_";
-            res += stream_name;
-            res += ";\n";
-
-            res += "        ";
-            res += "let consumer_name = &servicer_data.r.deployment_name;\n";
-
-            write!(res,
-                r#"
-        let stream = servicer_data.r.nats_conns[servicer_data.r.nats_conn_id_{}].get_or_create_stream(::async_nats::jetstream::stream::Config {{
-            name: stream_name.clone(),
-            ..Default::default()
-        }}).await?;"#,
-                stream_name
-            ).unwrap();
-
-            write!(res, r#"
-        let consumer = stream.get_or_create_consumer(consumer_name, ::async_nats::jetstream::consumer::pull::Config {{
-            durable_name: Some(consumer_name.clone()),
-            ..Default::default()
-        }}).await?;
-"#).unwrap();
-
-            if enable_subjects {
-                write!(res, r#"
-        let stream_name = stream_name.clone();
-"#).unwrap();
-            }
-
+            *res += "        ";
+            *res += "let servicer_data = servicer_data.clone();\n";
             let maybe_subject_parse =
                 if enable_subjects {
                     r#"
@@ -3465,24 +3829,70 @@ async fn setup_jetstream_consumers_and_publishers(servicer_data: AppServicerApi)
                                             let subject = &stripped_subject[1..];"#
                 } else { "" };
 
-            write!(res, r#"
+            let maybe_add_seq_id = if consumer_needs_seq_id {
+                ", msg.info().map(|i| i.stream_sequence).unwrap_or_default()"
+            } else { "" };
+            let maybe_add_stream_name = if consumer_needs_stream_name {
+                ", stream_name"
+            } else { "" };
 
+            let maybe_add_seq_wrapper_struct = if consumer_needs_seq_id {
+                let stream_name_pascal = stream_name.to_case(Case::Pascal);
+                format!("{stream_name_pascal}ConsumerPayload {{ seq_id: msg.info().map(|i| i.stream_sequence).unwrap_or_default(), msg: input }}")
+            } else { "input".to_string() };
+
+            let is_batch_consumer = db.db.backend_application_nats_stream().c_is_batch_consumer(*stream);
+            let maybe_batch_consumer_variables = if is_batch_consumer {
+                let max_batch_size = db.db.backend_application_nats_stream().c_batch_consumer_max_batch_size(*stream);
+                let flush_deadline_ms = db.db.backend_application_nats_stream().c_batch_consumer_flush_deadline_ms(*stream);
+                format!(r#"
+                let max_match_size = {max_batch_size};
+                let deadline_ms = {flush_deadline_ms};
+                let mut buffer = Vec::with_capacity(max_match_size);
+                let mut last_msg: Option<::async_nats::jetstream::Message> = None;
+                let mut next_flush_deadline = tokio::time::Instant::now() + tokio::time::Duration::from_millis(deadline_ms);
+"#)
+            } else { String::new() };
+
+            // consumer that will always reconnect upon error
+            write!(res, r#"
         tokio::spawn(async move {{
             loop {{
-                match consumer.messages().await {{
-                    Ok(mut messages) => {{
-                        loop {{
-                            match messages.next().await {{
-                                Some(msg) => {{
-                                    match msg {{
-                                        Ok(msg) => {{
-                                            let app_api = build_app_api(&servicer_data, "gen_js_input_{stream_name}", nats_fetch_trace_id(&msg));
-                                            let bytes = msg.message.payload.as_ref();
-                                            let payload_size = bytes.len();
-                                            let pre = ::std::time::Instant::now();
-                                            let deserialized_message = bw_type_{stream_type_name}_deserialize_json(bytes);{maybe_subject_parse}
-                                            match deserialized_message {{
-                                                Ok(input) => {{"#).unwrap();
+                let stream_name = &servicer_data.r.nats_stream_{stream_name};
+                let consumer_name = &servicer_data.r.deployment_name;
+                let stream = match servicer_data.r.nats_conns[servicer_data.r.nats_conn_id_{stream_name}].get_stream(stream_name.clone()).await {{
+                    Ok(stream) => stream,
+                    Err(err) => {{
+                        log::error!("Can't get NATS stream, will retry in 2 seconds, error: {{:?}}", err);
+                        tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+                        continue;
+                    }}
+                }};
+                let consumer = match stream.get_or_create_consumer(consumer_name, ::async_nats::jetstream::consumer::pull::Config {{
+                    durable_name: Some(consumer_name.clone()),
+                    ack_policy: ::async_nats::jetstream::consumer::AckPolicy::All,
+                    deliver_policy: ::async_nats::jetstream::consumer::DeliverPolicy::Last,
+                    ..Default::default()
+                }}).await {{
+                    Ok(consumer) => consumer,
+                    Err(err) => {{
+                        log::error!("Can't create NATS consumer, will retry in 2 seconds, error: {{:?}}", err);
+                        tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+                        continue;
+                    }}
+                }};
+
+                let mut messages = match consumer.messages().await {{
+                    Ok(messages) => messages,
+                    Err(e) => {{
+                        ::log::error!("Error while getting messages from nats stream, will retry in 2 seconds, error: {{:?}}", e);
+                        tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+                        continue;
+                    }}
+                }};
+{maybe_batch_consumer_variables}
+                loop {{"#).unwrap();
+
             let maybe_subject_input = if enable_subjects {
                 ", &subject"
             } else { "" };
@@ -3503,69 +3913,300 @@ async fn setup_jetstream_consumers_and_publishers(servicer_data: AppServicerApi)
                 prometheus_nats_bytes_processed_metric(&prom_bytes_name, app_name, stream_name),
             );
 
-            res += &format!(
-                r#"
+            if is_batch_consumer {
+                write!(res, r#"
+                    tokio::select! {{
+                        msg = messages.next() => {{
+                            if let Some(msg) = msg {{
+                                match msg {{
+                                    Ok(msg) => {{
+                                        let app_api = build_app_api(&servicer_data, "gen_js_input_{stream_name}", nats_fetch_trace_id(&msg));
+                                        let bytes = msg.message.payload.as_ref();
+                                        let payload_size = bytes.len();
+                                        let pre = ::std::time::Instant::now();
+                                        let deserialized_message = bw_type_{stream_type_name}_deserialize_json(bytes);{maybe_subject_parse}
+                                        match deserialized_message {{
+                                            Ok(input) => {{
+                                                buffer.push({maybe_add_seq_wrapper_struct});
+                                                let current_deadline = tokio::time::Instant::now();
+                                                if buffer.len() >= max_match_size || current_deadline >= next_flush_deadline {{
+                                                    next_flush_deadline = tokio::time::Instant::now() + tokio::time::Duration::from_millis(deadline_ms);
+                                                    let mut filled_buffer = Vec::with_capacity(max_match_size);
+                                                    std::mem::swap(&mut filled_buffer, &mut buffer);
                                                     let mut span = app_api.span("impl_js_input_{stream_name}");
-                                                    let res = servicer_data.app_implementation.jetstream_consume_{}(&app_api, input{maybe_subject_input}).await;
-                                                    {prom_latency_name}.observe((::std::time::Instant::now() - pre).as_secs_f64());"#,
-                stream_name
-            );
-            res += r#"
-                                                    match res {
-                                                        Ok(()) => {
-                                                            if let Err(e) = msg.ack().await {
+                                                    let res = servicer_data.app_implementation.jetstream_consume_{stream_name}(&app_api, filled_buffer{maybe_subject_input}{maybe_add_stream_name}).await;
+                                                    {prom_latency_name}.observe((::std::time::Instant::now() - pre).as_secs_f64());
+                                                    match res {{
+                                                        Ok(()) => {{
+                                                            if let Err(e) = msg.ack().await {{
                                                                 span.set_status(::opentelemetry::trace::Status::error(e.to_string()));
-                                                                ::log::error!("Error while acking successfully processed message: {:?}", e);
+                                                                ::log::error!("Error while acking successfully processed message: {{:?}}", e);
                                                                 break;
-                                                            };"#;
-            res += &format!(
-                r#"
-                                                            {prom_bytes_name}.inc_by(payload_size.try_into().unwrap_or_default());"#
-            );
-            res += r#"
-                                                        },
-                                                        Err(e) => {
+                                                            }};
+                                                            last_msg = None;
+                                                        }},
+                                                        Err(e) => {{
                                                             span.set_status(::opentelemetry::trace::Status::error(e.to_string()));
-                                                            ::log::error!("Got error while processing message: {:?}", e);
+                                                            ::log::error!("Got error while processing message: {{:?}}", e);
                                                             break;
-                                                        }
-                                                    }
-                                                },
-                                                Err(e) => {
-                                                    ::log::error!("Error during deserialization of json data: {:?}", e);
-                                                    break;
-                                                },
-                                            }
-                                        },
-                                        Err(e) => {
-                                            ::log::error!("Got error from nats stream: {:?}", e);
+                                                        }}
+                                                    }}
+                                                }} else {{
+                                                    // only if we push message to the buffer and don't process batch we need to store earlier message for acknowledgement later
+                                                    last_msg = Some(msg);
+                                                }}
+                                                {prom_bytes_name}.inc_by(payload_size.try_into().unwrap_or_default());
+                                            }},
+                                            Err(e) => {{
+                                                ::log::error!("Error during deserialization of json data: {{:?}}", e);
+                                                break;
+                                            }},
+                                        }}
+                                    }},
+                                    Err(e) => {{
+                                        ::log::error!("Got error from nats stream: {{:?}}", e);
+                                        break;
+                                    }},
+                                }}
+                            }}
+                        }}
+                        _ = tokio::time::sleep_until(next_flush_deadline) => {{
+                            next_flush_deadline = tokio::time::Instant::now() + tokio::time::Duration::from_millis(deadline_ms);
+                            if !buffer.is_empty() {{
+                                if let Some(msg) = &last_msg {{
+                                    let app_api = build_app_api(&servicer_data, "gen_js_input_{stream_name}", nats_fetch_trace_id(msg));
+                                    let mut span = app_api.span("impl_js_input_{stream_name}");
+                                    let mut filled_buffer = Vec::with_capacity(max_match_size);
+                                    std::mem::swap(&mut filled_buffer, &mut buffer);
+                                    let pre = ::std::time::Instant::now();
+                                    let res = servicer_data.app_implementation.jetstream_consume_{stream_name}(&app_api, filled_buffer{maybe_subject_input}{maybe_add_stream_name}).await;
+                                    {prom_latency_name}.observe((::std::time::Instant::now() - pre).as_secs_f64());
+                                    match res {{
+                                        Ok(()) => {{
+                                            if let Err(e) = msg.ack().await {{
+                                                span.set_status(::opentelemetry::trace::Status::error(e.to_string()));
+                                                ::log::error!("Error while acking successfully processed message: {{:?}}", e);
+                                                break;
+                                            }} else {{
+                                                last_msg = None;
+                                            }}
+                                        }},
+                                        Err(e) => {{
+                                            span.set_status(::opentelemetry::trace::Status::error(e.to_string()));
+                                            ::log::error!("Got error while processing message: {{:?}}", e);
                                             break;
-                                        },
-                                    }
-                                },
-                                None => {},
-                            }
-                        }
-                    },
-                    Err(e) => {
-                        ::log::error!("Error while getting messages from nats stream: {:?}", e);
-                    },
-                }
-                tokio::time::sleep(tokio::time::Duration::from_secs(7)).await;
+                                        }}
+                                    }}
+                                }} else {{
+                                    log::error!("This branch should never happen, if buffer is not empty we should always have last message");
+                                }}
+                            }}
+                        }},
+                    }}
+                }}
+"#).unwrap();
+            } else {
+                write!(res, r#"
+                    match messages.next().await {{
+                        Some(msg) => {{
+                            match msg {{
+                                Ok(msg) => {{
+                                    let app_api = build_app_api(&servicer_data, "gen_js_input_{stream_name}", nats_fetch_trace_id(&msg));
+                                    let bytes = msg.message.payload.as_ref();
+                                    let payload_size = bytes.len();
+                                    let pre = ::std::time::Instant::now();
+                                    let deserialized_message = bw_type_{stream_type_name}_deserialize_json(bytes);{maybe_subject_parse}
+                                    match deserialized_message {{
+                                        Ok(input) => {{
+                                            let mut span = app_api.span("impl_js_input_{stream_name}");
+                                            let res = servicer_data.app_implementation.jetstream_consume_{stream_name}(&app_api, input{maybe_subject_input}{maybe_add_stream_name}{maybe_add_seq_id}).await;
+                                            {prom_latency_name}.observe((::std::time::Instant::now() - pre).as_secs_f64());
+                                            match res {{
+                                                Ok(()) => {{
+                                                    if let Err(e) = msg.ack().await {{
+                                                        span.set_status(::opentelemetry::trace::Status::error(e.to_string()));
+                                                        ::log::error!("Error while acking successfully processed message: {{:?}}", e);
+                                                        break;
+                                                    }}
+                                                    {prom_bytes_name}.inc_by(payload_size.try_into().unwrap_or_default());
+                                                }},
+                                                Err(e) => {{
+                                                    span.set_status(::opentelemetry::trace::Status::error(e.to_string()));
+                                                    ::log::error!("Got error while processing message: {{:?}}", e);
+                                                    break;
+                                                }}
+                                            }}
+                                        }},
+                                        Err(e) => {{
+                                            ::log::error!("Error during deserialization of json data: {{:?}}", e);
+                                            break;
+                                        }},
+                                    }}
+                                }},
+                                Err(e) => {{
+                                    ::log::error!("Got error from nats stream: {{:?}}", e);
+                                    break;
+                                }},
+                            }}
+                        }},
+                        None => {{}},
+                    }}
+                }}
+"#).unwrap();
+            }
+
+            *res += r#"
+                tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
             }
         });
     }
 "#;
         }
 
-        res += r#"
+        *res += r#"
 
     Ok(())
 }
 "#;
     }
+}
 
-    res
+
+fn generate_pg_listen_setup_function(
+    f_res: &mut String,
+    cgen_context: &mut RustCodegenContext,
+    db: &CheckedDB,
+    app: TableRowPointerBackendApplication,
+) {
+    let mut res = String::new();
+    let mut has_consumers = false;
+
+    // TODO: setup prometheus variables
+
+    res += r#"
+async fn setup_pg_listen_consumers(servicer_data: AppServicerApi) -> Result<(), Box<dyn ::std::error::Error + Send + Sync>> {
+"#;
+    for pg_shard in db.db.backend_application().c_children_backend_application_pg_shard(app) {
+        let shard_name = db.db.backend_application_pg_shard().c_shard_name(*pg_shard);
+        let shard_upper = shard_name.to_uppercase();
+        let db_schema = db.db.backend_application_pg_shard().c_pg_schema(*pg_shard);
+        let schema_name = db.db.pg_schema().c_schema_name(db_schema);
+        let queries = db.projections.application_pg_shard_queries.value(*pg_shard);
+        for cons in &queries.consumer_channels {
+            has_consumers = true;
+            let enr_channel = db.projections.enriched_pg_channels.value(*cons);
+            let channel_name = db.db.pg_channel().c_channel_name(*cons);
+            let maybe_parse_payload =
+                if let Some(pt) = enr_channel.payload_type {
+                    let snippets = db.projections.rust_versioned_type_snippets.value(pt);
+                    let deser_func = &snippets.json_deserialization_function.function_name;
+                    format!(r#"
+                                    let payload = n.payload();
+                                    let parsed_payload =
+                                        match {deser_func}(payload.as_bytes()) {{
+                                            Ok(p) => p,
+                                            Err(err) => {{
+                                                log::error!("Can't parse notify payload for postgres shard {shard_name} channel {channel_name}, error: {{:?}}", err);
+                                                continue;
+                                            }}
+                                        }};
+"#)
+                } else { String::new() };
+            let maybe_payload_arg = if enr_channel.payload_type.is_some() {
+                ", parsed_payload"
+            } else { "" };
+            // connect non stop inside a loop
+            // TODO: add tracing context for the payload always?
+            // TODO: set open telemetry error status on error
+            let prom_latency_variable = format!(
+                "METRIC_PGN_PROCESS_{}_{}",
+                schema_name.to_uppercase(),
+                channel_name.to_uppercase()
+            );
+            cgen_context.register_prom_variable(
+                prom_latency_variable.clone(),
+                prometheus_pg_notify_processor_latency_metric(
+                    &prom_latency_variable,
+                    db.db.backend_application().c_application_name(app),
+                    &schema_name,
+                    &channel_name,
+                ),
+            );
+            write!(&mut res, r#"
+    {{
+        use futures_util::StreamExt;
+
+        let servicer_data = servicer_data.clone();
+        let pg_url = ::std::env::var("EPL_PG_CONN_{shard_upper}").expect("must exist at this point");
+        tokio::spawn(async move {{
+            loop {{
+                let (client, mut conn) = match ::tokio_postgres::connect(&pg_url, ::tokio_postgres::NoTls).await {{
+                    Ok(res) => res,
+                    Err(err) => {{
+                        log::error!("Can't connect to postgres database for postgres shard {shard_name} channel {channel_name}, will retry in 2 seconds, error: {{:?}}", err);
+                        tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+                        continue;
+                    }}
+                }};
+
+                let servicer_data = servicer_data.clone();
+                let spawned = tokio::spawn(async move {{
+                    let mut stream = ::futures::stream::poll_fn(move |cx| conn.poll_message(cx));
+                    while let Some(next_msg) = stream.next().await {{
+                        match next_msg {{
+                            Ok(async_msg) => {{
+                                match async_msg {{
+                                    ::tokio_postgres::AsyncMessage::Notification(n) => {{
+                                        let channel = n.channel();{maybe_parse_payload}
+                                        if channel == "{channel_name}" {{
+                                            let app_api = build_app_api(&servicer_data, "pg_listen_{shard_name}_{channel_name}", generate_trace_id());
+                                            let pre = ::std::time::Instant::now();
+                                            if let Err(err) = servicer_data.app_implementation.pg_listen_{shard_name}_{channel_name}(app_api{maybe_payload_arg}).await {{
+                                                log::error!("Error executing pg_listen_{shard_name}_{channel_name} implementation, error: {{:?}}", err);
+                                            }}
+                                            {prom_latency_variable}.observe((::std::time::Instant::now() - pre).as_secs_f64());
+                                        }} else {{
+                                            log::warn!("Received message for wrong channel in postgres shard {shard_name} channel {channel_name}, bad channel name: {{channel}}");
+                                        }}
+                                    }}
+                                    // not interested in other messages
+                                    _ => {{}}
+                                }}
+                            }}
+                            Err(err) => {{
+                                log::error!("Error getting next asynchronous message for postgres shard {shard_name}, will retry in 2 seconds, error: {{:?}}", err);
+                                return;
+                            }}
+                        }}
+                    }}
+                }});
+
+                if let Err(err) = client.execute("LISTEN {channel_name};", &[]).await {{
+                    log::error!("Can't execute LISTEN command for postgres shard {shard_name} channel {channel_name}, will retry in 2 seconds, error: {{:?}}", err);
+                    tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+                    continue;
+                }}
+
+                if let Err(err) = spawned.await {{
+                    log::error!("Postgres connection driver join error for postgres shard {shard_name} channel {channel_name}, will retry in 2 seconds, error: {{:?}}", err);
+                }}
+
+                log::error!("Async messages disconnected from database for postgres shard {shard_name}, will retry in 2 seconds");
+                tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+            }}
+        }});
+    }}
+"#).unwrap()
+        }
+    }
+
+    res += "
+    Ok(())
+}";
+
+    if has_consumers {
+        *f_res += &res;
+    }
 }
 
 fn implementation_backend_mock_rs() -> String {

@@ -14,6 +14,7 @@ TABLE minio_cluster {
     monitoring_cluster TEXT DEFAULT region_default,
     expected_zfs_recordsize TEXT DEFAULT 1M,
     distribute_over_dcs BOOL DEFAULT true,
+    multiple_disk_mediums_ok BOOL DEFAULT false,
 
     instance_memory_mb INT DEFAULT 1024,
     lb_memory_mb INT DEFAULT 64,
@@ -44,4 +45,16 @@ TABLE minio_bucket {
     CHECK { isKebabCase(bucket_name) },
     // s3 bucket naming character limit
     CHECK { string.len(bucket_name) >= 3 and string.len(bucket_name) <= 63 },
+}
+
+// exposes bucket to the world for read only access
+TABLE minio_bucket_public_ingress {
+    bucket REF FOREIGN CHILD minio_bucket,
+    subdomain TEXT DEFAULT '',
+    tld REF tld,
+
+    UNIQUE(tld, subdomain).
+
+    // allow only / for now, implement more if this is every needed
+    // mountpoint TEXT DEFAULT '/',
 }

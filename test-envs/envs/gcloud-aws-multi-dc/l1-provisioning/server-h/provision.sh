@@ -844,16 +844,16 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-client.crt START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN CERTIFICATE-----
-MIIByDCCAW6gAwIBAgIUHsCcloPE2YUJcE4t+fqpa21LfNcwCgYIKoZIzj0EAwIw
-EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjQxMTEzMTU1NjAwWhcNMjUxMTEzMTU1NjAw
-WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAERoeaUPbeUMnQSL+s3mr0dnhn
-NJJFEUuq2OXZnUGqMbjgXyxjNB7+V0/xTSinWwvLO3UKe2c0ijwxQycH73i8T6OB
+MIIByDCCAW6gAwIBAgIUVzF3tlD33yMa/nLS1ersdAoCSWIwCgYIKoZIzj0EAwIw
+EDEOMAwGA1UEAxMFbm9tYWQwHhcNMjUxMjI2MTUzMTAwWhcNMjYxMjI2MTUzMTAw
+WjAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtI4gfUKZiPUlfj5qNs79wGKN
+4H0Kbdh1+dDombaTB3vs+rQL2jLVWhWDppPlE4gYJw45LwhVkf1cMlcsNQ/xFKOB
 tTCBsjAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUF
-BwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFJXB6waOz+FX0daqi0qD1jEKSR6T
+BwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFKUj0Sh7Z/AzhxkAd+DIrCiIpBlV
 MB8GA1UdIwQYMBaAFP6NePTz+Juul1Mk+t06b2nIdx6hMDMGA1UdEQEB/wQpMCeC
 FGNsaWVudC51cy13ZXN0Lm5vbWFkgglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0E
-AwIDSAAwRQIgLk/0rVlcNpLXsp5yFY4DF0BRrohni13LCXInyXDhThACIQDji7YT
-hk57KpxKjqvmNjftJX3AfTmF6u3gqxBHSta0/w==
+AwIDSAAwRQIgOVm3IkCE//4dPlD++LCY+jXA7iCEZ9lLPz5AIJaCfwsCIQDQfA6P
+ssdbBX1CjSPohoeiVU7kJepE0LNqD49YiRcVrw==
 -----END CERTIFICATE-----
 LilBoiPeepLikesBenzTruck
 
@@ -870,9 +870,9 @@ TMP_SECRET_PATH=/run/tmpsec-$RANDOM
 # NIX REGION secret_value_nomad-client.key START
 cat > $TMP_SECRET_PATH <<'LilBoiPeepLikesBenzTruck'
 -----BEGIN EC PRIVATE KEY-----
-MHcCAQEEIG0j2LoiFFwLYQibGytMV+pmCF3s6lYxknfnb2mdvyoCoAoGCCqGSM49
-AwEHoUQDQgAERoeaUPbeUMnQSL+s3mr0dnhnNJJFEUuq2OXZnUGqMbjgXyxjNB7+
-V0/xTSinWwvLO3UKe2c0ijwxQycH73i8Tw==
+MHcCAQEEIIdWi/HtBVKu25lwt0P0exLYcazNLJqH7NpHVyi5mIvMoAoGCCqGSM49
+AwEHoUQDQgAEtI4gfUKZiPUlfj5qNs79wGKN4H0Kbdh1+dDombaTB3vs+rQL2jLV
+WhWDppPlE4gYJw45LwhVkf1cMlcsNQ/xFA==
 -----END EC PRIVATE KEY-----
 LilBoiPeepLikesBenzTruck
 
@@ -2268,7 +2268,7 @@ then
   METRICS_FILE=/var/lib/node_exporter/epl_l1_last_hash.prom
   BOOT_TIME=$( cat /proc/stat | grep btime | awk '{ print $2 }' )
   echo "
-epl_l1_provisioning_last_hash{hash=\"69c9ded741eb9fa22a145b25a75a62c9d72c5dde4693e0cac8b64e9a66f5d1a6\",hostname=\"server-h\"} $BOOT_TIME
+epl_l1_provisioning_last_hash{hash=\"73e67ebb70c0ff2137d2e7b973b4db7ba16a26763dc1781f9bff962e011d3e8a\",hostname=\"server-h\"} $BOOT_TIME
 " > $METRICS_FILE.tmp
   chmod 644 $METRICS_FILE.tmp
   mv -f $METRICS_FILE.tmp $METRICS_FILE

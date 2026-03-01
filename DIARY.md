@@ -5528,3 +5528,89 @@ TODO: `cargo build` on compiler environment refreshes dependencies in non destru
 * 2025-05-04
 
 TODO: compile environment generate lockfile corrupts working builds on all apps
+
+* 2025-05-25
+
+TODO: implement blackbox ro source for clickhouse managed db
+TODO: if secrets differ in value source update them
+TODO: if queries fail in previous time but succeed in present tell with an error
+
+* 2025-06-29
+
+DONE: nomad cli certificate expired, we don't renew it?
+
+* 2025-08-22
+
+TODO: one app build failure takes down deployment of other apps
+
+* 2025-12-09
+
+TODO: generic abstraction that services wait for their files to be available before starting
+TODO: when servers don't exist in a datacenter and we try to get VPN gateway ips assertion fails, it should be an error
+TODO: check vlan ids are unique per datacenter!!
+TODO: nomad initialized with bad id, make sure we wait for our secrets before starting service
+```
+nomad[]: client.rpc: error performing RPC to server which is not safe to automatically retry: error="rpc error: rpc error: node secret ID does not match. Not registering node." rpc=Node.Register server=10.26.17.101:4647
+nomad[]: client: error registering: error="rpc error: rpc error: node secret ID does not match. Not registering node."
+```
+* 2025-12-15
+
+DONE: add TIMESTAMP support for pg inserters
+TODO: add generated inserters for pg
+
+* 2025-12-26
+
+DONE: add pg notify first class support, have two functions:
+- consumer, we just get the new message when it is created
+- waiter, we can call .await on the future to get a new message and use it in the background
+- bb8 pool doesn't support listen notifications, we need dedicated tokio-postgres connection per listen flow
+
+working example
+```
+        let (client, conn) = tokio_postgres::connect("some url", tokio_postgres::NoTls).await?;
+        let stream = futures::stream::poll_fn(move |cx| conn.poll_message(cx));
+        loop {
+            let next_msg = stream.next().await;
+            match next_msg {
+                Some(msg) => {
+                    match msg {
+                        Ok(async_msg) => {
+                            match async_msg {
+                                ::tokio_postgres::AsyncMessage::Notification(n) => {
+                                    n.channel()
+                                }
+                                _ => {}
+                            }
+                        }
+                        Err(e) => {
+                            // TODO: close retry stream here
+                        }
+                    }
+                }
+                None => {
+                    // TODO: close retry stream here
+                }
+            }
+        }
+```
+
+DONE: ensure that pg channels don't clash names in transaction scripts
+TODO: make sure tracing/metrics are tracked correctly inside pg notifications
+
+* 2025-12-28
+
+TODO: all nomad services restart after volume change, how to prevent? reload config instead?
+TODO: Cargo.lock not added to git, can't build app
+DONE: pgnotify workflow doesn't work
+
+* 2026-01-03
+
+TODO: allow ignoring fields in ch importer
+
+* 2026-01-30
+
+TODO: loki ignores retention policy, just replace the whole damn thing with victorialogs
+
+* 2026-02-21
+
+TODO: export external cert expiry times to node exporter as well

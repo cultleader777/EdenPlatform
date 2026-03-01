@@ -315,6 +315,7 @@ impl AppResources {
 }
 
 
+#[derive(Clone)]
 struct AppServicerApi {
     r: ::std::sync::Arc<AppResources>,
     app_implementation: ::std::sync::Arc<dyn AppRequirements + Send + Sync>,
@@ -1032,7 +1033,7 @@ impl TrxDefaultAllAtOnceS1 {
         let mut span = self.state._r.tracer.start_with_context("pgmq_insert_id_returning", &self.state.context);
         let rows = self.state.trx.query(the_query, &[&test_arg]).await.map_err(|e| { span.set_status(::opentelemetry::trace::Status::error(e.to_string())); PgInteractionError::PostgresError(e) })?;
         let mut res = Vec::with_capacity(rows.len());
-        METRIC_TRX_PGQ_TESTDB_INSERT_ID_RETURNING.observe((::std::time::Instant::now() - pre).as_secs_f64());
+        METRIC_TRX_PGQ_TESTDB_ALL_AT_ONCE_INSERT_ID_RETURNING.observe((::std::time::Instant::now() - pre).as_secs_f64());
         for r in rows {
             res.push(PgqTestdbRowInsertIdReturning {
                 id: r.try_get::<usize, i32>(0).map_err(|e| { span.set_status(::opentelemetry::trace::Status::error(e.to_string())); PgInteractionError::DeserializationError(e.to_string()) })?,
@@ -1059,7 +1060,7 @@ impl TrxDefaultAllAtOnceS2 {
         let mut span = self.state._r.tracer.start_with_context("pgq_max_id_from_foo", &self.state.context);
         let rows = self.state.trx.query(the_query, &[&test_arg]).await.map_err(|e| { span.set_status(::opentelemetry::trace::Status::error(e.to_string())); PgInteractionError::PostgresError(e) })?;
         let mut res = Vec::with_capacity(rows.len());
-        METRIC_TRX_PGQ_TESTDB_MAX_ID_FROM_FOO.observe((::std::time::Instant::now() - pre).as_secs_f64());
+        METRIC_TRX_PGQ_TESTDB_ALL_AT_ONCE_MAX_ID_FROM_FOO.observe((::std::time::Instant::now() - pre).as_secs_f64());
         for r in rows {
             res.push(PgqTestdbRowMaxIdFromFoo {
                 max_id: r.try_get::<usize, Option<i32>>(0).map_err(|e| { span.set_status(::opentelemetry::trace::Status::error(e.to_string())); PgInteractionError::DeserializationError(e.to_string()) })?,
@@ -1093,7 +1094,7 @@ impl TrxDefaultAllAtOnceS3 {
         let pre = ::std::time::Instant::now();
         let mut span = self.state._r.tracer.start_with_context("pgm_insert_id", &self.state.context);
         let res = self.state.trx.execute(the_query, &[&test_arg]).await.map_err(|e| { span.set_status(::opentelemetry::trace::Status::error(e.to_string())); PgInteractionError::PostgresError(e) })?;
-        METRIC_TRX_PGM_TESTDB_INSERT_ID.observe((::std::time::Instant::now() - pre).as_secs_f64());
+        METRIC_TRX_PGM_TESTDB_ALL_AT_ONCE_INSERT_ID.observe((::std::time::Instant::now() - pre).as_secs_f64());
 
         Ok(res)
     }
@@ -1878,80 +1879,94 @@ async fn setup_jetstream_consumers_and_publishers(servicer_data: AppServicerApi)
         ..Default::default()
     }).await?;
     {
-        let stream_name = &servicer_data.r.nats_stream_some_test_stream_consumer;
-        let consumer_name = &servicer_data.r.deployment_name;
-
-        let stream = servicer_data.r.nats_conns[servicer_data.r.nats_conn_id_some_test_stream_consumer].get_or_create_stream(::async_nats::jetstream::stream::Config {
-            name: stream_name.clone(),
-            ..Default::default()
-        }).await?;
-        let consumer = stream.get_or_create_consumer(consumer_name, ::async_nats::jetstream::consumer::pull::Config {
-            durable_name: Some(consumer_name.clone()),
-            ..Default::default()
-        }).await?;
-
-        let stream_name = stream_name.clone();
-
+        let servicer_data = servicer_data.clone();
 
         tokio::spawn(async move {
             loop {
-                match consumer.messages().await {
-                    Ok(mut messages) => {
-                        loop {
-                            match messages.next().await {
-                                Some(msg) => {
-                                    match msg {
-                                        Ok(msg) => {
-                                            let app_api = build_app_api(&servicer_data, "gen_js_input_some_test_stream_consumer", nats_fetch_trace_id(&msg));
-                                            let bytes = msg.message.payload.as_ref();
-                                            let payload_size = bytes.len();
-                                            let pre = ::std::time::Instant::now();
-                                            let deserialized_message = bw_type_test_vtype_deserialize_json(bytes);
+                let stream_name = &servicer_data.r.nats_stream_some_test_stream_consumer;
+                let consumer_name = &servicer_data.r.deployment_name;
+                let stream = match servicer_data.r.nats_conns[servicer_data.r.nats_conn_id_some_test_stream_consumer].get_stream(stream_name.clone()).await {
+                    Ok(stream) => stream,
+                    Err(err) => {
+                        log::error!("Can't get NATS stream, will retry in 2 seconds, error: {:?}", err);
+                        tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+                        continue;
+                    }
+                };
+                let consumer = match stream.get_or_create_consumer(consumer_name, ::async_nats::jetstream::consumer::pull::Config {
+                    durable_name: Some(consumer_name.clone()),
+                    ack_policy: ::async_nats::jetstream::consumer::AckPolicy::All,
+                    deliver_policy: ::async_nats::jetstream::consumer::DeliverPolicy::Last,
+                    ..Default::default()
+                }).await {
+                    Ok(consumer) => consumer,
+                    Err(err) => {
+                        log::error!("Can't create NATS consumer, will retry in 2 seconds, error: {:?}", err);
+                        tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+                        continue;
+                    }
+                };
+
+                let mut messages = match consumer.messages().await {
+                    Ok(messages) => messages,
+                    Err(e) => {
+                        ::log::error!("Error while getting messages from nats stream, will retry in 2 seconds, error: {:?}", e);
+                        tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+                        continue;
+                    }
+                };
+
+                loop {
+                    match messages.next().await {
+                        Some(msg) => {
+                            match msg {
+                                Ok(msg) => {
+                                    let app_api = build_app_api(&servicer_data, "gen_js_input_some_test_stream_consumer", nats_fetch_trace_id(&msg));
+                                    let bytes = msg.message.payload.as_ref();
+                                    let payload_size = bytes.len();
+                                    let pre = ::std::time::Instant::now();
+                                    let deserialized_message = bw_type_test_vtype_deserialize_json(bytes);
                                             let stripped_subject = msg.subject.as_str().strip_prefix(stream_name.as_str()).expect("Can't strip subject name");
                                             assert!(stripped_subject.len() > 0);
                                             let subject = &stripped_subject[1..];
-                                            match deserialized_message {
-                                                Ok(input) => {
-                                                    let mut span = app_api.span("impl_js_input_some_test_stream_consumer");
-                                                    let res = servicer_data.app_implementation.jetstream_consume_some_test_stream_consumer(&app_api, input, &subject).await;
-                                                    METRIC_NATS_CONSUMER_LATENCY_SOME_TEST_STREAM_CONSUMER.observe((::std::time::Instant::now() - pre).as_secs_f64());
-                                                    match res {
-                                                        Ok(()) => {
-                                                            if let Err(e) = msg.ack().await {
-                                                                span.set_status(::opentelemetry::trace::Status::error(e.to_string()));
-                                                                ::log::error!("Error while acking successfully processed message: {:?}", e);
-                                                                break;
-                                                            };
-                                                            METRIC_NATS_CONSUMER_BYTES_SOME_TEST_STREAM_CONSUMER.inc_by(payload_size.try_into().unwrap_or_default());
-                                                        },
-                                                        Err(e) => {
-                                                            span.set_status(::opentelemetry::trace::Status::error(e.to_string()));
-                                                            ::log::error!("Got error while processing message: {:?}", e);
-                                                            break;
-                                                        }
+                                    match deserialized_message {
+                                        Ok(input) => {
+                                            let mut span = app_api.span("impl_js_input_some_test_stream_consumer");
+                                            let res = servicer_data.app_implementation.jetstream_consume_some_test_stream_consumer(&app_api, input, &subject).await;
+                                            METRIC_NATS_CONSUMER_LATENCY_SOME_TEST_STREAM_CONSUMER.observe((::std::time::Instant::now() - pre).as_secs_f64());
+                                            match res {
+                                                Ok(()) => {
+                                                    if let Err(e) = msg.ack().await {
+                                                        span.set_status(::opentelemetry::trace::Status::error(e.to_string()));
+                                                        ::log::error!("Error while acking successfully processed message: {:?}", e);
+                                                        break;
                                                     }
+                                                    METRIC_NATS_CONSUMER_BYTES_SOME_TEST_STREAM_CONSUMER.inc_by(payload_size.try_into().unwrap_or_default());
                                                 },
                                                 Err(e) => {
-                                                    ::log::error!("Error during deserialization of json data: {:?}", e);
+                                                    span.set_status(::opentelemetry::trace::Status::error(e.to_string()));
+                                                    ::log::error!("Got error while processing message: {:?}", e);
                                                     break;
-                                                },
+                                                }
                                             }
                                         },
                                         Err(e) => {
-                                            ::log::error!("Got error from nats stream: {:?}", e);
+                                            ::log::error!("Error during deserialization of json data: {:?}", e);
                                             break;
                                         },
                                     }
                                 },
-                                None => {},
+                                Err(e) => {
+                                    ::log::error!("Got error from nats stream: {:?}", e);
+                                    break;
+                                },
                             }
-                        }
-                    },
-                    Err(e) => {
-                        ::log::error!("Error while getting messages from nats stream: {:?}", e);
-                    },
+                        },
+                        None => {},
+                    }
                 }
-                tokio::time::sleep(tokio::time::Duration::from_secs(7)).await;
+
+                tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
             }
         });
     }
@@ -2625,7 +2640,7 @@ async fn setup_jetstream_consumers_and_publishers(servicer_data: AppServicerApi)
         },
     )).unwrap();
 
-    static ref METRIC_TRX_PGM_TESTDB_INSERT_ID: ::prometheus::Histogram = ::prometheus::register_histogram!(::prometheus::histogram_opts!(
+    static ref METRIC_TRX_PGM_TESTDB_ALL_AT_ONCE_INSERT_ID: ::prometheus::Histogram = ::prometheus::register_histogram!(::prometheus::histogram_opts!(
         "epl_pg_query_time",
         "Postgres query time",
         vec![0.001, 0.0025, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0],
@@ -2640,7 +2655,7 @@ async fn setup_jetstream_consumers_and_publishers(servicer_data: AppServicerApi)
         },
     )).unwrap();
 
-    static ref METRIC_TRX_PGQ_TESTDB_INSERT_ID_RETURNING: ::prometheus::Histogram = ::prometheus::register_histogram!(::prometheus::histogram_opts!(
+    static ref METRIC_TRX_PGQ_TESTDB_ALL_AT_ONCE_INSERT_ID_RETURNING: ::prometheus::Histogram = ::prometheus::register_histogram!(::prometheus::histogram_opts!(
         "epl_pg_query_time",
         "Postgres query time",
         vec![0.001, 0.0025, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0],
@@ -2655,7 +2670,7 @@ async fn setup_jetstream_consumers_and_publishers(servicer_data: AppServicerApi)
         },
     )).unwrap();
 
-    static ref METRIC_TRX_PGQ_TESTDB_MAX_ID_FROM_FOO: ::prometheus::Histogram = ::prometheus::register_histogram!(::prometheus::histogram_opts!(
+    static ref METRIC_TRX_PGQ_TESTDB_ALL_AT_ONCE_MAX_ID_FROM_FOO: ::prometheus::Histogram = ::prometheus::register_histogram!(::prometheus::histogram_opts!(
         "epl_pg_query_time",
         "Postgres query time",
         vec![0.001, 0.0025, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0],

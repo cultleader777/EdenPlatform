@@ -897,6 +897,7 @@ pub fn pg_db_type_to_rust_type(vt: &postgres::ValidDbType) -> &'static str {
         postgres::ValidDbType::DOUBLE => "f64",
         postgres::ValidDbType::BOOL => "bool",
         postgres::ValidDbType::TEXT => "String",
+        postgres::ValidDbType::TIMESTAMP => "::chrono::DateTime<::chrono::Utc>",
     }
 }
 
@@ -927,6 +928,8 @@ pub fn ch_str_type_to_rust_type(vt: &str) -> &'static str {
         "String" => "String",
         "Date" => "::chrono::NaiveDate",
         "DateTime" => "::chrono::DateTime<::chrono::Utc>",
+        "DateTime64(9)" => "::chrono::DateTime<::chrono::Utc>",
+        "UUID" => "::uuid::Uuid",
         other => panic!("Unknown ch type to rust type mapping: {other}")
     }
 }

@@ -356,3 +356,43 @@ DATA STRUCT pg_schema {
         )
     );
 }
+
+#[test]
+fn test_channel_no_bw_type() {
+    assert_eq!(
+        PlatformValidationError::PgChannelBwTypeNotFound {
+            pg_schema: "testy".to_string(),
+            channel_name: "chan".to_string(),
+            payload_type_not_found: "some_type".to_string()
+        },
+        common::assert_platform_validation_error_wcustom_data(
+            r#"
+DATA STRUCT pg_channel [
+    {
+        schema_name: testy,
+        channel_name: chan,
+        payload_type: some_type
+    }
+]
+
+DATA STRUCT pg_schema {
+    schema_name: testy WITH pg_migration [
+        {
+            time: 0,
+            upgrade: "CREATE TABLE foo(id INT NOT NULL);",
+            downgrade: "DROP TABLE foo;",
+        },
+    ] WITH pg_test_dataset [
+        {
+            dataset_name: test1,
+            dataset_contents: "
+                foo:
+                - id: 7
+            "
+        }
+    ],
+}
+"#,
+        )
+    );
+}

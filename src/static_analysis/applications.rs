@@ -10,7 +10,7 @@ use crate::database::{
     TableRowPointerFrontendApplicationDeployment,
     TableRowPointerFrontendApplicationDeploymentIngress,
     TableRowPointerFrontendApplicationExternalLink, TableRowPointerFrontendApplicationExternalPage,
-    TableRowPointerFrontendApplicationUsedEndpoint, TableRowPointerNatsJetstreamStream, TableRowPointerRegion, TableRowPointerBackendApplicationS3Bucket, TableRowPointerMinioBucket, TableRowPointerBackendApplicationConfig, TableRowPointerBackendApplicationChShard, TableRowPointerChDeploymentSchemas, TableRowPointerChQuery, TableRowPointerChMutator,
+    TableRowPointerFrontendApplicationUsedEndpoint, TableRowPointerNatsJetstreamStream, TableRowPointerRegion, TableRowPointerBackendApplicationS3Bucket, TableRowPointerMinioBucket, TableRowPointerBackendApplicationConfig, TableRowPointerBackendApplicationChShard, TableRowPointerChDeploymentSchemas, TableRowPointerChQuery, TableRowPointerChMutator, TableRowPointerPgChannel,
 };
 
 use super::{projections::Projection, PlatformValidationError};
@@ -19,6 +19,8 @@ pub struct ApplicationPgQueries {
     pub queries: BTreeSet<TableRowPointerPgQuery>,
     pub mutators: BTreeSet<TableRowPointerPgMutator>,
     pub transactions: BTreeSet<TableRowPointerPgTransaction>,
+    pub consumer_channels: BTreeSet<TableRowPointerPgChannel>,
+    pub producer_channels: BTreeSet<TableRowPointerPgChannel>,
 }
 
 pub fn check_application_build_environments(db: &Database) -> Result<(), PlatformValidationError> {
@@ -43,15 +45,14 @@ pub fn check_application_build_environments(db: &Database) -> Result<(), Platfor
     Ok(())
 }
 
-pub fn check_application_pg_queries(
-    db: &Database,
-) -> Result<
+pub fn check_application_pg_queries(db: &Database) -> Result<
     Projection<TableRowPointerBackendApplicationPgShard, ApplicationPgQueries>,
     PlatformValidationError,
 > {
     let mut queries_index: HashMap<String, TableRowPointerPgQuery> = HashMap::new();
     let mut mutators_index: HashMap<String, TableRowPointerPgMutator> = HashMap::new();
     let mut transactions_index: HashMap<String, TableRowPointerPgTransaction> = HashMap::new();
+    let mut channels_index: HashMap<String, TableRowPointerPgChannel> = HashMap::new();
 
     for dbq in db.pg_query().rows_iter() {
         let schema = db.pg_query().c_parent(dbq);
@@ -92,10 +93,25 @@ pub fn check_application_pg_queries(
         );
     }
 
+    for ch in db.pg_channel().rows_iter() {
+        let schema = db.pg_channel().c_parent(ch);
+        let key = format!(
+            "{}=>{}",
+            db.pg_schema().c_schema_name(schema),
+            db.pg_channel().c_channel_name(ch)
+        );
+        assert!(
+            channels_index.insert(key, ch).is_none(),
+            "Duplicate keys detected in pg channels, this should have been detected earlier"
+        );
+    }
+
     Projection::maybe_create(db.backend_application_pg_shard().rows_iter(), |shard| {
         let queries_src = db.backend_application_pg_shard().c_used_queries(shard);
         let mutators_src = db.backend_application_pg_shard().c_used_mutators(shard);
         let transactions_src = db.backend_application_pg_shard().c_used_transactions(shard);
+        let consumer_channels_src = db.backend_application_pg_shard().c_used_consumer_channels(shard);
+        let producer_channels_src = db.backend_application_pg_shard().c_used_producer_channels(shard);
         let pg_schema = db.backend_application_pg_shard().c_pg_schema(shard);
         let pg_schema_name = db.pg_schema().c_schema_name(pg_schema);
 
@@ -103,6 +119,8 @@ pub fn check_application_pg_queries(
             queries: BTreeSet::new(),
             mutators: BTreeSet::new(),
             transactions: BTreeSet::new(),
+            consumer_channels: BTreeSet::new(),
+            producer_channels: BTreeSet::new(),
         };
 
         for line in queries_src
@@ -220,6 +238,90 @@ pub fn check_application_pg_queries(
                     PlatformValidationError::ApplicationPgShardTransactionNotFoundInPgSchema {
                         transactions_src: transactions_src.clone(),
                         transaction_not_found: line.to_string(),
+                        application_pg_schema: pg_schema_name.clone(),
+                        application_pg_shard: db
+                            .backend_application_pg_shard()
+                            .c_shard_name(shard)
+                            .to_string(),
+                        application: db
+                            .backend_application()
+                            .c_application_name(db.backend_application_pg_shard().c_parent(shard))
+                            .to_string(),
+                    },
+                );
+            }
+        }
+
+        for line in consumer_channels_src
+            .lines()
+            .filter_map(|i| Some(i.trim()).filter(|i| !i.is_empty()))
+        {
+            let key = format!("{pg_schema_name}=>{line}");
+            if let Some(v) = channels_index.get(&key) {
+                if !queries.consumer_channels.insert(*v) {
+                    return Err(
+                        PlatformValidationError::ApplicationPgShardConsumerChannelDefinedTwice {
+                            consumer_channels_src: consumer_channels_src.to_string(),
+                            consumer_channel_defined_twice: line.to_string(),
+                            application_pg_schema: pg_schema_name.clone(),
+                            application_pg_shard: db
+                                .backend_application_pg_shard()
+                                .c_shard_name(shard)
+                                .to_string(),
+                            application: db
+                                .backend_application()
+                                .c_application_name(db.backend_application_pg_shard().c_parent(shard))
+                                .to_string(),
+                        },
+                    );
+                }
+            } else {
+                return Err(
+                    PlatformValidationError::ApplicationPgConsumerChannelNotFoundInPgSchema {
+                        consumer_channels_src: consumer_channels_src.clone(),
+                        consumer_channel_not_found: line.to_string(),
+                        application_pg_schema: pg_schema_name.clone(),
+                        application_pg_shard: db
+                            .backend_application_pg_shard()
+                            .c_shard_name(shard)
+                            .to_string(),
+                        application: db
+                            .backend_application()
+                            .c_application_name(db.backend_application_pg_shard().c_parent(shard))
+                            .to_string(),
+                    },
+                );
+            }
+        }
+
+        for line in producer_channels_src
+            .lines()
+            .filter_map(|i| Some(i.trim()).filter(|i| !i.is_empty()))
+        {
+            let key = format!("{pg_schema_name}=>{line}");
+            if let Some(v) = channels_index.get(&key) {
+                if !queries.producer_channels.insert(*v) {
+                    return Err(
+                        PlatformValidationError::ApplicationPgShardProducerChannelDefinedTwice {
+                            producer_channels_src: producer_channels_src.to_string(),
+                            producer_channel_defined_twice: line.to_string(),
+                            application_pg_schema: pg_schema_name.clone(),
+                            application_pg_shard: db
+                                .backend_application_pg_shard()
+                                .c_shard_name(shard)
+                                .to_string(),
+                            application: db
+                                .backend_application()
+                                .c_application_name(db.backend_application_pg_shard().c_parent(shard))
+                                .to_string(),
+                        },
+                    );
+                }
+            } else {
+                return Err(
+                    PlatformValidationError::ApplicationPgProducerChannelNotFoundInPgSchema {
+                        producer_channels_src: producer_channels_src.clone(),
+                        producer_channel_not_found: line.to_string(),
                         application_pg_schema: pg_schema_name.clone(),
                         application_pg_shard: db
                             .backend_application_pg_shard()
@@ -944,6 +1046,8 @@ pub fn application_deployments_nats_stream_wiring(
 
                             let app_stream_subjects_enabled = db.backend_application_nats_stream().c_enable_subjects(*app_sh);
                             let final_stream_subjects_enabled = db.nats_jetstream_stream().c_enable_subjects(*nats_stream);
+                            let app_stream_message_id_enabled = db.backend_application_nats_stream().c_enable_message_id(*app_sh);
+                            let final_stream_message_id_enabled = db.nats_jetstream_stream().c_enable_message_id(*nats_stream);
 
                             if app_stream_subjects_enabled != final_stream_subjects_enabled {
                                 return Err(PlatformValidationError::ApplicationStreamWiringSubjectsEnabledMismatch {
@@ -953,6 +1057,17 @@ pub fn application_deployments_nats_stream_wiring(
                                     application_expected_enable_subjects: app_stream_subjects_enabled,
                                     target_deployment_stream_enable_subjects: final_stream_subjects_enabled,
                                     explanation: "Application expected NATS stream enable_subjects value mismatches wired NATS cluster stream enable_subjects value",
+                                });
+                            }
+
+                            if app_stream_message_id_enabled != final_stream_message_id_enabled {
+                                return Err(PlatformValidationError::ApplicationStreamWiringMessageIdEnabledMismatch {
+                                    application_deployment: deployment_name.clone(),
+                                    application_name: application_name.clone(),
+                                    bad_line: line.to_string(),
+                                    application_expected_enable_message_id: app_stream_message_id_enabled,
+                                    target_deployment_stream_enable_message_id: final_stream_message_id_enabled,
+                                    explanation: "Application expected NATS stream enable_message_id value mismatches wired NATS cluster stream enable_message_id value",
                                 });
                             }
 

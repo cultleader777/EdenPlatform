@@ -76,43 +76,68 @@ pub(crate) fn provision_nomad(
             nomad_secrets.tls_ca_certificate.clone(),
         ))
         .absolute_path();
+        plan.add_zfs_dataset("nomad".to_string(), ZfsDataset {
+            compression_enabled: true,
+            encryption_enabled: true,
+            expose_to_containers: false,
+            mountpoint: "/var/lib/nomad".to_string(),
+            record_size: "4k".to_string(),
+            zpool: "rpool".to_string(),
+        });
+        let change_flag = "restart-nomad".to_string();
         if is_server {
-            plan.add_zfs_dataset("nomad".to_string(), ZfsDataset {
-                compression_enabled: true,
-                encryption_enabled: true,
-                expose_to_containers: false,
-                mountpoint: "/var/lib/nomad".to_string(),
-                record_size: "4k".to_string(),
-                zpool: "rpool".to_string(),
-            });
-            let _ = plan.add_secret(nixplan::root_secret_key(
+            let _ = plan.add_secret(nixplan::root_secret_key_with_change_flag(
                 "nomad-server.crt".to_string(),
                 region_secrets.server_tls_certificate.clone(),
+                change_flag.to_string(),
             ));
-            let _ = plan.add_secret(nixplan::root_secret_key(
+            let _ = plan.add_secret(nixplan::root_secret_key_with_change_flag(
                 "nomad-server.key".to_string(),
                 region_secrets.server_tls_key.clone(),
+                change_flag.to_string(),
             ));
-            let _ = plan.add_secret(nixplan::root_secret_key(
+            let _ = plan.add_secret(nixplan::root_secret_key_with_change_flag(
                 "nomad-cli.crt".to_string(),
                 nomad_secrets.cli_tls_certificate.clone(),
+                change_flag.to_string(),
             ));
-            let _ = plan.add_secret(nixplan::root_secret_key(
+            let _ = plan.add_secret(nixplan::root_secret_key_with_change_flag(
                 "nomad-cli.key".to_string(),
                 nomad_secrets.cli_tls_key.clone(),
+                change_flag.to_string(),
             ));
         } else {
-            let _ = plan.add_secret(nixplan::root_secret_key(
+            let _ = plan.add_secret(nixplan::root_secret_key_with_change_flag(
                 "nomad-client.crt".to_string(),
                 region_secrets.client_tls_certificate.clone(),
+                change_flag.to_string(),
             ));
-            let _ = plan.add_secret(nixplan::root_secret_key(
+            let _ = plan.add_secret(nixplan::root_secret_key_with_change_flag(
                 "nomad-client.key".to_string(),
                 region_secrets.client_tls_key.clone(),
+                change_flag.to_string(),
             ));
         }
+        plan.add_post_second_round_secrets_shell_hook(
+            format!("[ -f /run/change-flags/{change_flag} ] && echo 'nomad keys/certificates renewed, restarting service' && systemctl restart nomad.service")
+        );
 
         plan.add_ca_cert_file(nomad_secrets.tls_ca_certificate.value().clone());
+
+        let mut wait_for_volumes = String::new();
+        writeln!(
+            &mut wait_for_volumes,
+r#"            "+${{pkgs.util-linux}}/bin/findmnt \"/var/lib/nomad\"""#
+        ).unwrap();
+        for v in plan.nomad_host_volumes().values() {
+            let mountpoint = &v.mountpoint;
+            if mountpoint.starts_with("/srv/volumes") {
+                writeln!(
+                    &mut wait_for_volumes,
+r#"            "+${{pkgs.util-linux}}/bin/findmnt \"{mountpoint}\"""#
+                ).unwrap();
+            }
+        }
 
         plan.add_custom_nix_block(format!(
             r#"
@@ -129,6 +154,8 @@ pub(crate) fn provision_nomad(
         ExecStartPre = [
             "+${{pkgs.coreutils}}/bin/mkdir -p /var/lib/nomad"
             "+${{pkgs.coreutils}}/bin/chmod 700 /var/lib/nomad"
+            # host volumes and nomad olume
+{wait_for_volumes}
         ];
         ExecStart = "${{pkgs.nomad}}/bin/nomad agent -config={cfg_path}";
         ExecReload = "/bin/kill -HUP $MAINPID";

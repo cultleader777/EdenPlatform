@@ -73,6 +73,9 @@ TABLE backend_application_pg_shard {
     used_queries TEXT DEFAULT '',
     used_mutators TEXT DEFAULT '',
     used_transactions TEXT DEFAULT '',
+    // to communicate via NOTIFY/LISTEN in a typesafe manner
+    used_consumer_channels TEXT DEFAULT '',
+    used_producer_channels TEXT DEFAULT '',
 
     CHECK { isSnakeCase(shard_name) },
 }
@@ -133,11 +136,20 @@ TABLE backend_application_nats_stream {
     // in batched consumer batches of messages are acked
     is_batch_consumer BOOL DEFAULT false,
     enable_subjects BOOL DEFAULT false,
+    // for deduplicateing messages in deduplication window
+    enable_message_id BOOL DEFAULT false,
+    // flush at most every second or at max messages reached
+    // TODO: add check if defaults are changed but we don't use batch consumer
+    batch_consumer_max_batch_size INT DEFAULT 1024,
+    batch_consumer_flush_deadline_ms INT DEFAULT 1000,
+    consumer_needs_seq_id BOOL DEFAULT false,
+    consumer_needs_stream_name BOOL DEFAULT false,
 
     // consumer or producer must be enabled
     CHECK { enable_consumer or enable_producer },
     // both cannot be enabled
     CHECK { not(enable_consumer and enable_producer) },
+    CHECK { batch_consumer_max_batch_size >= 2 and batch_consumer_max_batch_size <= 1024 * 128 },
 }
 
 TABLE backend_http_endpoint {
@@ -307,6 +319,7 @@ DATA STRUCT rust_compilation_environment {
         {
             crate_name: tokio-postgres,
             version: 0.7.7,
+	    features: with-chrono-0_4,
         },
         {
             crate_name: bb8,

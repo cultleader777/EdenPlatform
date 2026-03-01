@@ -42,6 +42,7 @@ TABLE blackbox_deployment_task {
 
 TABLE blackbox_deployment_task_mount {
     target_path TEXT PRIMARY KEY CHILD OF blackbox_deployment_task,
+    read_only BOOL DEFAULT false,
     server_volume REF FOREIGN CHILD server_volume,
 }
 
@@ -93,4 +94,6 @@ TABLE blackbox_deployment_ingress {
     subdomain TEXT DEFAULT '',
     tld REF tld,
     basic_auth_credentials TEXT DEFAULT '',
+    client_max_body_size INT DEFAULT 1048576,
+    CHECK { client_max_body_size >= 262144 },
 }

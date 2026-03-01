@@ -154,9 +154,9 @@ DATA STRUCT pg_schema [
       {
         transaction_name: existing_transaction,
         steps: '
-          existing_query_b
-          existing_query_a[]
-          existing_mutator[]
+          pgmq_existing_query_b
+          pgq_existing_query_a[]
+          pgm_existing_mutator[]
         '
       }
     ]
@@ -314,9 +314,9 @@ DATA STRUCT pg_schema [
       {
         transaction_name: existing_transaction,
         steps: '
-          existing_query_b
-          existing_query_a[]
-          existing_mutator[]
+          pgmq_existing_query_b
+          pgq_existing_query_a[]
+          pgm_existing_mutator[]
         '
       }
     ]
@@ -474,9 +474,9 @@ DATA STRUCT pg_schema [
       {
         transaction_name: existing_transaction,
         steps: '
-          existing_query_b
-          existing_query_a[]
-          existing_mutator[]
+          pgmq_existing_query_b
+          pgq_existing_query_a[]
+          pgm_existing_mutator[]
         '
       }
     ]
@@ -578,9 +578,9 @@ DATA STRUCT pg_schema [
       {
         transaction_name: existing_transaction,
         steps: '
-          existing_query_b
-          existing_query_a[]
-          existing_mutator[]
+          pgmq_existing_query_b
+          pgq_existing_query_a[]
+          pgm_existing_mutator[]
         '
       }
     ]
@@ -1411,4 +1411,272 @@ DATA subnet_router_floating_ip {
 
 "#,
     ));
+}
+
+#[test]
+fn test_application_duplicate_pg_consumer_channel() {
+    assert_eq!(
+        PlatformValidationError::ApplicationPgShardConsumerChannelDefinedTwice {
+            consumer_channels_src: "
+              some_chan
+              some_chan
+            ".to_string(),
+            consumer_channel_defined_twice: "some_chan".to_string(),
+            application_pg_shard: "a".to_string(),
+            application_pg_schema: "testdb".to_string(),
+            application: "hello-world".to_string(),
+        },
+        common::assert_platform_validation_error_wcustom_data(
+            r#"
+DATA STRUCT backend_application [
+  {
+    application_name: hello-world,
+    WITH backend_application_pg_shard [
+        {
+            shard_name: a,
+            pg_schema: testdb,
+            used_consumer_channels: '
+              some_chan
+              some_chan
+            '
+        },
+    ]
+  }
+]
+
+DATA STRUCT pg_schema [
+  {
+    schema_name: testdb,
+    WITH pg_migration [
+      {
+        time: 1,
+        upgrade: "
+          CREATE TABLE foo (
+            id INT PRIMARY KEY
+          );
+        ",
+        downgrade: "DROP TABLE foo;",
+      }
+    ]
+    WITH pg_test_dataset [
+      {
+        dataset_name: default,
+        dataset_contents: "
+        foo:
+        - id: 1
+        - id: 2
+        - id: 3
+        "
+      }
+    ]
+    WITH pg_channel [
+      {
+        channel_name: some_chan,
+      },
+    ]
+  }
+]
+"#,
+        ),
+    );
+}
+
+#[test]
+fn test_application_non_existing_pg_consumer_channel() {
+    assert_eq!(
+        PlatformValidationError::ApplicationPgConsumerChannelNotFoundInPgSchema {
+            consumer_channels_src: "
+              non_existing
+            ".to_string(),
+            consumer_channel_not_found: "non_existing".to_string(),
+            application_pg_shard: "a".to_string(),
+            application_pg_schema: "testdb".to_string(),
+            application: "hello-world".to_string(),
+        },
+        common::assert_platform_validation_error_wcustom_data(
+            r#"
+DATA STRUCT backend_application [
+  {
+    application_name: hello-world,
+    WITH backend_application_pg_shard [
+        {
+            shard_name: a,
+            pg_schema: testdb,
+            used_consumer_channels: '
+              non_existing
+            '
+        },
+    ]
+  }
+]
+
+DATA STRUCT pg_schema [
+  {
+    schema_name: testdb,
+    WITH pg_migration [
+      {
+        time: 1,
+        upgrade: "
+          CREATE TABLE foo (
+            id INT PRIMARY KEY
+          );
+        ",
+        downgrade: "DROP TABLE foo;",
+      }
+    ]
+    WITH pg_test_dataset [
+      {
+        dataset_name: default,
+        dataset_contents: "
+        foo:
+        - id: 1
+        - id: 2
+        - id: 3
+        "
+      }
+    ]
+    WITH pg_channel [
+      {
+        channel_name: some_chan,
+      },
+    ]
+  }
+]
+"#,
+        ),
+    );
+}
+
+#[test]
+fn test_application_duplicate_pg_producer_channel() {
+    assert_eq!(
+        PlatformValidationError::ApplicationPgShardProducerChannelDefinedTwice {
+            producer_channels_src: "
+              some_chan
+              some_chan
+            ".to_string(),
+            producer_channel_defined_twice: "some_chan".to_string(),
+            application_pg_shard: "a".to_string(),
+            application_pg_schema: "testdb".to_string(),
+            application: "hello-world".to_string(),
+        },
+        common::assert_platform_validation_error_wcustom_data(
+            r#"
+DATA STRUCT backend_application [
+  {
+    application_name: hello-world,
+    WITH backend_application_pg_shard [
+        {
+            shard_name: a,
+            pg_schema: testdb,
+            used_producer_channels: '
+              some_chan
+              some_chan
+            '
+        },
+    ]
+  }
+]
+
+DATA STRUCT pg_schema [
+  {
+    schema_name: testdb,
+    WITH pg_migration [
+      {
+        time: 1,
+        upgrade: "
+          CREATE TABLE foo (
+            id INT PRIMARY KEY
+          );
+        ",
+        downgrade: "DROP TABLE foo;",
+      }
+    ]
+    WITH pg_test_dataset [
+      {
+        dataset_name: default,
+        dataset_contents: "
+        foo:
+        - id: 1
+        - id: 2
+        - id: 3
+        "
+      }
+    ]
+    WITH pg_channel [
+      {
+        channel_name: some_chan,
+      },
+    ]
+  }
+]
+"#,
+        ),
+    );
+}
+
+#[test]
+fn test_application_non_existing_pg_producer_channel() {
+    assert_eq!(
+        PlatformValidationError::ApplicationPgProducerChannelNotFoundInPgSchema {
+            producer_channels_src: "
+              non_existing
+            ".to_string(),
+            producer_channel_not_found: "non_existing".to_string(),
+            application_pg_shard: "a".to_string(),
+            application_pg_schema: "testdb".to_string(),
+            application: "hello-world".to_string(),
+        },
+        common::assert_platform_validation_error_wcustom_data(
+            r#"
+DATA STRUCT backend_application [
+  {
+    application_name: hello-world,
+    WITH backend_application_pg_shard [
+        {
+            shard_name: a,
+            pg_schema: testdb,
+            used_producer_channels: '
+              non_existing
+            '
+        },
+    ]
+  }
+]
+
+DATA STRUCT pg_schema [
+  {
+    schema_name: testdb,
+    WITH pg_migration [
+      {
+        time: 1,
+        upgrade: "
+          CREATE TABLE foo (
+            id INT PRIMARY KEY
+          );
+        ",
+        downgrade: "DROP TABLE foo;",
+      }
+    ]
+    WITH pg_test_dataset [
+      {
+        dataset_name: default,
+        dataset_contents: "
+        foo:
+        - id: 1
+        - id: 2
+        - id: 3
+        "
+      }
+    ]
+    WITH pg_channel [
+      {
+        channel_name: some_chan,
+      },
+    ]
+  }
+]
+"#,
+        ),
+    );
 }

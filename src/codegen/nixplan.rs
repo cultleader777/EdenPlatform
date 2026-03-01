@@ -11,6 +11,7 @@ pub struct NixSecretKey {
     user: String,
     group: String,
     mode: &'static str,
+    out_changed_flag: Option<String>,
 }
 
 pub struct NixSecretConfig {
@@ -40,6 +41,19 @@ pub fn root_secret_key(key_name: String, contents: SecretValue) -> NixSecretKey 
         user: "root".to_string(),
         group: "root".to_string(),
         mode: "0600",
+        out_changed_flag: None,
+    }
+}
+
+/// This is for cases where certificates are renewed for service and we need to rotate them
+pub fn root_secret_key_with_change_flag(key_name: String, contents: SecretValue, change_flag_name: String) -> NixSecretKey {
+    NixSecretKey {
+        key_name,
+        contents,
+        user: "root".to_string(),
+        group: "root".to_string(),
+        mode: "0600",
+        out_changed_flag: Some(change_flag_name),
     }
 }
 
@@ -54,6 +68,23 @@ pub fn custom_user_secret_key(
         user: user_name.clone(),
         group: user_name,
         mode: "0600",
+        out_changed_flag: None,
+    }
+}
+
+pub fn custom_user_secret_key_with_change_flag(
+    user_name: String,
+    key_name: String,
+    contents: SecretValue,
+    change_flag_name: String,
+) -> NixSecretKey {
+    NixSecretKey {
+        key_name,
+        contents,
+        user: user_name.clone(),
+        group: user_name,
+        mode: "0600",
+        out_changed_flag: Some(change_flag_name),
     }
 }
 
@@ -64,6 +95,7 @@ pub fn all_users_readable_key(key_name: String, contents: SecretValue) -> NixSec
         user: "root".to_string(),
         group: "root".to_string(),
         mode: "0644",
+        out_changed_flag: None,
     }
 }
 
@@ -622,6 +654,7 @@ epl_l1_provisioning_status $EPL_PROV_EXIT_CODE
     \" | sqlite3 {sqlite_db_path}
 }}").unwrap();
     generate_l1_secrets_function(&mut output, plan);
+    update_l1_certs_expiration_function(&mut output, plan);
     writeln!(output, "trap trap_exit ERR").unwrap();
     // running
     writeln!(output, "
@@ -648,6 +681,9 @@ epl_l1_track_state -1
     for shell_hook in &plan.post_second_round_secrets_shell_hooks {
         writeln!(output, "{shell_hook}").unwrap();
     }
+    writeln!(output, "update_l1_certs_expiration").unwrap();
+    // change-flags only valid for one run of l1 provisioning
+    writeln!(output, "rm -rf /run/change-flags").unwrap();
     writeln!(output, "rm -f /run/epl-l1-prov").unwrap();
     writeln!(output, "rm -f /run/epl-l1-provisioning.lock").unwrap();
     writeln!(output, "
@@ -719,16 +755,55 @@ fn generate_l1_secrets_function(output: &mut String, plan: &NixServerPlan) {
     writeln!(output, "chmod 755 /run/keys").unwrap();
 
     for sec_cfg in plan.secret_configs() {
-        generate_single_secret_write(output, &sec_cfg.key_name, &sec_cfg.contents, &sec_cfg.user, &sec_cfg.group, sec_cfg.mode);
+        generate_single_secret_write(output, &sec_cfg.key_name, &sec_cfg.contents, &sec_cfg.user, &sec_cfg.group, sec_cfg.mode, &None);
     }
     for sec in &plan.secrets {
-        generate_single_secret_write(output, &sec.key_name, sec.contents.value(), &sec.user, &sec.group, sec.mode);
+        generate_single_secret_write(output, &sec.key_name, sec.contents.value(), &sec.user, &sec.group, sec.mode, &sec.out_changed_flag);
     }
 
     writeln!(output, "}}").unwrap();
 }
 
-fn generate_single_secret_write(output: &mut String, name: &str, secret: &str, user: &str, group: &str, mode: &str) {
+fn update_l1_certs_expiration_function(output: &mut String, plan: &NixServerPlan) {
+    // might be leftovers
+    writeln!(output, "function update_l1_certs_expiration() {{").unwrap();
+
+    let mut cert_paths = Vec::new();
+    let is_x509_cert = |path: &str| path.ends_with(".crt") || path.ends_with("cert.pem");
+    for sec_cfg in plan.secret_configs() {
+        let path = format!("/run/keys/{}", sec_cfg.key_name);
+        if is_x509_cert(&path) {
+            cert_paths.push(path);
+        }
+    }
+    for sec in &plan.secrets {
+        let path = format!("/run/keys/{}", sec.key_name);
+        if is_x509_cert(&path) {
+            cert_paths.push(path);
+        }
+    }
+
+    if !cert_paths.is_empty() {
+        let tmp_exp_path = "/var/lib/node_exporter/epl_l1_cert_expiration.prom.tmp";
+        let final_exp_path = "/var/lib/node_exporter/epl_l1_cert_expiration.prom";
+        writeln!(output, "  rm -f '{tmp_exp_path}'").unwrap();
+
+        for cp in cert_paths {
+            write!(output,r#"
+  CERT_EXPIRY_UNIX=$( date -d "$( openssl x509 -in '{cp}' -noout -enddate 2>/dev/null | sed 's/^notAfter=//' )" +%s )
+  echo "epl_l1_cert_expiration_time{{file=\"{cp}\"}} $CERT_EXPIRY_UNIX" >> {tmp_exp_path}
+"#).unwrap();
+        }
+
+        *output += "\n";
+        writeln!(output, r#"  chmod 644 '{tmp_exp_path}'"#).unwrap();
+        writeln!(output, r#"  mv -f '{tmp_exp_path}' '{final_exp_path}'"#).unwrap();
+    }
+
+    writeln!(output, "}}").unwrap();
+}
+
+fn generate_single_secret_write(output: &mut String, name: &str, secret: &str, user: &str, group: &str, mode: &str, change_flag: &Option<String>) {
     let region_name = format!("secret_value_{name}");
     assert!(!secret.contains(DELIM), "You gotta be kidding me...");
     writeln!(output, "TMP_SECRET_PATH=/run/tmpsec-$RANDOM").unwrap();
@@ -753,6 +828,10 @@ fn generate_single_secret_write(output: &mut String, name: &str, secret: &str, u
     }
     writeln!(output, "  unset NEEDS_MOVE").unwrap();
     writeln!(output, "  cmp --silent $TMP_SECRET_PATH {sec_path} || NEEDS_MOVE=true").unwrap();
+    // we want to use these for things we know exist and that changed
+    if let Some(cf) = change_flag {
+        writeln!(output, "  [ -f {sec_path} ] && [ -n \"$NEEDS_MOVE\" ] && mkdir -p /run/change-flags && touch /run/change-flags/{cf}").unwrap();
+    }
     writeln!(output, "  [ \"$(stat -c '%A:%U:%G' $TMP_SECRET_PATH)\" == \"$(stat -c '%A:%U:%G' '{sec_path}')\" ] || NEEDS_MOVE=true").unwrap();
     writeln!(output, "  [ -n \"$NEEDS_MOVE\" ] && mv -f $TMP_SECRET_PATH {sec_path}").unwrap();
     writeln!(output, "fi").unwrap();

@@ -359,7 +359,8 @@ fn ipv6_analysis(db: &crate::database::Database) ->
             // we pick only one address for the interface
             // to leave the rest in the server for VMs
             // or anything else
-            if !ipv6_addr.ends_with(":1") {
+            // :2 is needed for hetzner default ips :(((
+            if !ipv6_addr.ends_with(":1") && !ipv6_addr.ends_with(":2") {
                 return Err(
                     PlatformValidationError::PublicIpV6AddressDoesNotEndWithOne {
                         server_name: db.server().c_hostname(server).clone(),

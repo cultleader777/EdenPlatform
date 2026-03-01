@@ -7,9 +7,10 @@ use nom::multi::many0;
 use nom::Parser;
 use tokio::process::Command;
 use tokio_postgres::{types::ToSql, Row, Transaction, Client};
-use crate::database::{TableRowPointerPgSchema, TableRowPointerPgQuery, Database, TableRowPointerPgTestDataset, TableRowPointerPgMutator, TableRowPointerPgTransaction, TableRowPointerRegion};
+use crate::database::{TableRowPointerPgSchema, TableRowPointerPgQuery, Database, TableRowPointerPgTestDataset, TableRowPointerPgMutator, TableRowPointerPgTransaction, TableRowPointerRegion, TableRowPointerPgChannel, TableRowPointerVersionedType};
 use crate::static_analysis::AsyncCheckContext;
 use crate::static_analysis::networking::check_servers_regional_distribution;
+use crate::static_analysis::projections::Index;
 use super::super::{PlatformValidationError, projections::Projection};
 use super::queries::TestTablesData;
 
@@ -17,6 +18,7 @@ use super::queries::TestTablesData;
 pub enum DbQueryOrMutator {
     Query(TableRowPointerPgQuery),
     Mutator(TableRowPointerPgMutator),
+    Notification(TableRowPointerPgChannel),
 }
 
 pub struct TransactionStep {
@@ -29,6 +31,7 @@ impl<'a> DbQueryOrMutator {
         match self {
             DbQueryOrMutator::Query(q) => db.pg_query().c_query_name(*q),
             DbQueryOrMutator::Mutator(m) => db.pg_mutator().c_mutator_name(*m),
+            DbQueryOrMutator::Notification(n) => db.pg_channel().c_channel_name(*n),
         }
     }
 }
@@ -112,28 +115,58 @@ pub fn sync_checks(db: &crate::database::Database) -> Result<(), PlatformValidat
         for child in db.pg_deployment().c_children_pg_deployment_schemas(depl) {
             assert!(db_names.insert(db.pg_deployment_schemas().c_db_name(*child).clone()));
         }
+        let image_pin = db.docker_image_pin().c_pin_name(db.pg_deployment().c_docker_image_pg(depl));
 
         let synchronous_replication = db.pg_deployment().c_synchronous_replication(depl);
-        let child_instances = db.pg_deployment().c_children_pg_deployment_instance(depl).len();
+        // child instances that can be leader
+        let mut child_leader_instances = 0;
+        let total_child_instances = db.pg_deployment().c_children_pg_deployment_instance(depl).len();
+        let mut non_leader_instances = 0;
+        for instance in db.pg_deployment().c_children_pg_deployment_instance(depl) {
+            let failover_priority = db.pg_deployment_instance().c_failover_priority(*instance);
+            if failover_priority > 0 {
+                child_leader_instances += 1;
+            } else {
+                non_leader_instances += 1;
+            }
 
-        let min_instances = 2;
-        if child_instances < min_instances {
+            //
+            let unsupported_version = "pg_15.1";
+            if failover_priority != 100 && image_pin == unsupported_version {
+                let vol = db.pg_deployment_instance().c_pg_server(*instance);
+                let srv = db.server_volume().c_parent(vol);
+
+                return Err(PlatformValidationError::PgDeploymentFailoverPriorityNotSupportedForThisVersion {
+                    db_region: db.region().c_region_name(region).clone(),
+                    pg_deployment: depl_name.clone(),
+                    min_supported_pg_version: "pg_17.2".to_string(),
+                    failover_priority,
+                    pg_version: unsupported_version.to_string(),
+                    instance_with_non_default_failover_priority: db.server().c_hostname(srv).clone(),
+                });
+            }
+        }
+
+        let min_leader_instances = 2;
+        if child_leader_instances < min_leader_instances {
             return Err(PlatformValidationError::PgDeploymentMustHaveAtLeastTwoNodes {
                 pg_deployment: depl_name.clone(),
                 db_region: db.region().c_region_name(region).clone(),
-                found_instances: child_instances,
-                minimum_instances: min_instances,
+                found_leader_instances: child_leader_instances,
+                minimum_leader_instances: min_leader_instances,
+                non_leader_instances,
             });
         }
 
         let min_sync_replication_instances = 3;
-        if synchronous_replication && child_instances < min_sync_replication_instances {
+        if synchronous_replication && child_leader_instances < min_sync_replication_instances {
             return Err(PlatformValidationError::PgDeploymentForSynchronousReplicationYouMustRunAtLeastThreeNodes {
                 pg_deployment: depl_name.clone(),
                 db_region: db.region().c_region_name(region).clone(),
-                found_instances: child_instances,
-                minimum_instances: min_sync_replication_instances,
+                found_leader_instances: child_leader_instances,
+                minimum_leader_instances: min_sync_replication_instances,
                 synchronous_replication_enabled: synchronous_replication,
+                non_leader_instances,
             });
         }
 
@@ -141,11 +174,11 @@ pub fn sync_checks(db: &crate::database::Database) -> Result<(), PlatformValidat
         // even then one was a snapshot replica which had to be stopped for
         // backup because people didn't that ZFS exists
         let max_child_instances = 5;
-        if child_instances > max_child_instances {
+        if total_child_instances > max_child_instances {
             return Err(PlatformValidationError::PgDeploymentHasMoreThanMaximumChildInstancesAllowed {
                 pg_deployment: depl_name.clone(),
                 db_region: db.region().c_region_name(region).clone(),
-                found_instances: child_instances,
+                found_instances: total_child_instances,
                 maximum_instances: max_child_instances,
             });
         }
@@ -483,6 +516,7 @@ pub enum ValidDbType {
     DOUBLE,
     BOOL,
     TEXT,
+    TIMESTAMP,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -521,13 +555,15 @@ fn analyze_query_segments(
                         "INT" => Some(ValidDbType::INT),
                         "BIGINT" => Some(ValidDbType::BIGINT),
                         "FLOAT" => Some(ValidDbType::FLOAT),
+                        "DOUBLE" => Some(ValidDbType::DOUBLE),
                         "BOOL" => Some(ValidDbType::BOOL),
                         "TEXT" => Some(ValidDbType::TEXT),
+                        "TIMESTAMP" => Some(ValidDbType::TIMESTAMP),
                         _ => {
                             return Err(PlatformValidationError::PgUnsupportedArgumentType {
                                 query_expression: original_query.to_string(),
                                 unsupported_type: t.clone(),
-                                allowed_types: vec!["INT", "BIGINT", "FLOAT", "BOOL", "TEXT"],
+                                allowed_types: vec!["INT", "BIGINT", "FLOAT", "DOUBLE", "BOOL", "TEXT", "TIMESTAMP"],
                             })
                         }
                     },
@@ -1058,6 +1094,7 @@ fn coerce_pg_row_to_vec(row: &Row) -> Vec<String> {
                     ValidDbType::DOUBLE => row.try_get::<usize, f64>(idx).map(|i| i.to_string()),
                     ValidDbType::BOOL => row.try_get::<usize, bool>(idx).map(|i| i.to_string()),
                     ValidDbType::TEXT => row.try_get::<usize, &str>(idx).map(|i| i.to_string()),
+                    ValidDbType::TIMESTAMP => row.try_get::<usize, ::chrono::NaiveDateTime>(idx).map(|i| i.to_string()),
                 }
             }
             None => Ok("NULL".to_string())
@@ -1079,6 +1116,7 @@ fn coerce_pg_row_to_hashmap(row: &Row) -> HashMap<String, String> {
             ValidDbType::DOUBLE => row.try_get::<usize, f64>(idx).map(|i| i.to_string()).unwrap_or_else(|_| "None".to_string()),
             ValidDbType::BOOL => row.try_get::<usize, bool>(idx).map(|i| i.to_string()).unwrap_or_else(|_| "None".to_string()),
             ValidDbType::TEXT => row.try_get::<usize, &str>(idx).map(|i| i.to_string()).unwrap_or_else(|_| "None".to_string()),
+            ValidDbType::TIMESTAMP => row.try_get::<usize, ::chrono::NaiveDateTime>(idx).map(|i| i.to_string()).unwrap_or_else(|_| "None".to_string()),
         };
         res.insert(col.name().to_string(), str_val);
     }
@@ -1178,6 +1216,10 @@ async fn check_if_data_exists_in_database<'a>(
 
                         // basically our expected result row is fond more than once in the table
                         // not good enough for us, likely user needs to make data more specific
+                        if should_debug {
+                            println!("------- POST MUTATOR DEBUG DATA -------");
+                            println!("{}", serde_yaml::to_string(&debugging_map).unwrap());
+                        }
                         return Err(PlatformValidationError::PgResultingDatasetRowFoundMoreThanOnceInTable {
                             pg_schema: db_name.to_string(),
                             mutator_name: mutator_name.to_string(),
@@ -1202,6 +1244,11 @@ async fn check_if_data_exists_in_database<'a>(
             }
 
             let not_found_rows_yaml = serde_yaml::to_string(&not_found_rows).unwrap();
+
+            if should_debug {
+                println!("------- POST MUTATOR DEBUG DATA -------");
+                println!("{}", serde_yaml::to_string(&debugging_map).unwrap());
+            }
             return Err(PlatformValidationError::PgResultingDatasetRowsAreNotFoundInTableAfterMutatorExecution {
                 pg_schema: db_name.to_string(),
                 mutator_name: mutator_name.to_string(),
@@ -1347,6 +1394,20 @@ fn verify_test_dataset_against_schema(
                                 parsing_error: e.to_string(),
                             }
                         })?;
+                    }
+                    ValidDbType::TIMESTAMP => {
+                        let _: chrono::DateTime<chrono::Utc> = chrono::NaiveDateTime::parse_from_str(rv.as_str(), "%Y-%m-%d %H:%M:%S%.f").map_err(|e| {
+                            PlatformValidationError::PgResultingDatasetColumnValueCannotBeParsedToExpectedType {
+                                pg_schema: db_name.to_string(),
+                                mutator_name: mutator_name.to_string(),
+                                resulting_data_table: table.to_string(),
+                                resulting_data_column: tc.clone(),
+                                resulting_data_column_value: rv.clone(),
+                                resulting_data: resulting_data.to_string(),
+                                type_tried_to_parse_to: tcolumn_type.clone(),
+                                parsing_error: e.to_string(),
+                            }
+                        })?.and_utc();
                     }
                     ValidDbType::TEXT => {}
                 }
@@ -1716,6 +1777,21 @@ fn prepare_arguments_vector(
                     ValidDbType::TEXT => {
                         db_vec.push(Box::new(v.clone()));
                     },
+                    ValidDbType::TIMESTAMP => {
+                        let no = chrono::NaiveDateTime::parse_from_str(v.as_str(), "%Y-%m-%d %H:%M:%S%.f").map_err(|e| {
+                            PlatformValidationError::PgQueryCannotParseArgumentToType {
+                                database: database.to_string(),
+                                query_name: query_name.to_string(),
+                                query_expression: query_expression.to_string(),
+                                arguments: original_arguments.to_string(),
+                                argument_name: arg.name.clone(),
+                                argument_value: v.clone(),
+                                argument_expected_type: "chrono::DateTime<chrono::Utc>".to_string(),
+                                parsing_error: e.to_string(),
+                            }
+                        })?.and_utc();
+                        db_vec.push(Box::new(no.naive_utc()))
+                    },
                 }
             }
             None => {
@@ -1757,6 +1833,7 @@ fn map_returned_query_type(input: &str) -> Option<ValidDbType> {
         "float8" => Some(ValidDbType::DOUBLE),
         "bool" => Some(ValidDbType::BOOL),
         "text" | "name" | "varchar" => Some(ValidDbType::TEXT),
+        "timestamp" => Some(ValidDbType::TIMESTAMP),
         _ => None
     }
 }
@@ -1769,6 +1846,7 @@ fn map_resulting_data_type(input: &str) -> Option<ValidDbType> {
         "double precision" => Some(ValidDbType::DOUBLE),
         "boolean" => Some(ValidDbType::BOOL),
         "text" => Some(ValidDbType::TEXT),
+        "timestamp without time zone" => Some(ValidDbType::TIMESTAMP),
         _ => None
     }
 }
@@ -1893,6 +1971,19 @@ async fn with_test_dataset_inserted(
                     }
                     "text" => {
                         values_buf.push(Box::new(rv.clone()));
+                    }
+                    "timestamp without time zone" => {
+                        let res = chrono::NaiveDateTime::parse_from_str(rv.as_str(), "%Y-%m-%d %H:%M:%S%.f").map_err(|e| {
+                            PlatformValidationError::PgDatasetColumnValueInvalidTimestamp {
+                                pg_schema: db_name.to_string(),
+                                table: table.clone(),
+                                column: tc.clone(),
+                                parsing_error: e.to_string(),
+                                column_value: rv.clone(),
+                                example_value: "2022-10-10 13:13:13.123".to_string(),
+                            }
+                        })?;
+                        values_buf.push(Box::new(res));
                     }
                     _ => {
                         return Err(PlatformValidationError::PgDatasetUnsupportedColumnType {
@@ -2188,6 +2279,35 @@ impl Drop for TempDb {
     }
 }
 
+pub struct EnrichedPgChannel {
+    pub payload_type: Option<TableRowPointerVersionedType>,
+}
+
+pub(crate) fn enriched_pg_channels(db: &Database, types_index: &Index<String, TableRowPointerVersionedType>) -> Result<Projection<TableRowPointerPgChannel, EnrichedPgChannel>, PlatformValidationError> {
+    Ok(Projection::maybe_create(db.pg_channel().rows_iter(), |pc| {
+        let pt = db.pg_channel().c_payload_type(pc);
+        let payload_type =
+            if !pt.is_empty() {
+                let types = types_index.values(pt);
+                if types.is_empty() {
+                    return Err(PlatformValidationError::PgChannelBwTypeNotFound {
+                        pg_schema: db.pg_schema().c_schema_name(db.pg_channel().c_parent(pc)).clone(),
+                        channel_name: db.pg_channel().c_channel_name(pc).clone(),
+                        payload_type_not_found: pt.clone(),
+                    });
+                }
+                assert_eq!(types.len(), 1, "Can only be one vtype per name due to primary key");
+                Some(types[0])
+            } else {
+                None
+            };
+
+        Ok(EnrichedPgChannel {
+            payload_type,
+        })
+    })?)
+}
+
 pub(crate) fn check_transaction_steps(db: &Database) -> Result<Projection<TableRowPointerPgTransaction, Vec<TransactionStep>>, PlatformValidationError> {
     let mut f_map: HashMap<TableRowPointerPgTransaction, Vec<TransactionStep>> = HashMap::new();
 
@@ -2195,25 +2315,20 @@ pub(crate) fn check_transaction_steps(db: &Database) -> Result<Projection<TableR
         let mut m: HashMap<String, DbQueryOrMutator> = HashMap::new();
 
         for query in db.pg_schema().c_children_pg_query(db_ptr) {
-            let output = m.insert(db.pg_query().c_query_name(*query).clone(), DbQueryOrMutator::Query(*query));
-
-            if output.is_some() {
-                return Err(PlatformValidationError::PgQueryAndMutatorShareSameName {
-                    pg_schema: db.pg_schema().c_schema_name(db_ptr).clone(),
-                    query_or_mutator_name: db.pg_query().c_query_name(*query).clone(),
-                });
-            }
+            let prefix = if db.pg_query().c_is_mutating(*query) { "pgmq_" } else { "pgq_" };
+            let key = format!("{}{}", prefix, db.pg_query().c_query_name(*query));
+            let output = m.insert(key, DbQueryOrMutator::Query(*query));
+            assert!(output.is_none(), "duplicate entries should be impossible due to prefix");
         }
-
         for mutator in db.pg_schema().c_children_pg_mutator(db_ptr) {
-            let output = m.insert(db.pg_mutator().c_mutator_name(*mutator).clone(), DbQueryOrMutator::Mutator(*mutator));
-
-            if output.is_some() {
-                return Err(PlatformValidationError::PgQueryAndMutatorShareSameName {
-                    pg_schema: db.pg_schema().c_schema_name(db_ptr).clone(),
-                    query_or_mutator_name: db.pg_mutator().c_mutator_name(*mutator).clone(),
-                });
-            }
+            let key = format!("pgm_{}", db.pg_mutator().c_mutator_name(*mutator));
+            let output = m.insert(key, DbQueryOrMutator::Mutator(*mutator));
+            assert!(output.is_none(), "duplicate entries should be impossible due to prefix");
+        }
+        for channel in db.pg_schema().c_children_pg_channel(db_ptr) {
+            let key = format!("pgn_{}", db.pg_channel().c_channel_name(*channel));
+            let output = m.insert(key, DbQueryOrMutator::Notification(*channel));
+            assert!(output.is_none(), "duplicate entries should be impossible due to prefix");
         }
 
         for transaction in db.pg_schema().c_children_pg_transaction(db_ptr) {
@@ -2242,6 +2357,7 @@ pub(crate) fn check_transaction_steps(db: &Database) -> Result<Projection<TableR
                                 DbQueryOrMutator::Mutator(_) => {
                                     mutators_found = true;
                                 },
+                                DbQueryOrMutator::Notification(_) => {},
                             }
                             res.push(step);
                         },
@@ -2380,7 +2496,7 @@ fn test_unsupported_argument_type() {
         Err(PlatformValidationError::PgUnsupportedArgumentType {
             query_expression: expr.to_string(),
             unsupported_type: "UNSUPPORTED".to_string(),
-            allowed_types: vec!["INT", "BIGINT", "FLOAT", "BOOL", "TEXT"],
+            allowed_types: vec!["INT", "BIGINT", "FLOAT", "DOUBLE", "BOOL", "TEXT", "TIMESTAMP"],
         })
     )
 }
@@ -2395,7 +2511,7 @@ fn test_unsupported_argument_type_lowercase() {
         Err(PlatformValidationError::PgUnsupportedArgumentType {
             query_expression: expr.to_string(),
             unsupported_type: "int".to_string(),
-            allowed_types: vec!["INT", "BIGINT", "FLOAT", "BOOL", "TEXT"],
+            allowed_types: vec!["INT", "BIGINT", "FLOAT", "DOUBLE", "BOOL", "TEXT", "TIMESTAMP"],
         })
     )
 }

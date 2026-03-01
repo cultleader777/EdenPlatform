@@ -1899,72 +1899,6 @@ DATA STRUCT pg_mutator [
 }
 
 #[test]
-fn test_db_duplicate_mutator_and_query_names() {
-    let err = common::assert_platform_validation_error_wcustom_data(
-        r#"
-DATA STRUCT pg_schema {
-    schema_name: testy WITH pg_migration [
-        {
-            time: 0,
-            upgrade: "CREATE TABLE foo(id INT NOT NULL);",
-            downgrade: "DROP TABLE foo;",
-        },
-    ] WITH pg_test_dataset [
-        {
-            dataset_name: test1,
-            dataset_contents: "
-                foo:
-                - id: 7
-            "
-        }
-    ],
-}
-
-DATA STRUCT pg_mutator [
-    {
-        schema_name: testy,
-        mutator_name: test_q_1,
-        mutator_expression: "
-            INSERT INTO foo(id)
-            VALUES({id:INT})
-            RETURNING pg_sleep(0.0)
-        ",
-        WITH pg_mutator_test {
-            test_dataset: test1,
-            resulting_data: '{}',
-            arguments: "{ id: 123 }",
-        }
-    }
-]
-
-DATA STRUCT pg_query [
-    {
-        schema_name: testy,
-        query_name: test_q_1,
-        query_expression: "
-            SELECT
-              123::INT AS o1,
-        ",
-        WITH pg_query_test {
-            arguments: "",
-            outputs: "[{ o1: 123 }]",
-            test_dataset: test1,
-        }
-    }
-]
-"#,
-    );
-
-    assert_eq!(
-        err,
-        PlatformValidationError::PgQueryAndMutatorShareSameName {
-            pg_schema: "testy".to_string(),
-            query_or_mutator_name: "test_q_1".to_string(),
-        }
-    );
-}
-
-#[test]
 fn test_pg_transaction_step_not_found() {
     let err = common::assert_platform_validation_error_wcustom_data(
         r#"
@@ -2035,7 +1969,7 @@ DATA STRUCT pg_transaction [
         schema_name: testy,
         transaction_name: some_path,
         steps: "
-            test_mutator_1
+            pgm_test_mutator_1
         ",
     }
 ]
@@ -2096,8 +2030,8 @@ DATA STRUCT pg_transaction [
         schema_name: testy,
         transaction_name: some_path,
         steps: "
-            test_query_1
-            test_query_2
+            pgq_test_query_1
+            pgq_test_query_2
         ",
     }
 ]
@@ -2170,8 +2104,8 @@ DATA STRUCT pg_transaction [
         transaction_name: some_path,
         is_read_only: true,
         steps: "
-            test_query_1
-            test_query_1
+            pgq_test_query_1
+            pgq_test_query_1
         ",
     }
 ]
@@ -2232,8 +2166,8 @@ DATA STRUCT pg_transaction [
         transaction_name: some_path,
         is_read_only: true,
         steps: "
-            test_mutator_1
-            test_query_1
+            pgm_test_mutator_1
+            pgq_test_query_1
         ",
     }
 ]
@@ -2310,8 +2244,8 @@ DATA STRUCT pg_transaction [
         transaction_name: some_path,
         is_read_only: true,
         steps: "
-            test_query_1
-            test_query_2
+            pgq_test_query_1
+            pgq_test_query_2
         ",
     }
 ]
@@ -2375,8 +2309,8 @@ DATA STRUCT pg_transaction [
         schema_name: testy,
         transaction_name: some_path,
         steps: "
-            test_mutator_1
-            test_query_1
+            pgm_test_mutator_1
+            pgq_test_query_1
         ",
     }
 ]
@@ -2907,8 +2841,140 @@ DATA server(hostname, ssh_interface, is_consul_master, is_nomad_master, is_vault
         PlatformValidationError::PgDeploymentMustHaveAtLeastTwoNodes {
             pg_deployment: "testdb".to_string(),
             db_region: "us-west".to_string(),
-            minimum_instances: 2,
-            found_instances: 1,
+            minimum_leader_instances: 2,
+            found_leader_instances: 1,
+            non_leader_instances: 0,
+        }
+    );
+}
+
+#[test]
+fn test_pg_deployment_failover_priority_min_version() {
+    let err = common::assert_platform_validation_error_wcustom_data(
+        r#"
+
+DATA STRUCT pg_deployment [
+  {
+    docker_image_pg: pg_15.1,
+    deployment_name: testdb,
+    synchronous_replication: false,
+    WITH pg_deployment_instance [
+      {
+        instance_id: 1,
+        pg_server: server-a=>pgtest1,
+      },
+      {
+        instance_id: 2,
+        pg_server: server-b=>pgtest1,
+        failover_priority: 0,
+      },
+    ]
+  }
+]
+
+DATA STRUCT network [
+  {
+    network_name: lan,
+    cidr: '10.0.0.0/8',
+  }
+]
+
+DATA subnet_router_floating_ip {
+  '10.17.0.2/24';
+}
+
+DATA server(hostname, ssh_interface, is_consul_master, is_nomad_master, is_vault_instance, is_vpn_gateway) {
+  server-a, eth0, true, true, false, true WITH server_disk(disk_id) {
+    'vda';
+  } WITH network_interface {
+    eth0, lan, 10.17.0.10;
+  } WITH server_root_volume {
+    pgtest1;
+  };
+  server-b, eth0, true, false, true, true WITH server_disk(disk_id) {
+    'vda';
+  } WITH network_interface {
+    eth0, lan, 10.17.0.11;
+  } WITH server_root_volume {
+    pgtest1;
+  };
+}
+"#,
+    );
+    assert_eq!(
+        err,
+        PlatformValidationError::PgDeploymentFailoverPriorityNotSupportedForThisVersion {
+            pg_deployment: "testdb".to_string(),
+            db_region: "us-west".to_string(),
+            instance_with_non_default_failover_priority: "server-b".to_string(),
+            min_supported_pg_version: "pg_17.2".to_string(),
+            pg_version: "pg_15.1".to_string(),
+            failover_priority: 0,
+        }
+    );
+}
+
+#[test]
+fn test_pg_deployment_only_one_instance_with_no_failover() {
+    let err = common::assert_platform_validation_error_wcustom_data(
+        r#"
+
+DATA STRUCT pg_deployment [
+  {
+    docker_image_pg: pg_17.2,
+    deployment_name: testdb,
+    synchronous_replication: false,
+    WITH pg_deployment_instance [
+      {
+        instance_id: 1,
+        pg_server: server-a=>pgtest1,
+      },
+      {
+        instance_id: 2,
+        pg_server: server-b=>pgtest1,
+        failover_priority: 0,
+      },
+    ]
+  }
+]
+
+DATA STRUCT network [
+  {
+    network_name: lan,
+    cidr: '10.0.0.0/8',
+  }
+]
+
+DATA subnet_router_floating_ip {
+  '10.17.0.2/24';
+}
+
+DATA server(hostname, ssh_interface, is_consul_master, is_nomad_master, is_vault_instance, is_vpn_gateway) {
+  server-a, eth0, true, true, false, true WITH server_disk(disk_id) {
+    'vda';
+  } WITH network_interface {
+    eth0, lan, 10.17.0.10;
+  } WITH server_root_volume {
+    pgtest1;
+  };
+  server-b, eth0, true, false, true, true WITH server_disk(disk_id) {
+    'vda';
+  } WITH network_interface {
+    eth0, lan, 10.17.0.11;
+  } WITH server_root_volume {
+    pgtest1;
+  };
+}
+"#,
+    );
+    assert_eq!(
+        err,
+        PlatformValidationError::PgDeploymentMustHaveAtLeastTwoNodes {
+            pg_deployment: "testdb".to_string(),
+            db_region: "us-west".to_string(),
+            minimum_leader_instances: 2,
+            found_leader_instances: 1,
+            non_leader_instances: 1,
         }
     );
 }
@@ -2991,9 +3057,108 @@ DATA server(hostname, ssh_interface, is_consul_master, is_nomad_master, is_vault
         PlatformValidationError::PgDeploymentForSynchronousReplicationYouMustRunAtLeastThreeNodes {
             pg_deployment: "testdb".to_string(),
             db_region: "us-west".to_string(),
-            minimum_instances: 3,
-            found_instances: 2,
+            minimum_leader_instances: 3,
+            found_leader_instances: 2,
             synchronous_replication_enabled: true,
+            non_leader_instances: 0,
+        }
+    );
+}
+
+#[test]
+fn test_pg_deployment_sync_replication_needs_at_least_3_instances_with_failover() {
+    let err = common::assert_platform_validation_error_wcustom_data(
+        r#"
+DATA STRUCT pg_schema [
+  {
+    schema_name: testdb,
+    WITH pg_migration [
+      {
+        time: 1,
+        upgrade: "
+          CREATE TABLE foo (
+            id INT PRIMARY KEY
+          );
+        ",
+        downgrade: "DROP TABLE foo;",
+      }
+    ]
+  }
+]
+
+DATA STRUCT pg_deployment [
+  {
+    docker_image_pg: pg_17.2,
+    deployment_name: testdb,
+    synchronous_replication: true,
+    WITH pg_deployment_instance [
+      {
+        instance_id: 1,
+        pg_server: server-a=>pgtest1,
+      },
+      {
+        instance_id: 2,
+        pg_server: server-b=>pgtest1,
+      },
+      {
+        instance_id: 3,
+        pg_server: server-c=>pgtest1,
+        failover_priority: 0,
+      },
+    ] WITH pg_deployment_schemas [
+      {
+        db_name: testdb_a,
+        pg_schema: testdb,
+      }
+    ]
+  }
+]
+
+DATA STRUCT network [
+  {
+    network_name: lan,
+    cidr: '10.0.0.0/8',
+  }
+]
+
+DATA subnet_router_floating_ip {
+  '10.17.0.2/24';
+}
+
+DATA server(hostname, ssh_interface, is_consul_master, is_nomad_master, is_vault_instance, is_vpn_gateway) {
+  server-a, eth0, true, true, false, true WITH server_disk(disk_id) {
+    'vda';
+  } WITH network_interface {
+    eth0, lan, 10.17.0.10;
+  } WITH server_root_volume {
+    pgtest1;
+  };
+  server-b, eth0, true, false, true, true WITH server_disk(disk_id) {
+    'vda';
+  } WITH network_interface {
+    eth0, lan, 10.17.0.11;
+  } WITH server_root_volume {
+    pgtest1;
+  };
+  server-c, eth0, false, false, false, false WITH server_disk(disk_id) {
+    'vda';
+  } WITH network_interface {
+    eth0, lan, 10.17.0.12;
+  } WITH server_root_volume {
+    pgtest1;
+  };
+}
+"#,
+    );
+    assert_eq!(
+        err,
+        PlatformValidationError::PgDeploymentForSynchronousReplicationYouMustRunAtLeastThreeNodes {
+            pg_deployment: "testdb".to_string(),
+            db_region: "us-west".to_string(),
+            minimum_leader_instances: 3,
+            found_leader_instances: 2,
+            synchronous_replication_enabled: true,
+            non_leader_instances: 1,
         }
     );
 }

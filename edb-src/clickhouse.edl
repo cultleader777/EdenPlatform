@@ -167,6 +167,7 @@ TABLE ch_nats_stream_import {
     consumer_name TEXT PRIMARY KEY CHILD OF ch_deployment_schemas,
     into_table TEXT,
     stream REF FOREIGN CHILD nats_jetstream_stream,
+    ignore_extra_source_fields BOOL DEFAULT false,
     UNIQUE(consumer_name), // unique across all epl environment
     CHECK { isSnakeCase(consumer_name) },
     CHECK { isSnakeCase(into_table) },

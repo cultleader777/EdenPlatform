@@ -198,10 +198,12 @@ fn test_application_ch_wiring_inserter_table_column_type_is_invalid() {
                 "Int128".to_string(),
                 "Int256".to_string(),
                 "DateTime".to_string(),
+                "DateTime64(9)".to_string(),
                 "Date".to_string(),
                 "Float32".to_string(),
                 "Float64".to_string(),
                 "Bool".to_string(),
+                "UUID".to_string(),
             ],
         },
         common::assert_platform_validation_error_wcustom_data_wargs(

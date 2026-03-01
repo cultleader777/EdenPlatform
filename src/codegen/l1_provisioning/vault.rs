@@ -127,20 +127,29 @@ pub(crate) fn provision_vault(
                         zpool: "rpool".to_string(),
                     });
 
+                    // reload service when it is running if certs have changed
+                    let change_flag = "reload-vault";
                     let tls_instance_cert = plan
-                        .add_secret(nixplan::custom_user_secret_key(
+                        .add_secret(nixplan::custom_user_secret_key_with_change_flag(
                             "vault".to_string(),
                             "vault-instance.crt".to_string(),
                             instance_tls_cert,
+                            change_flag.to_string(),
                         ))
                         .absolute_path();
                     let tls_instance_key = plan
-                        .add_secret(nixplan::custom_user_secret_key(
+                        .add_secret(nixplan::custom_user_secret_key_with_change_flag(
                             "vault".to_string(),
                             "vault-instance.key".to_string(),
                             instance_tls_key,
+                            change_flag.to_string(),
                         ))
                         .absolute_path();
+                    // reload instead of restart is crucial for vault because if we restart service it will become sealed
+                    // and our cluster might go down after l1 provisioning
+                    plan.add_post_second_round_secrets_shell_hook(
+                        format!("[ -f /run/change-flags/{change_flag} ] && echo 'vault keys/certificates renewed, reloading service' && systemctl reload vault.service")
+                    );
 
                     let full_vault_cfg = generate_vault_config(
                         db,
@@ -187,8 +196,11 @@ pub(crate) fn provision_vault(
             "+${{pkgs.coreutils}}/bin/mkdir -p /var/lib/vault"
             "+${{pkgs.coreutils}}/bin/chown vault:vault /var/lib/vault"
             "+${{pkgs.coreutils}}/bin/chmod 700 /var/lib/vault"
+            # wait until encrypted zfs volume is mounted
+            "+${{pkgs.util-linux}}/bin/findmnt \"/var/lib/vault\""
         ];
         ExecStart = "${{pkgs.vault-bin}}/bin/vault server -config={cfg_path} -log-level=info";
+        ExecReload = "${{pkgs.util-linux}}/bin/kill -HUP $MAINPID";
         Restart = "always";
         RestartSec = "20";
         TasksMax = "infinity";

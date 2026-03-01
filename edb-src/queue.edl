@@ -18,6 +18,11 @@ TABLE nats_cluster {
 
     instance_memory_mb INT DEFAULT 256,
 
+    // set 1 petabyte, because if we're running out we'll get an alert
+    // and zfs available disk space reporting is not reliable from nats
+    // server perspective so just set a big limit
+    max_file_store_bytes INT DEFAULT 1125899906842624,
+
     // used in fqdn
     CHECK { isKebabCase(cluster_name) }
 
@@ -29,6 +34,8 @@ TABLE nats_cluster {
     },
 
     CHECK { instance_memory_mb >= 32 },
+    // at least 1 GB makes sense
+    CHECK { max_file_store_bytes >= 1024 * 1024 * 1024 },
 }
 
 TABLE nats_jetstream_stream {
@@ -37,9 +44,17 @@ TABLE nats_jetstream_stream {
     max_bytes INT DEFAULT 1073741824,
     max_msg_size INT DEFAULT 1048576,
     enable_subjects BOOL DEFAULT false,
+    // for deduplicateing messages in deduplication window
+    enable_message_id BOOL DEFAULT false,
+    // two minutes by default
+    duplicate_window_ns INT DEFAULT 120000000000,
 
     CHECK { max_bytes >= 16777216 },
     CHECK { max_msg_size >= 1024 },
+    // 1 minute min
+    CHECK { duplicate_window_ns >= 1000000000 },
+    // 7 hours max
+    CHECK { duplicate_window_ns <= 25200000000000 },
     CHECK { isSnakeCase(stream_name) },
 }
 

@@ -7,7 +7,7 @@ use crate::{
     static_analysis::{
         server_runtime::{
             AdminService, ConsulServiceHandle, MinIOBucketPermission, NomadJobKind, NomadJobStage,
-            ServerRuntime, VaultSecretHandle, VaultSecretRequest, IntegrationTest, epl_architecture_to_nomad_architecture,
+            ServerRuntime, VaultSecretHandle, VaultSecretRequest, IntegrationTest, epl_architecture_to_nomad_architecture, RouteData,
         },
         PlatformValidationError, L1Projections, networking::{region_monitoring_clusters, region_loki_clusters, consul_services_exists_integration_test, prometheus_metric_exists_test, admin_service_responds_test, find_zfs_dataset_disk_medium, find_server_root_disk_medium, find_xfs_volume_root_disk_medium, check_servers_regional_distribution}, docker_images::image_handle_from_pin,
     },
@@ -215,7 +215,7 @@ pub fn deploy_minio_instances(
                 }
             }
 
-            if disk_mediums.len() > 1 {
+            if disk_mediums.len() > 1 && !db.minio_cluster().c_multiple_disk_mediums_ok(minio_cluster) {
                 return Err(PlatformValidationError::MinIOMultipleDiskMediumsDetectedInCluster {
                     minio_cluster: db.minio_cluster().c_cluster_name(minio_cluster).clone(),
                     disk_mediums: disk_mediums.iter().map(|i| i.to_string()).collect(),
@@ -419,6 +419,27 @@ pub fn deploy_minio_instances(
             }
         }
 
+        // expose buckets via nginx to the world if user wants this
+        for bucket in db.minio_cluster().c_children_minio_bucket(minio_cluster) {
+            for ingress in db.minio_bucket().c_referrers_minio_bucket_public_ingress__bucket(*bucket) {
+                let subdomain = db.minio_bucket_public_ingress().c_subdomain(*ingress);
+                let tld = db.minio_bucket_public_ingress().c_tld(*ingress);
+                runtime.expose_root_route_in_tld(
+                    db, region,
+                    tld,
+                    subdomain,
+                    RouteData {
+                        basic_auth: "".to_string(),
+                        content: crate::static_analysis::server_runtime::RouteContent::MinIOBucketExpose {
+                            consul_service: consul_service_io.clone(),
+                            port: minio_lb_port.try_into().expect("invalid minio lb port, should never be reached now"),
+                            bucket_name: db.minio_bucket().c_bucket_name(*bucket).clone(),
+                        }
+                    },
+                )?;
+            }
+        }
+
         // tests are added at the end to ensure all errors are validated before
         minio_cluster_tests(db, l1proj, minio_cluster, monitoring_cluster, runtime);
     }
@@ -532,6 +553,13 @@ done
         res += "thisminio/";
         res += db.minio_bucket().c_bucket_name(*bucket);
         res += "\n";
+
+        // this bucket exposed via ingress, allow public download
+        if !db.minio_bucket().c_referrers_minio_bucket_public_ingress__bucket(*bucket).is_empty() {
+            res += "mc anonymous set download thisminio/";
+            res += db.minio_bucket().c_bucket_name(*bucket);
+            res += "\n";
+        }
     }
 
     res += "\n\n";

@@ -153,7 +153,7 @@ fn check_nats_streams_compatibility(db: &Database, schemas: &HashMap<TableRowPoi
         let vtype_name = db.versioned_type().c_type_name(vtype);
         let last_type = vtype_data.last().unwrap();
         let enable_subjects = db.nats_jetstream_stream().c_enable_subjects(stream);
-
+        let ignore_extra_source_fields = db.ch_nats_stream_import().c_ignore_extra_source_fields(si);
         let schema = schemas.get(&ch_schema).unwrap();
         let last_snapshot = schema.schema_snapshots.values().rev().next();
 
@@ -286,16 +286,18 @@ fn check_nats_streams_compatibility(db: &Database, schemas: &HashMap<TableRowPoi
 
                 assert!(inserted_values.insert(f.0.as_str()));
             } else {
-                return Err(PlatformValidationError::ChNatsStreamIntoTableColumnDoesntExist {
-                    ch_nats_stream_import_consumer_name: consumer.clone(),
-                    ch_deployment: db.ch_deployment().c_deployment_name(ch_cluster).clone(),
-                    ch_database: db_name.clone(),
-                    bw_compat_type: vtype_name.clone(),
-                    bw_compat_non_existing_field_name: f.0.clone(),
-                    ch_schema: ch_schema_name.clone(),
-                    existing_columns_in_table: the_table.fields.keys().map(|i| i.clone()).collect(),
-                    into_table: into_table.clone(),
-                });
+                if !ignore_extra_source_fields {
+                    return Err(PlatformValidationError::ChNatsStreamIntoTableColumnDoesntExist {
+                        ch_nats_stream_import_consumer_name: consumer.clone(),
+                        ch_deployment: db.ch_deployment().c_deployment_name(ch_cluster).clone(),
+                        ch_database: db_name.clone(),
+                        bw_compat_type: vtype_name.clone(),
+                        bw_compat_non_existing_field_name: f.0.clone(),
+                        ch_schema: ch_schema_name.clone(),
+                        existing_columns_in_table: the_table.fields.keys().map(|i| i.clone()).collect(),
+                        into_table: into_table.clone(),
+                    });
+                }
             }
         }
 
@@ -329,10 +331,12 @@ pub static SUPPORTED_INSERTER_TYPES: &'static [&str] = &[
     "Int128",
     "Int256",
     "DateTime",
+    "DateTime64(9)",
     "Date",
     "Float32",
     "Float64",
     "Bool",
+    "UUID",
 ];
 
 pub fn is_supported_inserter_type(the_type: &str) -> bool {
@@ -1636,6 +1640,7 @@ fn map_returned_query_type(input: &str) -> Option<ValidDbType> {
         "String" => Some(ValidDbType::String),
         "Date" => Some(ValidDbType::Date),
         "DateTime" => Some(ValidDbType::DateTime),
+        "DateTime64(9)" => Some(ValidDbType::DateTime),
         _ => None
     }
 }
@@ -2049,6 +2054,20 @@ async fn with_test_dataset_inserted(
                         })?.and_utc();
                         write!(&mut values_buf, "'{}'", no.format("%Y-%m-%d %H:%M:%S")).unwrap();
                     }
+                    "DateTime64(9)" => {
+                        let no: chrono::DateTime<chrono::Utc> = chrono::NaiveDateTime::parse_from_str(rv.as_str(), "%Y-%m-%d %H:%M:%S%.f").map_err(|e| {
+                            PlatformValidationError::ChDatasetColumnValueCannotBeParsedToExpectedType {
+                                ch_schema: db_name.clone(),
+                                table: table.clone(),
+                                column: tc.clone(),
+                                column_value: rv.clone(),
+                                type_tried_to_parse_to: tcolumn_type.col_type.clone(),
+                                parsing_error: e.to_string(),
+                                input_dataset_name: db.ch_test_dataset().c_dataset_name(ds_ptr).to_string(),
+                            }
+                        })?.and_utc();
+                        write!(&mut values_buf, "'{}'", no.format("%Y-%m-%d %H:%M:%S%.f")).unwrap();
+                    }
                     "Date" => {
                         let no: chrono::NaiveDate = chrono::NaiveDate::parse_from_str(rv.as_str(), "%Y-%m-%d").map_err(|e| {
                             PlatformValidationError::ChDatasetColumnValueCannotBeParsedToExpectedType {
@@ -2062,6 +2081,20 @@ async fn with_test_dataset_inserted(
                             }
                         })?;
                         write!(&mut values_buf, "'{}'", no.format("%Y-%m-%d")).unwrap();
+                    }
+                    "UUID" => {
+                        let value = uuid::Uuid::parse_str(rv.as_str()).map_err(|e| {
+                            PlatformValidationError::ChDatasetColumnValueCannotBeParsedToExpectedType {
+                                ch_schema: db_name.clone(),
+                                table: table.clone(),
+                                column: tc.clone(),
+                                column_value: rv.clone(),
+                                type_tried_to_parse_to: tcolumn_type.col_type.clone(),
+                                parsing_error: e.to_string(),
+                                input_dataset_name: db.ch_test_dataset().c_dataset_name(ds_ptr).to_string(),
+                            }
+                        })?;
+                        write!(&mut values_buf, "'{}'", value).unwrap();
                     }
                     _ => {
                         return Err(PlatformValidationError::ChDatasetUnsupportedColumnType {
@@ -2321,7 +2354,8 @@ struct ChTableRow {
 
 pub async fn get_ch_schema(migration_sql: &str, client: &clickhouse::Client) -> Result<DbSchemaSnapshot, PlatformValidationError> {
     lazy_static! {
-        static ref IDENTIFIER_NAME_REGEX: regex::Regex = regex::Regex::new(r"^[a-z_][a-z0-9_]*$").unwrap();
+        // period is for Nested types
+        static ref IDENTIFIER_NAME_REGEX: regex::Regex = regex::Regex::new(r"^[a-z_][a-z0-9_.]*$").unwrap();
     }
 
     // mvp, we really need pgdump

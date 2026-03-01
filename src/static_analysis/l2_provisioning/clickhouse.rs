@@ -8,7 +8,7 @@ use crate::{
         server_runtime::{
             ServerRuntime, NomadJobStage, NomadJobKind, epl_architecture_to_nomad_architecture, IntegrationTest, VaultSecretRequest, VaultSecretHandle, ProvisioningResourcePath, ProvisioningScriptTag, ClickhouseDbCredentials, ChAccessKind,
         },
-        PlatformValidationError, L1Projections, networking::{region_monitoring_clusters, region_loki_clusters, server_region, prometheus_metric_exists_test, check_servers_regional_distribution}, docker_images::image_handle_from_pin, databases::clickhouse::{parse_clickhouse_ddl_segments, SUPPORTED_TABLE_ENGINES}, bw_compat_types::parser::ValidVersionedStructType,
+        PlatformValidationError, L1Projections, networking::{region_monitoring_clusters, region_loki_clusters, server_region, prometheus_metric_exists_test, check_servers_regional_distribution}, docker_images::image_handle_from_pin, databases::clickhouse::{parse_clickhouse_ddl_segments, SUPPORTED_TABLE_ENGINES}, AsyncChecksOutputs, Projections,
     },
 };
 
@@ -748,7 +748,22 @@ pub fn generate_ch_migration_script(db: &Database, schema: TableRowPointerChSche
     res
 }
 
-pub fn generate_ch_init_script(
+pub fn provision_ch_nats_stream_import(
+    db: &Database,
+    proj: &mut Projections,
+    asoutputs: &AsyncChecksOutputs,
+) {
+    for region in db.region().rows_iter() {
+        proj.server_runtime.add_provisioning_script(
+            region,
+            ProvisioningScriptTag::PostSystemResourceProvision,
+            "provision-ch-nats-imports.sh",
+            generate_ch_nats_consumers(db, region, proj, asoutputs),
+        );
+    }
+}
+
+fn generate_ch_init_script(
     db: &Database,
     region: TableRowPointerRegion,
     schema_map: &HashMap<TableRowPointerChSchema, ProvisioningResourcePath>,
@@ -855,45 +870,84 @@ set -e
 
         res += "echo Migrations scheduled, waiting for finish...\n";
         res += "wait\n";
+        res += "echo All migrations ran successfully\n";
+    }
+
+    res
+}
+
+pub fn generate_ch_nats_consumers(
+    db: &Database,
+    region: TableRowPointerRegion,
+    projections: &Projections,
+    async_outputs: &AsyncChecksOutputs,
+) -> String {
+    let mut res = String::new();
+
+    res += r#"
+set -e
+# pass root vault token in to access all secrets
+[ -n "$VAULT_TOKEN" ] || { echo VAULT_TOKEN environment variable is required; exit 7; }
+"#;
+
+    for ch_deployment in db.ch_deployment().rows_iter() {
+        let depl_region = db.ch_deployment().c_region(ch_deployment);
+        if region != depl_region {
+            continue;
+        }
+
+        let first_replica = db.ch_deployment().c_children_ch_deployment_instance(ch_deployment)[0];
+        let ch_volume = db.ch_deployment_instance().c_ch_server(first_replica);
+        let ch_server = db.server_volume().c_parent(ch_volume);
+        let ch_ip = projections.consul_network_iface.value(ch_server);
+        let ch_ip = db.network_interface().c_if_ip(*ch_ip);
+        let deployment_name = db.ch_deployment().c_deployment_name(ch_deployment);
+        let http_port = db.ch_deployment().c_http_port(ch_deployment);
+        res += "export CHUSER=default\n";
+        writeln!(&mut res, "export ADMIN_PASSWORD=$( vault kv get -field=admin_password epl/clickhouse/{deployment_name} )").unwrap();
+        writeln!(&mut res, "export CH_URL=\"http://$CHUSER:$ADMIN_PASSWORD@{ch_ip}:{http_port}\"").unwrap();
 
         res += "echo Provisioning NATS consumers...\n";
+
         for schema in db.ch_deployment().c_children_ch_deployment_schemas(ch_deployment) {
             let db_name = db.ch_deployment_schemas().c_db_name(*schema);
+            let db_ch_schema = db.ch_deployment_schemas().c_ch_schema(*schema);
+            let db_schema_info = async_outputs.checked_ch_dbs.get(&db_ch_schema).expect("clickhouse schema must be asynchronously checked here");
             for import in db.ch_deployment_schemas().c_children_ch_nats_stream_import(*schema) {
                 let consumer_name = db.ch_nats_stream_import().c_consumer_name(*import);
                 let target_table = db.ch_nats_stream_import().c_into_table(*import);
                 let nats_stream = db.ch_nats_stream_import().c_stream(*import);
-                let stream_type = db.nats_jetstream_stream().c_stream_type(nats_stream);
-                let vtype = l1proj.versioned_types.value(stream_type);
-                let last_type = vtype.last().unwrap();
                 struct ColumnMap {
                     table_column: String,
                     expression_mapping: String,
                 }
-                let c_maps = last_type.the_type().fields.iter().filter_map(|(fname, ftype)| {
-                    let ch_type = match &ftype.field_type {
-                        ValidVersionedStructType::Bool => "Bool",
-                        ValidVersionedStructType::F64 => "Float64",
-                        ValidVersionedStructType::I64 => "Int64",
-                        ValidVersionedStructType::String => "String",
-                        // get String from nats queue, use conversion later to convert to DateTime(9)
-                        ValidVersionedStructType::DateTime => "String",
-                        ValidVersionedStructType::UUID => "UUID",
-                        ValidVersionedStructType::Array(_) | ValidVersionedStructType::Struct(_) | ValidVersionedStructType::Option(_) => {
-                            // unsupported type, this will be checked later after async checks
-                            return None;
+                let (_, last_schema) = db_schema_info.schema_snapshots.last_key_value().expect("we should have last schema snapshot during import");
+                let ttable = last_schema.field_type_index.get(target_table).expect("target table should already be checked to exist");
+                let c_maps = ttable.fields.iter().filter_map(|(fname, col_data)| {
+                    let ch_type = &col_data.col_type;
+                    match ch_type.as_str() {
+                        "Bool" | "Float64" | "Int64" | "String" | "UUID" => {
+                            Some(ColumnMap {
+                                table_column: format!("{fname} {ch_type}"),
+                                expression_mapping: fname.clone(),
+                            })
                         }
-                    };
-                    // explicitly map columns in case we have some nasty custom sql parsing going on
-                    let expression_mapping = if ftype.field_type == ValidVersionedStructType::DateTime {
-                        format!("parseDateTime64BestEffort({fname}, 9) AS {fname}")
-                    } else {
-                        fname.clone()
-                    };
-                    return Some(ColumnMap {
-                        table_column: format!("{fname} {ch_type}"),
-                        expression_mapping,
-                    });
+                        "DateTime64(9)" => {
+                            Some(ColumnMap {
+                                table_column: format!("{fname} {ch_type}"),
+                                expression_mapping: format!("parseDateTime64BestEffort({fname}, 9) AS {fname}"),
+                            })
+                        }
+                        "DateTime" => {
+                            Some(ColumnMap {
+                                table_column: format!("{fname} {ch_type}"),
+                                expression_mapping: format!("parseDateTimeBestEffort({fname}) AS {fname}"),
+                            })
+                        }
+                        _ => {
+                            panic!("Unexpected clickhouse type: {ch_type}")
+                        }
+                    }
                 }).collect::<Vec<_>>();
                 let types = c_maps.iter().map(|i| i.table_column.as_str()).collect::<Vec<_>>().join(", ");
                 let maps = c_maps.iter().map(|i| i.expression_mapping.as_str()).collect::<Vec<_>>().join(", ");
@@ -903,16 +957,15 @@ set -e
                 let consul_fqdn = format!("epl-nats-{cluster_name}.service.consul:{nats_port}");
                 let nats_subject = format!("ch_imp.{deployment_name}.{db_name}.{consumer_name}");
                 // nats table
-                writeln!(&mut res, "echo \"CREATE TABLE IF NOT EXISTS nats_ch_imp_queue_{consumer_name} ( {types} ) ENGINE = NATS settings nats_url = '{consul_fqdn}', nats_queue_group = 'ch_imp_{consumer_name}', nats_subjects = '{nats_subject}', nats_format = 'JSONEachRow' \" | \\").unwrap();
-                writeln!(&mut res, "  curl --data-binary @- -s --fail-with-body $CH_URL/?database={db_name}").unwrap();
+                writeln!(res, "echo \"CREATE TABLE IF NOT EXISTS nats_ch_imp_queue_{consumer_name} ON CLUSTER default ( {types} ) ENGINE = NATS settings nats_url = '{consul_fqdn}', nats_queue_group = 'ch_imp_{consumer_name}', nats_subjects = '{nats_subject}', nats_format = 'JSONEachRow' \" | \\").unwrap();
+                writeln!(res, "  curl --data-binary @- -s --fail-with-body $CH_URL/?database={db_name}").unwrap();
                 // mat view
-                writeln!(&mut res, "echo \"CREATE MATERIALIZED VIEW IF NOT EXISTS nats_consumer_{consumer_name} TO {target_table} AS SELECT {maps} FROM nats_ch_imp_queue_{consumer_name} \" | \\").unwrap();
-                writeln!(&mut res, "  curl --data-binary @- -s --fail-with-body $CH_URL/?database={db_name}").unwrap();
+                writeln!(res, "echo \"CREATE MATERIALIZED VIEW IF NOT EXISTS nats_consumer_{consumer_name} ON CLUSTER default TO {target_table} AS SELECT {maps} FROM nats_ch_imp_queue_{consumer_name} \" | \\").unwrap();
+                writeln!(res, "  curl --data-binary @- -s --fail-with-body $CH_URL/?database={db_name}").unwrap();
             }
         }
-        res += "wait\n";
 
-        res += "echo All migrations ran successfully\n";
+        res += "echo Nats stream imports provisioned successfully\n";
     }
 
     res

@@ -2,7 +2,7 @@ use crate::{database::{Database, TableRowPointerRegion}, codegen::l1_provisionin
 
 use super::{
     server_runtime::{NomadJobStage, ProvisioningScriptTag, ServerRuntime},
-    L1Projections, PlatformValidationError,
+    L1Projections, PlatformValidationError, AsyncChecksOutputs, Projections,
 };
 
 pub mod build_epl_apps;
@@ -65,6 +65,17 @@ pub fn deploy_all_components(
     Ok(())
 }
 
+/// This is for cases where l2 provisioning scripts
+/// depend on async checks outputs performed
+/// For instance, nats stream import sql statements into clickhouse
+/// depend on checking the database
+pub fn post_async_checks_l2_provisioning(
+    db: &Database,
+    projections: &mut Projections,
+    asoutputs: &AsyncChecksOutputs,
+) {
+    clickhouse::provision_ch_nats_stream_import(db, projections, asoutputs);
+}
 
 /// Components in this function ought
 /// to be deployed once per region

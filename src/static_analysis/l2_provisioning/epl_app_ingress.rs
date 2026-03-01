@@ -163,6 +163,31 @@ pub fn ingress_static_analysis(
             }
         }
 
+        for minio_ingress in db.minio_bucket_public_ingress().rows_iter() {
+            let minio_bucket = db.minio_bucket_public_ingress().c_bucket(minio_ingress);
+            let bucket_name = db.minio_bucket().c_bucket_name(minio_bucket);
+            let minio_cluster = db.minio_bucket().c_parent(minio_bucket);
+            let cluster_name = db.minio_cluster().c_cluster_name(minio_cluster);
+            let region = db.minio_cluster().c_region(minio_cluster);
+            regions_with_ingresses.insert(region);
+            let tld = db.minio_bucket_public_ingress().c_tld(minio_ingress);
+            let e = dns_table.entry(tld).or_default();
+            let subdomain = db.minio_bucket_public_ingress().c_subdomain(minio_ingress);
+            if let Some(used_region) = e.get(subdomain) {
+                if region != *used_region {
+                    panic!(
+                        "Multiple regions targeted with single fqdn {}.{} is not supported yet (minio cluster {} bucket {} is trying to do)",
+                        subdomain,
+                        db.tld().c_domain(tld),
+                        cluster_name,
+                        bucket_name,
+                    )
+                }
+            } else {
+                let _ = e.insert(subdomain.clone(), region);
+            }
+        }
+
         for region in db.region().rows_iter() {
             let mut ingress_servers = Vec::new();
             let mut ipv6_ingress_servers = Vec::new();
@@ -313,6 +338,7 @@ pub fn deploy_epl_backend_applications(
                     .try_into()
                     .unwrap(),
                 target_path: nginx_path.downstream_path.clone(),
+                client_max_body_size: None,
             };
             let rd = RouteData { content: upstream, basic_auth: "".to_string() };
             runtime.expose_route_in_tld_for_app(
@@ -392,6 +418,7 @@ pub fn deploy_epl_frontend_applications(
                 .unwrap(),
             target_path: "/epl-app-$1".to_string(),
             unlimited_body: false,
+            client_max_body_size: None,
         };
 
         runtime.expose_prefix_in_tld_for_frontend_app(
@@ -423,6 +450,7 @@ pub fn deploy_epl_frontend_applications(
                     .unwrap(),
                 target_path: nginx_path.downstream_path.clone(),
                 unlimited_body: false,
+                client_max_body_size: None,
             };
             let rd = RouteData { content: upstream, basic_auth: "".to_string() };
             runtime.expose_route_in_tld_for_app(
@@ -455,6 +483,7 @@ pub fn deploy_epl_blackbox_applications(
         let deployment = db.blackbox_deployment_service_registration().c_parent(service);
         let region = db.blackbox_deployment().c_region(deployment);
         let tld = db.blackbox_deployment_ingress().c_tld(ingress);
+        let client_max_body_size = db.blackbox_deployment_ingress().c_client_max_body_size(ingress);
         let subdomain = db
             .blackbox_deployment_ingress()
             .c_subdomain(ingress);
@@ -496,6 +525,7 @@ pub fn deploy_epl_blackbox_applications(
             port: port.try_into()
                 .unwrap(),
             target_path: "/".to_string(),
+            client_max_body_size: Some(client_max_body_size),
         };
         runtime.expose_root_route_in_tld(
             db,

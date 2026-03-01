@@ -902,9 +902,9 @@ DATA STRUCT pg_schema [
       {
         transaction_name: all_at_once,
         steps: "
-          insert_id_returning
-          max_id_from_foo[]
-          insert_id[]
+          pgmq_insert_id_returning
+          pgq_max_id_from_foo[]
+          pgm_insert_id[]
         "
       }
     ]

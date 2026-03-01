@@ -677,7 +677,7 @@ fn makefile_define_custom_secrets(checked: &CheckedDB, res: &mut String) {
             write!(res, "ifndef SECRET_VALUE\n").unwrap();
             write!(res, "\t$(error SECRET_VALUE is undefined)\n").unwrap();
             write!(res, "endif\n").unwrap();
-            write!(res, "\t$(EPL_EXECUTABLE) override-secret --output-directory . --key custom_{key} --value $(SECRET_VALUE) --kind Misc").unwrap();
+            write!(res, "\t$(EPL_EXECUTABLE) override-secret --output-directory . --key custom_{key} --value \"$(SECRET_VALUE)\" --kind Misc").unwrap();
             *res += "\n";
         }
     }

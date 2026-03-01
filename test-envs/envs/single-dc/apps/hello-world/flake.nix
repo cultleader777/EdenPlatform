@@ -47,7 +47,10 @@
           clippy
           trunk
           rust-analyzer
+
         ];
+
+        RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
       };
     });
 }

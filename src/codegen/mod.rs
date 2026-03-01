@@ -165,7 +165,8 @@ pub fn generate_outputs(checked: &CheckedDB, secrets: &mut SecretsStorage) -> Co
 
     generate_applications(checked, &mut plan);
     generate_prometheus_tests(checked, &mut plan);
-    let l1_outputs = generate_machines(checked, &mut plan, &plans, &cgen_secrets);
+    let l1_outputs = generate_l1_provisioning(checked, &mut plan, &plans, &cgen_secrets);
+    generate_l2_provisioning(checked, &mut plan, &cgen_secrets);
     makefile::generate_makefile(checked, &mut plan, &l1_outputs);
     if checked.projections.cloud_topologies.cloud_needed() {
         generate_terraform_outputs(checked, &cgen_secrets.root_ssh_keys, &mut plan);
@@ -487,7 +488,7 @@ pub struct CodegenSecrets {
     pub fast_prov_secrets: FastProvSecrets,
 }
 
-fn generate_machines(
+fn generate_l1_provisioning(
     checked: &CheckedDB,
     plan: &mut CodegenPlan,
     plans: &NixAllServerPlans,
@@ -562,12 +563,6 @@ fn generate_machines(
     let l1_fast_dir = rd.create_directory("l1-fast");
     l1_provisioning::fast_l1::generate_fast_l1_provisioning_part(l1_fast_dir, checked, &l1_outputs, secrets);
 
-    let l2_prov_dir = rd.create_directory("l2-provisioning");
-    for region in checked.db.region().rows_iter() {
-        let l2_prov_dir = l2_prov_dir.create_directory(checked.db.region().c_region_name(region));
-        generate_l2_provisioning_part(l2_prov_dir, checked, region, secrets);
-    }
-
     let integration_test_dir = rd.create_directory("integration-tests");
     integration_tests::generate_integration_test_dir(checked, integration_test_dir);
 
@@ -575,6 +570,19 @@ fn generate_machines(
     rd.create_file_custom("admin-wg.conf", vpn_conf.into_bytes(), false, "600", false, None);
 
     l1_outputs
+}
+
+fn generate_l2_provisioning(
+    checked: &CheckedDB,
+    plan: &mut CodegenPlan,
+    secrets: &CodegenSecrets,
+) {
+    let rd = plan.root_dir();
+    let l2_prov_dir = rd.create_directory("l2-provisioning");
+    for region in checked.db.region().rows_iter() {
+        let l2_prov_dir = l2_prov_dir.create_directory(checked.db.region().c_region_name(region));
+        generate_l2_provisioning_part(l2_prov_dir, checked, region, secrets);
+    }
 }
 
 #[allow(dead_code)]

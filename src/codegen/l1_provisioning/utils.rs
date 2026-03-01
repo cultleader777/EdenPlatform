@@ -14,24 +14,14 @@ pub fn provision_generic_every_server(
         let is_hetzner = db.db.datacenter().c_implementation(dc) == "hetzner";
         for server in db.db.datacenter().c_referrers_server__dc(dc) {
             let server = *server;
-            provision_kernel_sysctl_settings(plans, server);
             provision_directories(plans, server);
             provision_server_packages(plans, server);
             provision_server_firewall(db, plans, server, is_hetzner, &global_settings);
             provision_server_shell(db, plans, server);
             provision_fast_l1_provisioning(db, plans, server, cgen_secrets);
+            provision_prevent_annoyances(plans, server);
         }
     }
-}
-
-fn provision_kernel_sysctl_settings(plans: &mut NixAllServerPlans, server: TableRowPointerServer) {
-    let plan = plans.fetch_plan(server);
-    plan.add_custom_nix_block(r#"
-    boot.kernel.sysctl = {
-      # for loki ScyllaDB
-      "fs.aio-max-nr" = 1048576;
-    };
-"#.to_string());
 }
 
 /// Special directory for admin usre to put l2 secrets to
@@ -249,6 +239,17 @@ fn provision_server_firewall(db: &CheckedDB, plans: &mut NixAllServerPlans, serv
     plan.add_custom_nix_block(mk_nix_region("firewall", firewall_rules_for_server));
 }
 
+/// Annoying things that seem to break down overtime
+/// Usually no reason why defaults suck
+fn provision_prevent_annoyances(plans: &mut NixAllServerPlans, server: TableRowPointerServer) {
+    plans.fetch_plan(server).add_custom_nix_block(r#"
+  # nix-daemon stopped working due to pesky rlimit error
+  systemd.services.nix-daemon.serviceConfig = {
+    LimitNOFILE = lib.mkForce (1024 * 1024 * 1024);
+  };
+"#.to_string());
+}
+
 fn provision_server_packages(plans: &mut NixAllServerPlans, server: TableRowPointerServer) {
     let plan = plans.fetch_plan(server);
 
@@ -277,6 +278,7 @@ fn provision_server_packages(plans: &mut NixAllServerPlans, server: TableRowPoin
       "tmux",
       "procmail", // lockfile for l1 provisioning
       "vault", // make command available everywhere
+      "openssl", // check openssl certificate expirations on every server
     ];
 
     for package in &packages {

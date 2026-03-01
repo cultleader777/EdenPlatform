@@ -16,7 +16,7 @@ use super::dc_impl::aws::compute_aws_topology;
 use super::dc_impl::bm_simple::compute_bm_simple_topology;
 use super::dc_impl::gcloud::compute_gcloud_topology;
 use super::databases::clickhouse::{ch_schemas_in_region, check_nats_stream_import_regionality};
-use super::databases::postgres::pg_schemas_in_region;
+use super::databases::postgres::{pg_schemas_in_region, DbQueryOrMutator};
 use super::dns::{dns_checks, server_fqdns};
 use super::http_endpoints::{
     check_app_duplicate_paths, check_frontend_duplicate_paths, check_http_path, HttpPathTree,
@@ -320,6 +320,33 @@ pub fn create_projections(db: &Database, sync_checks: &SyncChecksOutputs) -> Res
     let frontend_deployment_link_wirings =
         crate::static_analysis::applications::check_frontend_application_link_wirings(db)?;
 
+    crate::static_analysis::applications::check_application_build_environments(db)?;
+    let enriched_pg_channels = crate::static_analysis::databases::postgres::enriched_pg_channels(db, &bw_type_by_name)?;
+    let transaction_steps = crate::static_analysis::databases::postgres::check_transaction_steps(db)?;
+    crate::static_analysis::databases::clickhouse::check_ch_schema_name_clash(db)?;
+    let application_pg_shard_queries =
+        crate::static_analysis::applications::check_application_pg_queries(db)?;
+    let application_ch_shard_queries =
+        crate::static_analysis::applications::check_application_ch_queries(db)?;
+    let application_deployment_pg_wirings =
+        crate::static_analysis::applications::application_deployments_pg_shard_wiring(db)?;
+    let application_deployment_ch_wirings =
+        crate::static_analysis::applications::application_deployments_ch_shard_wiring(db)?;
+    let application_deployment_stream_wirings =
+        crate::static_analysis::applications::application_deployments_nats_stream_wiring(db)?;
+    let application_deployment_bucket_wirings =
+        crate::static_analysis::applications::application_deployments_s3_buckets_wiring(db)?;
+    let application_deployment_configs =
+        crate::static_analysis::applications::application_deployments_config(db)?;
+    let frontend_deployment_endpoint_wirings =
+        crate::static_analysis::applications::frontend_deployments_endpoint_wirings(
+            db,
+            &backend_ingress_endpoints,
+        )?;
+    let backend_apps_in_region = backend_apps_in_region(db);
+    let frontend_apps_in_region = frontend_apps_in_region(db);
+    ensure_no_double_use_minio_buckets(db, &application_deployment_bucket_wirings)?;
+
     let application_used_bw_types: Projection<
         TableRowPointerBackendApplication,
         BTreeMap<TableRowPointerVersionedType, VersionedTypeUsageFlags>,
@@ -367,34 +394,45 @@ pub fn create_projections(db: &Database, sync_checks: &SyncChecksOutputs) -> Res
             });
         }
 
+        for pg_shard in db.backend_application().c_children_backend_application_pg_shard(app) {
+            let queries = application_pg_shard_queries.value(*pg_shard);
+
+            for ch in &queries.consumer_channels {
+                let ech = enriched_pg_channels.value(*ch);
+                if let Some(pt) = ech.payload_type {
+                    let e = res.entry(pt).or_insert_with(VersionedTypeUsageFlags::new);
+                    e.json_deserialization = true;
+                }
+            }
+
+            for ch in &queries.producer_channels {
+                let ech = enriched_pg_channels.value(*ch);
+                if let Some(pt) = ech.payload_type {
+                    let e = res.entry(pt).or_insert_with(VersionedTypeUsageFlags::new);
+                    e.json_serialization = true;
+                }
+            }
+
+            for trx in &queries.transactions {
+                let steps = transaction_steps.value(*trx);
+                for step in steps {
+                    match step.query {
+                        DbQueryOrMutator::Notification(n) => {
+                            let ech = enriched_pg_channels.value(n);
+                            if let Some(pt) = &ech.payload_type {
+                                let e = res.entry(*pt).or_insert_with(VersionedTypeUsageFlags::new);
+                                e.json_serialization = true;
+                            }
+                        }
+                        DbQueryOrMutator::Mutator(_) => {}
+                        DbQueryOrMutator::Query(_) => {}
+                    }
+                }
+            }
+        }
+
         res
     });
-
-    crate::static_analysis::applications::check_application_build_environments(db)?;
-    let transaction_steps = crate::static_analysis::databases::postgres::check_transaction_steps(db)?;
-    crate::static_analysis::databases::clickhouse::check_ch_schema_name_clash(db)?;
-    let application_pg_shard_queries =
-        crate::static_analysis::applications::check_application_pg_queries(db)?;
-    let application_ch_shard_queries =
-        crate::static_analysis::applications::check_application_ch_queries(db)?;
-    let application_deployment_pg_wirings =
-        crate::static_analysis::applications::application_deployments_pg_shard_wiring(db)?;
-    let application_deployment_ch_wirings =
-        crate::static_analysis::applications::application_deployments_ch_shard_wiring(db)?;
-    let application_deployment_stream_wirings =
-        crate::static_analysis::applications::application_deployments_nats_stream_wiring(db)?;
-    let application_deployment_bucket_wirings =
-        crate::static_analysis::applications::application_deployments_s3_buckets_wiring(db)?;
-    let application_deployment_configs =
-        crate::static_analysis::applications::application_deployments_config(db)?;
-    let frontend_deployment_endpoint_wirings =
-        crate::static_analysis::applications::frontend_deployments_endpoint_wirings(
-            db,
-            &backend_ingress_endpoints,
-        )?;
-    let backend_apps_in_region = backend_apps_in_region(db);
-    let frontend_apps_in_region = frontend_apps_in_region(db);
-    ensure_no_double_use_minio_buckets(db, &application_deployment_bucket_wirings)?;
 
     let versioned_types = compute_types(db)?;
     let rust_versioned_type_snippets = codegen::rust::compute_snippets(db, &versioned_types);
@@ -543,5 +581,6 @@ pub fn create_projections(db: &Database, sync_checks: &SyncChecksOutputs) -> Res
         label_database,
         server_disk_sizes,
         bb_depl_resources_per_region,
+        enriched_pg_channels,
     })
 }

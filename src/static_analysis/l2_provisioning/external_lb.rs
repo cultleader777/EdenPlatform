@@ -59,6 +59,16 @@ pub fn deploy_external_lb(
         &mut basic_auth_files,
     );
 
+    // Save to compare diffs if configs change when we develop
+    runtime.add_provisioning_resource(
+        region,
+        "configs",
+        "external_lb_site.conf".to_string(),
+        site_config_file.clone(),
+        false,
+        Vec::new()
+    );
+
     let admin_site = generate_admin_site(runtime);
     let service_slug = "epl-external-lb";
     let nomad_job_name = "external-lb";
@@ -514,27 +524,6 @@ server {{
 
                 let is_epl_app = content.content.is_epl_app();
                 let location_path = mk_nginx_path(target_route);
-                res += "    location ~ ^";
-                res += &location_path;
-                if is_epl_app {
-                    res += "$";
-                }
-
-                res += " {\n";
-
-                if !content.basic_auth.is_empty() {
-                    // no downtime reload screwed
-                    let new_pwd_file = format!("basic_auth_{}.htpasswd", basic_auth_files.len() + 1);
-                    write!(&mut res, r#"
-        auth_basic "Restricted Area";
-        auth_basic_user_file /secrets/{new_pwd_file};
-"#).unwrap();
-                    let mut content = content.basic_auth.clone();
-                    if !content.ends_with("\n") {
-                        content.push('\n');
-                    }
-                    basic_auth_files.push((new_pwd_file, content));
-                }
 
                 match &content.content {
                     crate::static_analysis::server_runtime::RouteContent::InternalUpstream {
@@ -543,7 +532,30 @@ server {{
                         is_https,
                         target_path,
                         unlimited_body,
+                        client_max_body_size,
                     } => {
+                        res += "    location ~ ^";
+                        res += &location_path;
+                        if is_epl_app {
+                            res += "$";
+                        }
+
+                        res += " {\n";
+
+                        if !content.basic_auth.is_empty() {
+                            // no downtime reload screwed
+                            let new_pwd_file = format!("basic_auth_{}.htpasswd", basic_auth_files.len() + 1);
+                            write!(&mut res, r#"
+        auth_basic "Restricted Area";
+        auth_basic_user_file /secrets/{new_pwd_file};
+"#).unwrap();
+                            let mut content = content.basic_auth.clone();
+                            if !content.ends_with("\n") {
+                                content.push('\n');
+                            }
+                            basic_auth_files.push((new_pwd_file, content));
+                        }
+
                         let is_nomad = consul_service.service_name() == "nomad-servers";
                         let is_consul = consul_service.service_name() == "consul";
                         // TODO: why vault returns 500 errors when cache is on like nomad/consul?
@@ -555,6 +567,11 @@ server {{
                             res += ") {\n";
                             res += "            return 405;\n";
                             res += "        }\n";
+                        }
+
+                        if let Some(client_max_body_size) = client_max_body_size {
+                            write!(&mut res, "        client_max_body_size {client_max_body_size};
+").unwrap();
                         }
 
                         // nomad special https://developer.hashicorp.com/nomad/tutorials/manage-clusters/reverse-proxy-ui
@@ -616,11 +633,46 @@ server {{
         }}
 ").expect("should work");
                         }
+
+                        // location end
+                        res += "    }\n\n";
                     }
+                    // TODO: rewrite this section with consistent enum matchings,
+                    // better to have multiple clear definitions than one complex one
+                    crate::static_analysis::server_runtime::RouteContent::MinIOBucketExpose {
+                        consul_service,
+                        port,
+                        bucket_name,
+                    } => {
+                        let consul_service = consul_service.service_fqdn();
+                        write!(&mut res, r#"
+    location / {{
+        client_max_body_size 0;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # prevents error in case DNS is unresolvable
+        set $dummy_var "{consul_service}:{port}";
+        rewrite ^/(.*)$ /{bucket_name}/$1 break;
+        proxy_pass http://$dummy_var;
+
+        # MinIO-specific best practices
+        proxy_buffering off;
+        proxy_request_buffering off;
+        chunked_transfer_encoding off;  # Helps with large/signed uploads
+    }}
+"#).unwrap();
+                    }
+
                 }
-                res += "    }\n\n";
             }
 
+            // server end
             res += "}\n";
             res += "\n";
         }

@@ -210,6 +210,7 @@ pub fn deploy_postgres_instances(
 
             let instance_id = db.pg_deployment_instance().c_instance_id(*depl_child);
             let server_volume = db.pg_deployment_instance().c_pg_server(*depl_child);
+            let failover_priority = db.pg_deployment_instance().c_failover_priority(*depl_child);
             let server = db.server_volume().c_parent(server_volume);
             let hostname = db.server().c_hostname(server);
 
@@ -386,7 +387,7 @@ pub fn deploy_postgres_instances(
             let depl_config =
                 generate_deployment_config(
                     db, depl, instance_id, pg_deployment_subnet,
-                    &secrets, synchronous_replication,
+                    &secrets, synchronous_replication, failover_priority,
                 );
 
             let config_path = task.add_secure_config("patroni.yml".to_string(), depl_config);
@@ -410,6 +411,7 @@ pub fn deploy_postgres_instances(
                     pg_master_port,
                     pg_slave_port,
                     pg_haproxy_metrics_port,
+                    pg_patroni_port,
                     consul_service.service_name(),
                 ),
             );
@@ -538,6 +540,7 @@ fn generate_deployment_config(
     subnet_access: &str,
     secrets: &PostgresSecretsSet,
     synchronous_replication: bool,
+    failover_priority: i64,
 ) -> String {
     let depl_name = db.pg_deployment().c_deployment_name(depl);
     let pg_port = db.pg_deployment().c_instance_pg_port(depl);
@@ -552,6 +555,9 @@ fn generate_deployment_config(
     let pg_replicator_password = secrets.pg_replicator_password.template_expression();
     let pg_rewind_password = secrets.pg_rewind_password.template_expression();
     let pg_admin_password = secrets.pg_admin_password.template_expression();
+    // if we don't want node to be a leader don't load balance to it as well
+    // so it could be like analytics replica
+    let no_load_balance = failover_priority == 0;
     let maybe_synchronous_replication =
         if synchronous_replication {
             r#"
@@ -631,10 +637,10 @@ postgresql:
   - host all all {subnet_access} md5
 
 tags:
-    nofailover: false
-    noloadbalance: false
-    clonefrom: false
-    nosync: false
+  failover_priority: {failover_priority}
+  noloadbalance: {no_load_balance}
+  clonefrom: false
+  nosync: false
 "#
     )
 }
@@ -644,6 +650,7 @@ fn generate_haproxy_config(
     master_port: u16,
     slave_port: u16,
     metrics_port: u16,
+    patroni_port: u16,
     consul_service_name: &str,
 ) -> String {
     format!(
@@ -678,8 +685,10 @@ resolvers consul
 listen postgres_write
     bind {{{{ env "meta.private_ip" }}}}:{master_port}
     mode tcp
+    option httpchk OPTIONS /primary
+    http-check expect status 200
     default-server inter 3s fall 3 rise 2 on-marked-down shutdown-sessions
-    server-template pg-master 1 master.{consul_service_name}.service.consul:{pg_port} resolvers consul resolve-prefer ipv4 check
+    server-template pg-master 1 master.{consul_service_name}.service.consul:{pg_port} resolvers consul resolve-prefer ipv4 check port {patroni_port}
 
 listen postgres_read
     bind {{{{ env "meta.private_ip" }}}}:{slave_port}

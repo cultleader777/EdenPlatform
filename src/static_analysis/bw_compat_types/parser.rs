@@ -553,5 +553,5 @@ fn test_bw_type_expected_hash() {
     let res2 = test_val.version_hash();
 
     assert_eq!(res, res2);
-    assert_eq!(0x1234EBA350308B0E, res);
+    assert_eq!(1311908940005343839, res);
 }

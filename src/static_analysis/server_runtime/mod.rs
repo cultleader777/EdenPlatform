@@ -6,7 +6,7 @@ use regex::Regex;
 use crate::{database::{
     Database, TableRowPointerPgDeploymentSchemas, TableRowPointerPgDeploymentUnmanagedDb,
     TableRowPointerMinioBucket, TableRowPointerMonitoringCluster, TableRowPointerServer,
-    TableRowPointerServerVolume, TableRowPointerTld, TableRowPointerRegion, TableRowPointerLokiCluster, TableRowPointerServerKind, TableRowPointerDockerImage, TableRowPointerChDeploymentSchemas, TableRowPointerNomadNamespace, TableRowPointerCustomSecret,
+    TableRowPointerServerVolume, TableRowPointerTld, TableRowPointerRegion, TableRowPointerLokiCluster, TableRowPointerServerKind, TableRowPointerDockerImage, TableRowPointerChDeploymentSchemas, TableRowPointerNomadNamespace, TableRowPointerCustomSecret
 }, codegen::{l1_provisioning::{consul::consul_tests, nomad::nomad_tests, vault::vault_tests}, CodegenSecrets}, static_analysis::get_global_settings};
 
 use super::{
@@ -191,6 +191,12 @@ pub enum RouteContent {
         port: u16,
         target_path: String,
         unlimited_body: bool,
+        client_max_body_size: Option<i64>,
+    },
+    MinIOBucketExpose {
+        consul_service: ConsulServiceHandle,
+        port: u16,
+        bucket_name: String,
     },
 }
 
@@ -200,6 +206,7 @@ impl RouteContent {
             RouteContent::InternalUpstream { consul_service, .. } => {
                 consul_service.service_name.starts_with("epl-app-")
             }
+            RouteContent::MinIOBucketExpose { .. } => { false }
         }
     }
 }
@@ -239,6 +246,7 @@ pub enum ProvisioningScriptTag {
     L1Resources,             // provision vault secrets
     RunNomadSystemJob,       // all the system jobs, postgres, queues
     SystemResourceProvision, // provision system resources, like database migrations
+    PostSystemResourceProvision, // provision system resources, like database migrations
     EplApplicationBuild,     // build epl applications
     EplApplicationPush,      // build epl applications
     RunNomadAppJob,          // rn nomad epl applications
@@ -251,6 +259,7 @@ impl ProvisioningScriptTag {
             ProvisioningScriptTag::L1Resources => 10,
             ProvisioningScriptTag::RunNomadSystemJob => 20,
             ProvisioningScriptTag::SystemResourceProvision => 30,
+            ProvisioningScriptTag::PostSystemResourceProvision => 35,
             ProvisioningScriptTag::EplApplicationBuild => 40,
             ProvisioningScriptTag::EplApplicationPush => 50,
             ProvisioningScriptTag::RunNomadAppJob => 60,
@@ -268,6 +277,9 @@ impl ProvisioningScriptTag {
             ],
             ProvisioningScriptTag::SystemResourceProvision => vec![
                 ProvisioningScriptTag::RunNomadSystemJob, // depends on running the jobs
+            ],
+            ProvisioningScriptTag::PostSystemResourceProvision => vec![
+                ProvisioningScriptTag::SystemResourceProvision, // depends on provisioned system resources
             ],
             ProvisioningScriptTag::RunNomadAppJob => vec![
                 ProvisioningScriptTag::RunNomadSystemJob, // apps depend on nats/postgres
@@ -420,11 +432,8 @@ impl VaultSecretHandle {
         let key = &self.vault_secret_key;
         let left = &self.left;
         let right = &self.right;
-        //format!(
-        //    r#"{left}{{{{ with secret "{engine}/data/{name}" }}}}{{{{ .Data.data.{key} | toJSON }}}}{{{{ end }}}}{right}"#
-        //)
         format!(
-            r#"{left}{{{{ with secret "{engine}/data/{name}" }}}}{{{{ .Data.data.{key} }}}}{{{{ end }}}}{right}"#
+            r#"{left}{{{{ with secret "{engine}/data/{name}" }}}}{{{{ index .Data.data "{key}" }}}}{{{{ end }}}}{right}"#
         )
     }
 
@@ -540,6 +549,7 @@ pub struct VaultSecretBuilder<'a> {
     sr: &'a mut ServerRuntime,
     engine_key: String,
     vault_secret_name: String,
+    issued_secrets: usize,
 }
 
 #[derive(Clone)]
@@ -549,6 +559,7 @@ pub struct FinalizedVaultSecrets {
     #[allow(dead_code)]
     vault_secret_name: String,
     vault_policy_name: String,
+    secrets_count: usize,
 }
 
 impl FinalizedVaultSecrets {
@@ -635,6 +646,8 @@ impl<'a> VaultSecretBuilder<'a> {
             "Requesting duplicate secret with key {key}"
         );
 
+        self.issued_secrets += 1;
+
         handle
     }
 
@@ -643,6 +656,7 @@ impl<'a> VaultSecretBuilder<'a> {
             engine_key: self.engine_key,
             vault_policy_name: format!("epl-{}", self.vault_secret_name.replace("/", "-")),
             vault_secret_name: self.vault_secret_name,
+            secrets_count: self.issued_secrets,
         }
     }
 
@@ -691,6 +705,8 @@ impl<'a> VaultSecretBuilder<'a> {
                 }
             )
             .is_none());
+
+        self.issued_secrets += 1;
 
         secret
     }
@@ -922,6 +938,7 @@ impl ServerRuntime {
             sr: self,
             engine_key: engine_key.to_string(),
             vault_secret_name: component.to_string(),
+            issued_secrets: 0,
         }
     }
 
@@ -1327,6 +1344,7 @@ impl ServerRuntime {
                         port: adm_svc.service_internal_port,
                         target_path: "/".to_string(),
                         unlimited_body: false,
+                        client_max_body_size: None,
                     },
                     basic_auth: "".to_string(),
                 },
@@ -2555,6 +2573,26 @@ impl SingleServerData {
         lock.write_lock(lock_reason)
     }
 
+    pub fn server_volume_read_lock(
+        &mut self,
+        db: &Database,
+        vol: TableRowPointerServerVolume,
+        lock_reason: String,
+    ) -> Result<SuccessfulVolumeLock, PlatformValidationError> {
+        assert_eq!(
+            db.server_volume().c_parent(vol),
+            self.server,
+            "Volume does not belong to this server data"
+        );
+
+        let lock = self
+            .locked_volumes
+            .entry(ServerVolumeKey::ServerVolumePtr(vol))
+            .or_insert_with(|| ServerVolumeLocks::new(db, vol));
+
+        lock.read_lock(lock_reason)
+    }
+
     pub fn reserve_memory_mb(
         &mut self,
         comment: String,
@@ -2623,6 +2661,10 @@ impl NomadJob {
     }
 
     pub fn assign_vault_secrets(&mut self, secrets: FinalizedVaultSecrets) {
+        if secrets.secrets_count == 0 {
+            // Nothing to do, no secrets
+            return;
+        }
         assert!(
             self.vault_policy.is_none(),
             "Cannot assign vault secrets to job twice"

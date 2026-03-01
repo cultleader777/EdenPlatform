@@ -4,7 +4,7 @@ use std::fmt::Write;
 use convert_case::Casing;
 use serde_json::Value;
 
-use crate::codegen::nixplan::{write_nix_region_start, write_nix_region_end, ZfsDataset};
+use crate::codegen::nixplan::{write_nix_region_start, write_nix_region_end, ZfsDataset, custom_user_secret_key_with_change_flag};
 use crate::codegen::secrets::tls_cert_expiration_days;
 use crate::database::TableRowPointerDatacenter;
 use crate::{
@@ -53,20 +53,27 @@ pub(crate) fn provision_consul(
 
             let server_tls_cert_key = "consul-tls-server-cert.pem";
             let server_tls_pkey_key = "consul-tls-server-pkey.pem";
+            let change_flag = "restart-consul";
             let abs_server_cert_path = plan
-                .add_secret(custom_user_secret_key(
+                .add_secret(custom_user_secret_key_with_change_flag(
                     "consul".to_string(),
                     server_tls_cert_key.to_string(),
                     server_secrets.tls_certificate.clone(),
+                    change_flag.to_string(),
                 ))
                 .absolute_path();
             let abs_server_pkey_path = plan
-                .add_secret(custom_user_secret_key(
+                .add_secret(custom_user_secret_key_with_change_flag(
                     "consul".to_string(),
                     server_tls_pkey_key.to_string(),
                     server_secrets.tls_private_key.clone(),
+                    change_flag.to_string(),
                 ))
                 .absolute_path();
+
+            plan.add_post_second_round_secrets_shell_hook(
+                format!("[ -f /run/change-flags/{change_flag} ] && echo 'consul keys/certificates renewed, restarting service' && systemctl restart consul.service")
+            );
 
             let certs_path = ConsulServerCertsPath {
                 abs_server_cert_path,
@@ -136,19 +143,25 @@ pub(crate) fn provision_consul(
       ];
     }};
     users.users.consul.extraGroups = ["keys"];
+    systemd.services.consul = {{
+      serviceConfig = {{
+        ExecStartPre = [
+          # wait until encrypted zfs volume is mounted
+          "+${{pkgs.util-linux}}/bin/findmnt \"/var/lib/consul\""
+        ];
+      }};
+    }};
 "#
         ));
 
-        if is_server {
-            plan.add_zfs_dataset("consul".to_string(), ZfsDataset {
-                compression_enabled: true,
-                encryption_enabled: true,
-                expose_to_containers: false,
-                mountpoint: "/var/lib/consul".to_string(),
-                record_size: "4k".to_string(),
-                zpool: "rpool".to_string(),
-            });
-        }
+        plan.add_zfs_dataset("consul".to_string(), ZfsDataset {
+            compression_enabled: true,
+            encryption_enabled: true,
+            expose_to_containers: false,
+            mountpoint: "/var/lib/consul".to_string(),
+            record_size: "4k".to_string(),
+            zpool: "rpool".to_string(),
+        });
 
         let mut restart_block = String::new();
         gen_reload_service_on_path_change(

@@ -461,6 +461,14 @@ pub enum PlatformValidationError {
         accepted_true_values: &'static str,
         accepted_false_values: &'static str,
     },
+    PgDatasetColumnValueInvalidTimestamp {
+        pg_schema: String,
+        table: String,
+        column: String,
+        column_value: String,
+        parsing_error: String,
+        example_value: String,
+    },
     PgDatasetUnsupportedColumnType {
         database: String,
         table: String,
@@ -638,10 +646,6 @@ pub enum PlatformValidationError {
         seq_scan_table: String,
         query_plan: String,
     },
-    PgQueryAndMutatorShareSameName {
-        pg_schema: String,
-        query_or_mutator_name: String,
-    },
     PgQueryOptFieldMustBeSnakeCase {
         pg_schema: String,
         query_name: String,
@@ -744,18 +748,28 @@ pub enum PlatformValidationError {
         server: String,
         server_region: String,
     },
-    PgDeploymentMustHaveAtLeastTwoNodes {
-        pg_deployment: String,
+    PgDeploymentFailoverPriorityNotSupportedForThisVersion {
         db_region: String,
-        found_instances: usize,
-        minimum_instances: usize,
+        pg_deployment: String,
+        pg_version: String,
+        min_supported_pg_version: String,
+        instance_with_non_default_failover_priority: String,
+        failover_priority: i64,
+    },
+    PgDeploymentMustHaveAtLeastTwoNodes {
+        db_region: String,
+        pg_deployment: String,
+        found_leader_instances: usize,
+        minimum_leader_instances: usize,
+        non_leader_instances: usize,
     },
     PgDeploymentForSynchronousReplicationYouMustRunAtLeastThreeNodes {
         pg_deployment: String,
         db_region: String,
         synchronous_replication_enabled: bool,
-        found_instances: usize,
-        minimum_instances: usize,
+        found_leader_instances: usize,
+        minimum_leader_instances: usize,
+        non_leader_instances: usize,
     },
     PgDeploymentHasMoreThanMaximumChildInstancesAllowed {
         pg_deployment: String,
@@ -849,6 +863,11 @@ pub enum PlatformValidationError {
         resulting_data_table: String,
         rows_not_found_after_mutator_execution: String,
         resulting_data: String,
+    },
+    PgChannelBwTypeNotFound {
+        pg_schema: String,
+        channel_name: String,
+        payload_type_not_found: String,
     },
     ChQueryHasNoTests {
         ch_schema: String,
@@ -1371,6 +1390,20 @@ pub enum PlatformValidationError {
         application_pg_shard: String,
         application: String,
     },
+    ApplicationPgConsumerChannelNotFoundInPgSchema {
+        consumer_channels_src: String,
+        consumer_channel_not_found: String,
+        application_pg_schema: String,
+        application_pg_shard: String,
+        application: String,
+    },
+    ApplicationPgProducerChannelNotFoundInPgSchema {
+        producer_channels_src: String,
+        producer_channel_not_found: String,
+        application_pg_schema: String,
+        application_pg_shard: String,
+        application: String,
+    },
     ApplicationPgShardQueryDefinedTwice {
         used_queries_src: String,
         used_query_defined_twice: String,
@@ -1388,6 +1421,20 @@ pub enum PlatformValidationError {
     ApplicationPgShardTransactionDefinedTwice {
         used_transactions_src: String,
         used_transaction_defined_twice: String,
+        application_pg_schema: String,
+        application_pg_shard: String,
+        application: String,
+    },
+    ApplicationPgShardConsumerChannelDefinedTwice {
+        consumer_channels_src: String,
+        consumer_channel_defined_twice: String,
+        application_pg_schema: String,
+        application_pg_shard: String,
+        application: String,
+    },
+    ApplicationPgShardProducerChannelDefinedTwice {
+        producer_channels_src: String,
+        producer_channel_defined_twice: String,
         application_pg_schema: String,
         application_pg_shard: String,
         application: String,
@@ -1628,6 +1675,14 @@ pub enum PlatformValidationError {
         bad_line: String,
         application_expected_enable_subjects: bool,
         target_deployment_stream_enable_subjects: bool,
+        explanation: &'static str,
+    },
+    ApplicationStreamWiringMessageIdEnabledMismatch {
+        application_deployment: String,
+        application_name: String,
+        bad_line: String,
+        application_expected_enable_message_id: bool,
+        target_deployment_stream_enable_message_id: bool,
         explanation: &'static str,
     },
     ApplicationStreamWiringApplicationStreamDefinedMultipleTimes {

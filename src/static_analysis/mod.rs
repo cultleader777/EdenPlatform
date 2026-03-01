@@ -1,7 +1,7 @@
 use std::{sync::Arc, collections::{BTreeMap, HashMap, BTreeSet, HashSet}};
 
-use crate::{database::{Database, TableRowPointerBackendApplication, TableRowPointerPgSchema, TableRowPointerVersionedType, TableRowPointerBackendHttpEndpoint, TableRowPointerHttpMethods, TableRowPointerHttpEndpointDataType, TableRowPointerPgTransaction, TableRowPointerServer, TableRowPointerNetworkInterface, TableRowPointerBackendApplicationPgShard, TableRowPointerBackendApplicationDeployment, TableRowPointerPgDeploymentSchemas, TableRowPointerBackendApplicationNatsStream, TableRowPointerNatsJetstreamStream, TableRowPointerAlertTriggerTest, TableRowPointerNixpkgsVersion, TableRowPointerFrontendPage, TableRowPointerFrontendApplication, TableRowPointerFrontendApplicationUsedEndpoint, TableRowPointerFrontendApplicationDeployment, TableRowPointerBackendApplicationDeploymentIngress, TableRowPointerFrontendApplicationExternalPage, TableRowPointerFrontendApplicationExternalLink, TableRowPointerFrontendApplicationDeploymentIngress, TableRowPointerTld, TableRowPointerLokiCluster, TableRowPointerMonitoringCluster, TableRowPointerRegion, TableRowPointerDatacenter, TableRowGlobalSettings, TableRowPointerServerKind, TableRowPointerServerDisk, TableRowPointerTempoCluster, TableRowPointerBackendApplicationS3Bucket, TableRowPointerMinioBucket, TableRowPointerBackendApplicationConfig, TableRowPointerChSchema, TableRowPointerChDeploymentSchemas, TableRowPointerBackendApplicationChShard, TableRowPointerNomadNamespace}, codegen::rust::{RustVersionedTypeSnippets, GeneratedRustSourceForHttpEndpoint}, prom_metrics_dump::AllClusterSeriesDatabase};
-use self::{databases::{postgres::{EnrichedPgDbData, TransactionStep}, clickhouse::EnrichedChDbData}, bw_compat_types::ComputedType, projections::{Projection, Index, VersionedTypeUsageFlags}, http_endpoints::{CheckedHttpEndpoint, HttpPathTree, PathArgs}, networking::{NetworkAnalysisOutput, ClusterPicker, DcVpnGateways, VpnGateway}, server_runtime::ServerRuntime, applications::{ApplicationPgQueries, ApplicationChQueries}, alerts::{PromtoolTestSuite, AlertTestCompiled}, dns::DnsChecks, dc_impl::{aws::AwsTopology, gcloud::GcloudTopology, bm_simple::BmSimpleDatacenterArguments}, docker_images::run_docker_image_checks, server_labels::LabelDatabase, l2_provisioning::{epl_app_ingress::IpsCollection, blackbox_deployments::BlackBoxDeploymentResource}};
+use crate::{database::{Database, TableRowPointerBackendApplication, TableRowPointerPgSchema, TableRowPointerVersionedType, TableRowPointerBackendHttpEndpoint, TableRowPointerHttpMethods, TableRowPointerHttpEndpointDataType, TableRowPointerPgTransaction, TableRowPointerServer, TableRowPointerNetworkInterface, TableRowPointerBackendApplicationPgShard, TableRowPointerBackendApplicationDeployment, TableRowPointerPgDeploymentSchemas, TableRowPointerBackendApplicationNatsStream, TableRowPointerNatsJetstreamStream, TableRowPointerAlertTriggerTest, TableRowPointerNixpkgsVersion, TableRowPointerFrontendPage, TableRowPointerFrontendApplication, TableRowPointerFrontendApplicationUsedEndpoint, TableRowPointerFrontendApplicationDeployment, TableRowPointerBackendApplicationDeploymentIngress, TableRowPointerFrontendApplicationExternalPage, TableRowPointerFrontendApplicationExternalLink, TableRowPointerFrontendApplicationDeploymentIngress, TableRowPointerTld, TableRowPointerLokiCluster, TableRowPointerMonitoringCluster, TableRowPointerRegion, TableRowPointerDatacenter, TableRowGlobalSettings, TableRowPointerServerKind, TableRowPointerServerDisk, TableRowPointerTempoCluster, TableRowPointerBackendApplicationS3Bucket, TableRowPointerMinioBucket, TableRowPointerBackendApplicationConfig, TableRowPointerChSchema, TableRowPointerChDeploymentSchemas, TableRowPointerBackendApplicationChShard, TableRowPointerNomadNamespace, TableRowPointerPgChannel}, codegen::rust::{RustVersionedTypeSnippets, GeneratedRustSourceForHttpEndpoint}, prom_metrics_dump::AllClusterSeriesDatabase};
+use self::{databases::{postgres::{EnrichedPgDbData, TransactionStep, EnrichedPgChannel}, clickhouse::EnrichedChDbData}, bw_compat_types::ComputedType, projections::{Projection, Index, VersionedTypeUsageFlags}, http_endpoints::{CheckedHttpEndpoint, HttpPathTree, PathArgs}, networking::{NetworkAnalysisOutput, ClusterPicker, DcVpnGateways, VpnGateway}, server_runtime::ServerRuntime, applications::{ApplicationPgQueries, ApplicationChQueries}, alerts::{PromtoolTestSuite, AlertTestCompiled}, dns::DnsChecks, dc_impl::{aws::AwsTopology, gcloud::GcloudTopology, bm_simple::BmSimpleDatacenterArguments}, docker_images::run_docker_image_checks, server_labels::LabelDatabase, l2_provisioning::{epl_app_ingress::IpsCollection, blackbox_deployments::BlackBoxDeploymentResource, post_async_checks_l2_provisioning}};
 
 pub mod networking;
 pub mod databases;
@@ -86,6 +86,7 @@ pub struct Projections {
     pub used_architectures_per_region: BTreeMap<TableRowPointerRegion, BTreeSet<String>>,
     pub label_database: LabelDatabase,
     pub server_disk_sizes: BTreeMap<TableRowPointerServerDisk, i64>,
+    pub enriched_pg_channels: Projection<TableRowPointerPgChannel, EnrichedPgChannel>,
 }
 
 pub struct CloudTopologies {
@@ -153,11 +154,13 @@ pub struct SyncChecksOutputs {
 pub fn run_static_checks(db: Arc<Database>) -> Result<CheckedDB, PlatformValidationError> {
     let bencher = bench_start("Synchronous checks");
     let sync_res = run_sync_checks(&db)?;
-    let projections = projections::create_projections(&db, &sync_res)?;
+    let mut projections = projections::create_projections(&db, &sync_res)?;
     bencher.end();
     let bencher = bench_start("Asynchronous checks");
     let async_res = run_async_checks(&db, &projections)?;
     bencher.end();
+
+    post_async_checks_l2_provisioning(&db, &mut projections, &async_res);
 
     Ok(CheckedDB { db, async_res, projections, sync_res })
 }

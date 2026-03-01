@@ -179,9 +179,10 @@ pub fn deploy_nats_instances(
                 ));
             }
 
+            let instance_memory_mb = db.nats_cluster().c_instance_memory_mb(nats_cluster);
             let locked_mem = server_data.reserve_memory_mb(
                 format!("nats memory {cluster_name}"),
-                db.nats_cluster().c_instance_memory_mb(nats_cluster),
+                instance_memory_mb,
             )?;
             let prom_mem =
                 server_data.reserve_memory_mb("nats prometheus exporter memory".to_string(), 32)?;
@@ -225,11 +226,23 @@ pub fn deploy_nats_instances(
             );
             nats_task.add_memory(locked_mem);
             nats_task.bind_volume(volume_lock, target_mount_path.to_string());
+            nats_task.set_env_variable("GOMEMLIMIT", &format!("{}MiB", instance_memory_mb));
+
+            // set 1 petabyte, because if we're running out we'll get an alert
+            // and zfs available disk space reporting is not reliable so just set
+            // a big limit
+            let max_file_store_bytes = db.nats_cluster().c_max_file_store_bytes(nats_cluster);
+            let nats_cfg = nats_task.add_local_file("js.conf".to_string(), format!(r#"
+jetstream {{
+  store_dir: {target_mount_path}/nats
+  max_file_store: {max_file_store_bytes}
+}}
+"#));
 
             let arguments = vec![
                 format!("--name={cluster_name}-{hostname}"),
                 "--jetstream".to_string(),
-                format!("--store_dir={target_mount_path}/nats"),
+                format!("--config={nats_cfg}"),
                 format!("--port={clients_port}"),
                 format!("--http_port={http_port}"),
                 "--addr=${meta.private_ip}".to_string(),
@@ -250,15 +263,15 @@ pub fn deploy_nats_instances(
             nats_prom_task.add_memory(prom_mem);
             let arguments = vec![
                 "-addr=${meta.private_ip}".to_string(),
-                "-channelz".to_string(),
+                "-accstatz".to_string(),
                 "-connz_detailed".to_string(),
                 "-healthz".to_string(),
                 "-gatewayz".to_string(),
                 "-leafz".to_string(),
                 "-routez".to_string(),
-                "-serverz".to_string(),
                 "-subz".to_string(),
                 "-varz".to_string(),
+                "-jsz=all".to_string(),
                 "-use_internal_server_id".to_string(),
                 "-use_internal_server_name".to_string(),
                 format!("-p={prom_port}"),
@@ -333,6 +346,7 @@ fn provision_nats_resources(db: &Database, runtime: &mut ServerRuntime, region: 
     script += "\n";
 
     for nats_cluster in db.nats_cluster().rows_iter() {
+        let instance_count = db.nats_cluster().c_children_nats_deployment_instance(nats_cluster).len();
         let this_region = db.nats_cluster().c_region(nats_cluster);
         if region != this_region {
             continue;
@@ -362,6 +376,7 @@ fn provision_nats_resources(db: &Database, runtime: &mut ServerRuntime, region: 
             let stream_name = db.nats_jetstream_stream().c_stream_name(*nats_stream);
             let max_msg_size = db.nats_jetstream_stream().c_max_msg_size(*nats_stream);
             let enable_subjects = db.nats_jetstream_stream().c_enable_subjects(*nats_stream);
+            let duplicate_window = db.nats_jetstream_stream().c_duplicate_window_ns(*nats_stream);
             let subjects =
                 if enable_subjects {
                     format!("{stream_name}.*")
@@ -381,8 +396,8 @@ fn provision_nats_resources(db: &Database, runtime: &mut ServerRuntime, region: 
     "max_msg_size": {max_msg_size},
     "storage": "file",
     "discard": "old",
-    "num_replicas": 3,
-    "duplicate_window": 120000000000,
+    "num_replicas": {instance_count},
+    "duplicate_window": {duplicate_window},
     "sealed": false,
     "deny_delete": false,
     "deny_purge": false,

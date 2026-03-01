@@ -86,13 +86,16 @@ job "nats-main-nats" {
         memory = 256
         memory_max = 384
       }
+      env {
+        GOMEMLIMIT = "256MiB"
+      }
       config {
-        image = "nats@sha256:3ba544a6bbef5767fb28be2737308833ea6f6fbddcb36cc0c8f42bef58ebaf33"
+        image = "nats@sha256:110974826bc2099b037c3324e47e5bdd743472bff304920ab92c881646d656e3"
         network_mode = "host"
         args = [
           "--name=main-nats-server-b",
           "--jetstream",
-          "--store_dir=/data/nats",
+          "--config=/local/js.conf",
           "--port=4222",
           "--http_port=4224",
           "--addr=${meta.private_ip}",
@@ -110,6 +113,18 @@ job "nats-main-nats" {
         volume = "v_1"
         destination = "/data"
       }
+
+      template {
+        destination = "local/js.conf"
+        perms = "644"
+        data = <<EOL
+
+jetstream {
+  store_dir: /data/nats
+  max_file_store: 1125899906842624
+}
+EOL
+      }
     }
 
     task "nats-main-nats-prom-exp" {
@@ -119,19 +134,19 @@ job "nats-main-nats" {
         memory_max = 160
       }
       config {
-        image = "natsio/prometheus-nats-exporter@sha256:31c02aac089a0e9bc5cd9bd1726064f8c6bfa771acbef85a8be88a687e87daba"
+        image = "natsio/prometheus-nats-exporter@sha256:26c826662ac8424597cc9bdf89ea5b606eb66e3c11db9b1215c27d2076bbb01b"
         network_mode = "host"
         args = [
           "-addr=${meta.private_ip}",
-          "-channelz",
+          "-accstatz",
           "-connz_detailed",
           "-healthz",
           "-gatewayz",
           "-leafz",
           "-routez",
-          "-serverz",
           "-subz",
           "-varz",
+          "-jsz=all",
           "-use_internal_server_id",
           "-use_internal_server_name",
           "-p=4225",
@@ -217,13 +232,16 @@ job "nats-main-nats" {
         memory = 256
         memory_max = 384
       }
+      env {
+        GOMEMLIMIT = "256MiB"
+      }
       config {
-        image = "nats@sha256:3ba544a6bbef5767fb28be2737308833ea6f6fbddcb36cc0c8f42bef58ebaf33"
+        image = "nats@sha256:110974826bc2099b037c3324e47e5bdd743472bff304920ab92c881646d656e3"
         network_mode = "host"
         args = [
           "--name=main-nats-server-c",
           "--jetstream",
-          "--store_dir=/data/nats",
+          "--config=/local/js.conf",
           "--port=4222",
           "--http_port=4224",
           "--addr=${meta.private_ip}",
@@ -241,6 +259,18 @@ job "nats-main-nats" {
         volume = "v_1"
         destination = "/data"
       }
+
+      template {
+        destination = "local/js.conf"
+        perms = "644"
+        data = <<EOL
+
+jetstream {
+  store_dir: /data/nats
+  max_file_store: 1125899906842624
+}
+EOL
+      }
     }
 
     task "nats-main-nats-prom-exp" {
@@ -250,19 +280,19 @@ job "nats-main-nats" {
         memory_max = 160
       }
       config {
-        image = "natsio/prometheus-nats-exporter@sha256:31c02aac089a0e9bc5cd9bd1726064f8c6bfa771acbef85a8be88a687e87daba"
+        image = "natsio/prometheus-nats-exporter@sha256:26c826662ac8424597cc9bdf89ea5b606eb66e3c11db9b1215c27d2076bbb01b"
         network_mode = "host"
         args = [
           "-addr=${meta.private_ip}",
-          "-channelz",
+          "-accstatz",
           "-connz_detailed",
           "-healthz",
           "-gatewayz",
           "-leafz",
           "-routez",
-          "-serverz",
           "-subz",
           "-varz",
+          "-jsz=all",
           "-use_internal_server_id",
           "-use_internal_server_name",
           "-p=4225",
@@ -348,13 +378,16 @@ job "nats-main-nats" {
         memory = 256
         memory_max = 384
       }
+      env {
+        GOMEMLIMIT = "256MiB"
+      }
       config {
-        image = "nats@sha256:3ba544a6bbef5767fb28be2737308833ea6f6fbddcb36cc0c8f42bef58ebaf33"
+        image = "nats@sha256:110974826bc2099b037c3324e47e5bdd743472bff304920ab92c881646d656e3"
         network_mode = "host"
         args = [
           "--name=main-nats-server-d",
           "--jetstream",
-          "--store_dir=/data/nats",
+          "--config=/local/js.conf",
           "--port=4222",
           "--http_port=4224",
           "--addr=${meta.private_ip}",
@@ -372,6 +405,18 @@ job "nats-main-nats" {
         volume = "v_1"
         destination = "/data"
       }
+
+      template {
+        destination = "local/js.conf"
+        perms = "644"
+        data = <<EOL
+
+jetstream {
+  store_dir: /data/nats
+  max_file_store: 1125899906842624
+}
+EOL
+      }
     }
 
     task "nats-main-nats-prom-exp" {
@@ -381,19 +426,19 @@ job "nats-main-nats" {
         memory_max = 160
       }
       config {
-        image = "natsio/prometheus-nats-exporter@sha256:31c02aac089a0e9bc5cd9bd1726064f8c6bfa771acbef85a8be88a687e87daba"
+        image = "natsio/prometheus-nats-exporter@sha256:26c826662ac8424597cc9bdf89ea5b606eb66e3c11db9b1215c27d2076bbb01b"
         network_mode = "host"
         args = [
           "-addr=${meta.private_ip}",
-          "-channelz",
+          "-accstatz",
           "-connz_detailed",
           "-healthz",
           "-gatewayz",
           "-leafz",
           "-routez",
-          "-serverz",
           "-subz",
           "-varz",
+          "-jsz=all",
           "-use_internal_server_id",
           "-use_internal_server_name",
           "-p=4225",

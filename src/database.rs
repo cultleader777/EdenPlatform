@@ -189,6 +189,9 @@ pub struct TableRowPointerLokiCluster(usize);
 pub struct TableRowPointerMinioBucket(usize);
 
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
+pub struct TableRowPointerMinioBucketPublicIngress(usize);
+
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
 pub struct TableRowPointerMinioCluster(usize);
 
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
@@ -229,6 +232,9 @@ pub struct TableRowPointerNixpkgsVersion(usize);
 
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
 pub struct TableRowPointerNomadNamespace(usize);
+
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
+pub struct TableRowPointerPgChannel(usize);
 
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, ::std::hash::Hash, serde::Deserialize)]
 pub struct TableRowPointerPgDeployment(usize);
@@ -505,6 +511,11 @@ pub struct TableRowBackendApplicationNatsStream {
     pub enable_producer: bool,
     pub is_batch_consumer: bool,
     pub enable_subjects: bool,
+    pub enable_message_id: bool,
+    pub batch_consumer_max_batch_size: i64,
+    pub batch_consumer_flush_deadline_ms: i64,
+    pub consumer_needs_seq_id: bool,
+    pub consumer_needs_stream_name: bool,
     pub parent: TableRowPointerBackendApplication,
 }
 
@@ -515,6 +526,8 @@ pub struct TableRowBackendApplicationPgShard {
     pub used_queries: ::std::string::String,
     pub used_mutators: ::std::string::String,
     pub used_transactions: ::std::string::String,
+    pub used_consumer_channels: ::std::string::String,
+    pub used_producer_channels: ::std::string::String,
     pub parent: TableRowPointerBackendApplication,
 }
 
@@ -578,6 +591,7 @@ pub struct TableRowBlackboxDeploymentIngress {
     pub subdomain: ::std::string::String,
     pub tld: TableRowPointerTld,
     pub basic_auth_credentials: ::std::string::String,
+    pub client_max_body_size: i64,
 }
 
 #[derive(Debug)]
@@ -641,6 +655,7 @@ pub struct TableRowBlackboxDeploymentTask {
 #[derive(Debug)]
 pub struct TableRowBlackboxDeploymentTaskMount {
     pub target_path: ::std::string::String,
+    pub read_only: bool,
     pub server_volume: TableRowPointerServerVolume,
     pub parent: TableRowPointerBlackboxDeploymentTask,
 }
@@ -746,6 +761,7 @@ pub struct TableRowChNatsStreamImport {
     pub consumer_name: ::std::string::String,
     pub into_table: ::std::string::String,
     pub stream: TableRowPointerNatsJetstreamStream,
+    pub ignore_extra_source_fields: bool,
     pub parent: TableRowPointerChDeploymentSchemas,
 }
 
@@ -1045,8 +1061,16 @@ pub struct TableRowMinioBucket {
     pub locking_enabled: bool,
     pub parent: TableRowPointerMinioCluster,
     pub referrers_docker_registry_instance__minio_bucket: Vec<TableRowPointerDockerRegistryInstance>,
+    pub referrers_minio_bucket_public_ingress__bucket: Vec<TableRowPointerMinioBucketPublicIngress>,
     pub referrers_loki_cluster__storage_bucket: Vec<TableRowPointerLokiCluster>,
     pub referrers_tempo_cluster__storage_bucket: Vec<TableRowPointerTempoCluster>,
+}
+
+#[derive(Debug)]
+pub struct TableRowMinioBucketPublicIngress {
+    pub bucket: TableRowPointerMinioBucket,
+    pub subdomain: ::std::string::String,
+    pub tld: TableRowPointerTld,
 }
 
 #[derive(Debug)]
@@ -1065,6 +1089,7 @@ pub struct TableRowMinioCluster {
     pub monitoring_cluster: ::std::string::String,
     pub expected_zfs_recordsize: ::std::string::String,
     pub distribute_over_dcs: bool,
+    pub multiple_disk_mediums_ok: bool,
     pub instance_memory_mb: i64,
     pub lb_memory_mb: i64,
     pub consul_service_name: ::std::string::String,
@@ -1141,6 +1166,7 @@ pub struct TableRowNatsCluster {
     pub nats_http_mon_port: i64,
     pub nats_prometheus_port: i64,
     pub instance_memory_mb: i64,
+    pub max_file_store_bytes: i64,
     pub children_nats_jetstream_stream: Vec<TableRowPointerNatsJetstreamStream>,
     pub children_nats_deployment_instance: Vec<TableRowPointerNatsDeploymentInstance>,
 }
@@ -1159,6 +1185,8 @@ pub struct TableRowNatsJetstreamStream {
     pub max_bytes: i64,
     pub max_msg_size: i64,
     pub enable_subjects: bool,
+    pub enable_message_id: bool,
+    pub duplicate_window_ns: i64,
     pub parent: TableRowPointerNatsCluster,
     pub referrers_ch_nats_stream_import__stream: Vec<TableRowPointerChNatsStreamImport>,
 }
@@ -1216,6 +1244,13 @@ pub struct TableRowNomadNamespace {
 }
 
 #[derive(Debug)]
+pub struct TableRowPgChannel {
+    pub channel_name: ::std::string::String,
+    pub payload_type: ::std::string::String,
+    pub parent: TableRowPointerPgSchema,
+}
+
+#[derive(Debug)]
 pub struct TableRowPgDeployment {
     pub deployment_name: ::std::string::String,
     pub namespace: TableRowPointerNomadNamespace,
@@ -1249,6 +1284,7 @@ pub struct TableRowPgDeployment {
 pub struct TableRowPgDeploymentInstance {
     pub instance_id: i64,
     pub pg_server: TableRowPointerServerVolume,
+    pub failover_priority: i64,
     pub parent: TableRowPointerPgDeployment,
 }
 
@@ -1337,6 +1373,7 @@ pub struct TableRowPgSchema {
     pub schema_name: ::std::string::String,
     pub children_pg_migration: Vec<TableRowPointerPgMigration>,
     pub children_pg_query: Vec<TableRowPointerPgQuery>,
+    pub children_pg_channel: Vec<TableRowPointerPgChannel>,
     pub children_pg_mutator: Vec<TableRowPointerPgMutator>,
     pub children_pg_transaction: Vec<TableRowPointerPgTransaction>,
     pub children_pg_mat_view: Vec<TableRowPointerPgMatView>,
@@ -1631,6 +1668,7 @@ pub struct TableRowTld {
     pub referrers_global_settings__admin_tld: Vec<TableRowPointerGlobalSettings>,
     pub referrers_backend_application_deployment_ingress__tld: Vec<TableRowPointerBackendApplicationDeploymentIngress>,
     pub referrers_frontend_application_deployment_ingress__tld: Vec<TableRowPointerFrontendApplicationDeploymentIngress>,
+    pub referrers_minio_bucket_public_ingress__tld: Vec<TableRowPointerMinioBucketPublicIngress>,
     pub referrers_blackbox_deployment_ingress__tld: Vec<TableRowPointerBlackboxDeploymentIngress>,
 }
 
@@ -1837,6 +1875,11 @@ pub struct TableDefinitionBackendApplicationNatsStream {
     c_enable_producer: Vec<bool>,
     c_is_batch_consumer: Vec<bool>,
     c_enable_subjects: Vec<bool>,
+    c_enable_message_id: Vec<bool>,
+    c_batch_consumer_max_batch_size: Vec<i64>,
+    c_batch_consumer_flush_deadline_ms: Vec<i64>,
+    c_consumer_needs_seq_id: Vec<bool>,
+    c_consumer_needs_stream_name: Vec<bool>,
     c_parent: Vec<TableRowPointerBackendApplication>,
 }
 
@@ -1847,6 +1890,8 @@ pub struct TableDefinitionBackendApplicationPgShard {
     c_used_queries: Vec<::std::string::String>,
     c_used_mutators: Vec<::std::string::String>,
     c_used_transactions: Vec<::std::string::String>,
+    c_used_consumer_channels: Vec<::std::string::String>,
+    c_used_producer_channels: Vec<::std::string::String>,
     c_parent: Vec<TableRowPointerBackendApplication>,
 }
 
@@ -1910,6 +1955,7 @@ pub struct TableDefinitionBlackboxDeploymentIngress {
     c_subdomain: Vec<::std::string::String>,
     c_tld: Vec<TableRowPointerTld>,
     c_basic_auth_credentials: Vec<::std::string::String>,
+    c_client_max_body_size: Vec<i64>,
 }
 
 pub struct TableDefinitionBlackboxDeploymentLocalFile {
@@ -1973,6 +2019,7 @@ pub struct TableDefinitionBlackboxDeploymentTask {
 pub struct TableDefinitionBlackboxDeploymentTaskMount {
     rows: Vec<TableRowBlackboxDeploymentTaskMount>,
     c_target_path: Vec<::std::string::String>,
+    c_read_only: Vec<bool>,
     c_server_volume: Vec<TableRowPointerServerVolume>,
     c_parent: Vec<TableRowPointerBlackboxDeploymentTask>,
 }
@@ -2078,6 +2125,7 @@ pub struct TableDefinitionChNatsStreamImport {
     c_consumer_name: Vec<::std::string::String>,
     c_into_table: Vec<::std::string::String>,
     c_stream: Vec<TableRowPointerNatsJetstreamStream>,
+    c_ignore_extra_source_fields: Vec<bool>,
     c_parent: Vec<TableRowPointerChDeploymentSchemas>,
 }
 
@@ -2377,8 +2425,16 @@ pub struct TableDefinitionMinioBucket {
     c_locking_enabled: Vec<bool>,
     c_parent: Vec<TableRowPointerMinioCluster>,
     c_referrers_docker_registry_instance__minio_bucket: Vec<Vec<TableRowPointerDockerRegistryInstance>>,
+    c_referrers_minio_bucket_public_ingress__bucket: Vec<Vec<TableRowPointerMinioBucketPublicIngress>>,
     c_referrers_loki_cluster__storage_bucket: Vec<Vec<TableRowPointerLokiCluster>>,
     c_referrers_tempo_cluster__storage_bucket: Vec<Vec<TableRowPointerTempoCluster>>,
+}
+
+pub struct TableDefinitionMinioBucketPublicIngress {
+    rows: Vec<TableRowMinioBucketPublicIngress>,
+    c_bucket: Vec<TableRowPointerMinioBucket>,
+    c_subdomain: Vec<::std::string::String>,
+    c_tld: Vec<TableRowPointerTld>,
 }
 
 pub struct TableDefinitionMinioCluster {
@@ -2397,6 +2453,7 @@ pub struct TableDefinitionMinioCluster {
     c_monitoring_cluster: Vec<::std::string::String>,
     c_expected_zfs_recordsize: Vec<::std::string::String>,
     c_distribute_over_dcs: Vec<bool>,
+    c_multiple_disk_mediums_ok: Vec<bool>,
     c_instance_memory_mb: Vec<i64>,
     c_lb_memory_mb: Vec<i64>,
     c_consul_service_name: Vec<::std::string::String>,
@@ -2473,6 +2530,7 @@ pub struct TableDefinitionNatsCluster {
     c_nats_http_mon_port: Vec<i64>,
     c_nats_prometheus_port: Vec<i64>,
     c_instance_memory_mb: Vec<i64>,
+    c_max_file_store_bytes: Vec<i64>,
     c_children_nats_jetstream_stream: Vec<Vec<TableRowPointerNatsJetstreamStream>>,
     c_children_nats_deployment_instance: Vec<Vec<TableRowPointerNatsDeploymentInstance>>,
 }
@@ -2491,6 +2549,8 @@ pub struct TableDefinitionNatsJetstreamStream {
     c_max_bytes: Vec<i64>,
     c_max_msg_size: Vec<i64>,
     c_enable_subjects: Vec<bool>,
+    c_enable_message_id: Vec<bool>,
+    c_duplicate_window_ns: Vec<i64>,
     c_parent: Vec<TableRowPointerNatsCluster>,
     c_referrers_ch_nats_stream_import__stream: Vec<Vec<TableRowPointerChNatsStreamImport>>,
 }
@@ -2547,6 +2607,13 @@ pub struct TableDefinitionNomadNamespace {
     c_referrers_blackbox_deployment__namespace: Vec<Vec<TableRowPointerBlackboxDeployment>>,
 }
 
+pub struct TableDefinitionPgChannel {
+    rows: Vec<TableRowPgChannel>,
+    c_channel_name: Vec<::std::string::String>,
+    c_payload_type: Vec<::std::string::String>,
+    c_parent: Vec<TableRowPointerPgSchema>,
+}
+
 pub struct TableDefinitionPgDeployment {
     rows: Vec<TableRowPgDeployment>,
     c_deployment_name: Vec<::std::string::String>,
@@ -2581,6 +2648,7 @@ pub struct TableDefinitionPgDeploymentInstance {
     rows: Vec<TableRowPgDeploymentInstance>,
     c_instance_id: Vec<i64>,
     c_pg_server: Vec<TableRowPointerServerVolume>,
+    c_failover_priority: Vec<i64>,
     c_parent: Vec<TableRowPointerPgDeployment>,
 }
 
@@ -2669,6 +2737,7 @@ pub struct TableDefinitionPgSchema {
     c_schema_name: Vec<::std::string::String>,
     c_children_pg_migration: Vec<Vec<TableRowPointerPgMigration>>,
     c_children_pg_query: Vec<Vec<TableRowPointerPgQuery>>,
+    c_children_pg_channel: Vec<Vec<TableRowPointerPgChannel>>,
     c_children_pg_mutator: Vec<Vec<TableRowPointerPgMutator>>,
     c_children_pg_transaction: Vec<Vec<TableRowPointerPgTransaction>>,
     c_children_pg_mat_view: Vec<Vec<TableRowPointerPgMatView>>,
@@ -2963,6 +3032,7 @@ pub struct TableDefinitionTld {
     c_referrers_global_settings__admin_tld: Vec<Vec<TableRowPointerGlobalSettings>>,
     c_referrers_backend_application_deployment_ingress__tld: Vec<Vec<TableRowPointerBackendApplicationDeploymentIngress>>,
     c_referrers_frontend_application_deployment_ingress__tld: Vec<Vec<TableRowPointerFrontendApplicationDeploymentIngress>>,
+    c_referrers_minio_bucket_public_ingress__tld: Vec<Vec<TableRowPointerMinioBucketPublicIngress>>,
     c_referrers_blackbox_deployment_ingress__tld: Vec<Vec<TableRowPointerBlackboxDeploymentIngress>>,
 }
 
@@ -3111,6 +3181,7 @@ pub struct Database {
     http_methods: TableDefinitionHttpMethods,
     loki_cluster: TableDefinitionLokiCluster,
     minio_bucket: TableDefinitionMinioBucket,
+    minio_bucket_public_ingress: TableDefinitionMinioBucketPublicIngress,
     minio_cluster: TableDefinitionMinioCluster,
     minio_instance: TableDefinitionMinioInstance,
     monitoring_cluster: TableDefinitionMonitoringCluster,
@@ -3125,6 +3196,7 @@ pub struct Database {
     nixpkgs_environment: TableDefinitionNixpkgsEnvironment,
     nixpkgs_version: TableDefinitionNixpkgsVersion,
     nomad_namespace: TableDefinitionNomadNamespace,
+    pg_channel: TableDefinitionPgChannel,
     pg_deployment: TableDefinitionPgDeployment,
     pg_deployment_instance: TableDefinitionPgDeploymentInstance,
     pg_deployment_schemas: TableDefinitionPgDeploymentSchemas,
@@ -3424,6 +3496,10 @@ impl Database {
         &self.minio_bucket
     }
 
+    pub fn minio_bucket_public_ingress(&self) -> &TableDefinitionMinioBucketPublicIngress {
+        &self.minio_bucket_public_ingress
+    }
+
     pub fn minio_cluster(&self) -> &TableDefinitionMinioCluster {
         &self.minio_cluster
     }
@@ -3478,6 +3554,10 @@ impl Database {
 
     pub fn nomad_namespace(&self) -> &TableDefinitionNomadNamespace {
         &self.nomad_namespace
+    }
+
+    pub fn pg_channel(&self) -> &TableDefinitionPgChannel {
+        &self.pg_channel
     }
 
     pub fn pg_deployment(&self) -> &TableDefinitionPgDeployment {
@@ -4020,6 +4100,11 @@ impl Database {
         let backend_application_nats_stream_enable_producer: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let backend_application_nats_stream_is_batch_consumer: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let backend_application_nats_stream_enable_subjects: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
+        let backend_application_nats_stream_enable_message_id: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
+        let backend_application_nats_stream_batch_consumer_max_batch_size: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
+        let backend_application_nats_stream_batch_consumer_flush_deadline_ms: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
+        let backend_application_nats_stream_consumer_needs_seq_id: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
+        let backend_application_nats_stream_consumer_needs_stream_name: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let backend_application_nats_stream_parent: Vec<TableRowPointerBackendApplication> = ::bincode::deserialize_from(&mut cursor)?;
 
         let backend_application_nats_stream_len = backend_application_nats_stream_parent.len();
@@ -4030,6 +4115,11 @@ impl Database {
         assert_eq!(backend_application_nats_stream_len, backend_application_nats_stream_enable_producer.len());
         assert_eq!(backend_application_nats_stream_len, backend_application_nats_stream_is_batch_consumer.len());
         assert_eq!(backend_application_nats_stream_len, backend_application_nats_stream_enable_subjects.len());
+        assert_eq!(backend_application_nats_stream_len, backend_application_nats_stream_enable_message_id.len());
+        assert_eq!(backend_application_nats_stream_len, backend_application_nats_stream_batch_consumer_max_batch_size.len());
+        assert_eq!(backend_application_nats_stream_len, backend_application_nats_stream_batch_consumer_flush_deadline_ms.len());
+        assert_eq!(backend_application_nats_stream_len, backend_application_nats_stream_consumer_needs_seq_id.len());
+        assert_eq!(backend_application_nats_stream_len, backend_application_nats_stream_consumer_needs_stream_name.len());
 
         let mut rows_backend_application_nats_stream: Vec<TableRowBackendApplicationNatsStream> = Vec::with_capacity(backend_application_nats_stream_len);
         #[allow(clippy::needless_range_loop)]
@@ -4041,6 +4131,11 @@ impl Database {
                 enable_producer: backend_application_nats_stream_enable_producer[row],
                 is_batch_consumer: backend_application_nats_stream_is_batch_consumer[row],
                 enable_subjects: backend_application_nats_stream_enable_subjects[row],
+                enable_message_id: backend_application_nats_stream_enable_message_id[row],
+                batch_consumer_max_batch_size: backend_application_nats_stream_batch_consumer_max_batch_size[row],
+                batch_consumer_flush_deadline_ms: backend_application_nats_stream_batch_consumer_flush_deadline_ms[row],
+                consumer_needs_seq_id: backend_application_nats_stream_consumer_needs_seq_id[row],
+                consumer_needs_stream_name: backend_application_nats_stream_consumer_needs_stream_name[row],
                 parent: backend_application_nats_stream_parent[row],
             });
         }
@@ -4050,6 +4145,8 @@ impl Database {
         let backend_application_pg_shard_used_queries: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
         let backend_application_pg_shard_used_mutators: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
         let backend_application_pg_shard_used_transactions: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let backend_application_pg_shard_used_consumer_channels: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let backend_application_pg_shard_used_producer_channels: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
         let backend_application_pg_shard_parent: Vec<TableRowPointerBackendApplication> = ::bincode::deserialize_from(&mut cursor)?;
 
         let backend_application_pg_shard_len = backend_application_pg_shard_parent.len();
@@ -4059,6 +4156,8 @@ impl Database {
         assert_eq!(backend_application_pg_shard_len, backend_application_pg_shard_used_queries.len());
         assert_eq!(backend_application_pg_shard_len, backend_application_pg_shard_used_mutators.len());
         assert_eq!(backend_application_pg_shard_len, backend_application_pg_shard_used_transactions.len());
+        assert_eq!(backend_application_pg_shard_len, backend_application_pg_shard_used_consumer_channels.len());
+        assert_eq!(backend_application_pg_shard_len, backend_application_pg_shard_used_producer_channels.len());
 
         let mut rows_backend_application_pg_shard: Vec<TableRowBackendApplicationPgShard> = Vec::with_capacity(backend_application_pg_shard_len);
         #[allow(clippy::needless_range_loop)]
@@ -4069,6 +4168,8 @@ impl Database {
                 used_queries: backend_application_pg_shard_used_queries[row].clone(),
                 used_mutators: backend_application_pg_shard_used_mutators[row].clone(),
                 used_transactions: backend_application_pg_shard_used_transactions[row].clone(),
+                used_consumer_channels: backend_application_pg_shard_used_consumer_channels[row].clone(),
+                used_producer_channels: backend_application_pg_shard_used_producer_channels[row].clone(),
                 parent: backend_application_pg_shard_parent[row],
             });
         }
@@ -4227,13 +4328,15 @@ impl Database {
         let blackbox_deployment_ingress_subdomain: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
         let blackbox_deployment_ingress_tld: Vec<TableRowPointerTld> = ::bincode::deserialize_from(&mut cursor)?;
         let blackbox_deployment_ingress_basic_auth_credentials: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let blackbox_deployment_ingress_client_max_body_size: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
 
-        let blackbox_deployment_ingress_len = blackbox_deployment_ingress_basic_auth_credentials.len();
+        let blackbox_deployment_ingress_len = blackbox_deployment_ingress_client_max_body_size.len();
 
         assert_eq!(blackbox_deployment_ingress_len, blackbox_deployment_ingress_service.len());
         assert_eq!(blackbox_deployment_ingress_len, blackbox_deployment_ingress_port.len());
         assert_eq!(blackbox_deployment_ingress_len, blackbox_deployment_ingress_subdomain.len());
         assert_eq!(blackbox_deployment_ingress_len, blackbox_deployment_ingress_tld.len());
+        assert_eq!(blackbox_deployment_ingress_len, blackbox_deployment_ingress_basic_auth_credentials.len());
 
         let mut rows_blackbox_deployment_ingress: Vec<TableRowBlackboxDeploymentIngress> = Vec::with_capacity(blackbox_deployment_ingress_len);
         #[allow(clippy::needless_range_loop)]
@@ -4244,6 +4347,7 @@ impl Database {
                 subdomain: blackbox_deployment_ingress_subdomain[row].clone(),
                 tld: blackbox_deployment_ingress_tld[row],
                 basic_auth_credentials: blackbox_deployment_ingress_basic_auth_credentials[row].clone(),
+                client_max_body_size: blackbox_deployment_ingress_client_max_body_size[row],
             });
         }
 
@@ -4410,12 +4514,14 @@ impl Database {
         }
 
         let blackbox_deployment_task_mount_target_path: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let blackbox_deployment_task_mount_read_only: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let blackbox_deployment_task_mount_server_volume: Vec<TableRowPointerServerVolume> = ::bincode::deserialize_from(&mut cursor)?;
         let blackbox_deployment_task_mount_parent: Vec<TableRowPointerBlackboxDeploymentTask> = ::bincode::deserialize_from(&mut cursor)?;
 
         let blackbox_deployment_task_mount_len = blackbox_deployment_task_mount_parent.len();
 
         assert_eq!(blackbox_deployment_task_mount_len, blackbox_deployment_task_mount_target_path.len());
+        assert_eq!(blackbox_deployment_task_mount_len, blackbox_deployment_task_mount_read_only.len());
         assert_eq!(blackbox_deployment_task_mount_len, blackbox_deployment_task_mount_server_volume.len());
 
         let mut rows_blackbox_deployment_task_mount: Vec<TableRowBlackboxDeploymentTaskMount> = Vec::with_capacity(blackbox_deployment_task_mount_len);
@@ -4423,6 +4529,7 @@ impl Database {
         for row in 0..blackbox_deployment_task_mount_len {
             rows_blackbox_deployment_task_mount.push(TableRowBlackboxDeploymentTaskMount {
                 target_path: blackbox_deployment_task_mount_target_path[row].clone(),
+                read_only: blackbox_deployment_task_mount_read_only[row],
                 server_volume: blackbox_deployment_task_mount_server_volume[row],
                 parent: blackbox_deployment_task_mount_parent[row],
             });
@@ -4703,6 +4810,7 @@ impl Database {
         let ch_nats_stream_import_consumer_name: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
         let ch_nats_stream_import_into_table: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
         let ch_nats_stream_import_stream: Vec<TableRowPointerNatsJetstreamStream> = ::bincode::deserialize_from(&mut cursor)?;
+        let ch_nats_stream_import_ignore_extra_source_fields: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let ch_nats_stream_import_parent: Vec<TableRowPointerChDeploymentSchemas> = ::bincode::deserialize_from(&mut cursor)?;
 
         let ch_nats_stream_import_len = ch_nats_stream_import_parent.len();
@@ -4710,6 +4818,7 @@ impl Database {
         assert_eq!(ch_nats_stream_import_len, ch_nats_stream_import_consumer_name.len());
         assert_eq!(ch_nats_stream_import_len, ch_nats_stream_import_into_table.len());
         assert_eq!(ch_nats_stream_import_len, ch_nats_stream_import_stream.len());
+        assert_eq!(ch_nats_stream_import_len, ch_nats_stream_import_ignore_extra_source_fields.len());
 
         let mut rows_ch_nats_stream_import: Vec<TableRowChNatsStreamImport> = Vec::with_capacity(ch_nats_stream_import_len);
         #[allow(clippy::needless_range_loop)]
@@ -4718,6 +4827,7 @@ impl Database {
                 consumer_name: ch_nats_stream_import_consumer_name[row].clone(),
                 into_table: ch_nats_stream_import_into_table[row].clone(),
                 stream: ch_nats_stream_import_stream[row],
+                ignore_extra_source_fields: ch_nats_stream_import_ignore_extra_source_fields[row],
                 parent: ch_nats_stream_import_parent[row],
             });
         }
@@ -5546,6 +5656,7 @@ impl Database {
         let minio_bucket_locking_enabled: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let minio_bucket_parent: Vec<TableRowPointerMinioCluster> = ::bincode::deserialize_from(&mut cursor)?;
         let minio_bucket_referrers_docker_registry_instance__minio_bucket: Vec<Vec<TableRowPointerDockerRegistryInstance>> = ::bincode::deserialize_from(&mut cursor)?;
+        let minio_bucket_referrers_minio_bucket_public_ingress__bucket: Vec<Vec<TableRowPointerMinioBucketPublicIngress>> = ::bincode::deserialize_from(&mut cursor)?;
         let minio_bucket_referrers_loki_cluster__storage_bucket: Vec<Vec<TableRowPointerLokiCluster>> = ::bincode::deserialize_from(&mut cursor)?;
         let minio_bucket_referrers_tempo_cluster__storage_bucket: Vec<Vec<TableRowPointerTempoCluster>> = ::bincode::deserialize_from(&mut cursor)?;
 
@@ -5555,6 +5666,7 @@ impl Database {
         assert_eq!(minio_bucket_len, minio_bucket_locking_enabled.len());
         assert_eq!(minio_bucket_len, minio_bucket_parent.len());
         assert_eq!(minio_bucket_len, minio_bucket_referrers_docker_registry_instance__minio_bucket.len());
+        assert_eq!(minio_bucket_len, minio_bucket_referrers_minio_bucket_public_ingress__bucket.len());
         assert_eq!(minio_bucket_len, minio_bucket_referrers_loki_cluster__storage_bucket.len());
 
         let mut rows_minio_bucket: Vec<TableRowMinioBucket> = Vec::with_capacity(minio_bucket_len);
@@ -5565,8 +5677,28 @@ impl Database {
                 locking_enabled: minio_bucket_locking_enabled[row],
                 parent: minio_bucket_parent[row],
                 referrers_docker_registry_instance__minio_bucket: minio_bucket_referrers_docker_registry_instance__minio_bucket[row].clone(),
+                referrers_minio_bucket_public_ingress__bucket: minio_bucket_referrers_minio_bucket_public_ingress__bucket[row].clone(),
                 referrers_loki_cluster__storage_bucket: minio_bucket_referrers_loki_cluster__storage_bucket[row].clone(),
                 referrers_tempo_cluster__storage_bucket: minio_bucket_referrers_tempo_cluster__storage_bucket[row].clone(),
+            });
+        }
+
+        let minio_bucket_public_ingress_bucket: Vec<TableRowPointerMinioBucket> = ::bincode::deserialize_from(&mut cursor)?;
+        let minio_bucket_public_ingress_subdomain: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let minio_bucket_public_ingress_tld: Vec<TableRowPointerTld> = ::bincode::deserialize_from(&mut cursor)?;
+
+        let minio_bucket_public_ingress_len = minio_bucket_public_ingress_tld.len();
+
+        assert_eq!(minio_bucket_public_ingress_len, minio_bucket_public_ingress_bucket.len());
+        assert_eq!(minio_bucket_public_ingress_len, minio_bucket_public_ingress_subdomain.len());
+
+        let mut rows_minio_bucket_public_ingress: Vec<TableRowMinioBucketPublicIngress> = Vec::with_capacity(minio_bucket_public_ingress_len);
+        #[allow(clippy::needless_range_loop)]
+        for row in 0..minio_bucket_public_ingress_len {
+            rows_minio_bucket_public_ingress.push(TableRowMinioBucketPublicIngress {
+                bucket: minio_bucket_public_ingress_bucket[row],
+                subdomain: minio_bucket_public_ingress_subdomain[row].clone(),
+                tld: minio_bucket_public_ingress_tld[row],
             });
         }
 
@@ -5584,6 +5716,7 @@ impl Database {
         let minio_cluster_monitoring_cluster: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
         let minio_cluster_expected_zfs_recordsize: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
         let minio_cluster_distribute_over_dcs: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
+        let minio_cluster_multiple_disk_mediums_ok: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
         let minio_cluster_instance_memory_mb: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let minio_cluster_lb_memory_mb: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let minio_cluster_consul_service_name: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
@@ -5606,6 +5739,7 @@ impl Database {
         assert_eq!(minio_cluster_len, minio_cluster_monitoring_cluster.len());
         assert_eq!(minio_cluster_len, minio_cluster_expected_zfs_recordsize.len());
         assert_eq!(minio_cluster_len, minio_cluster_distribute_over_dcs.len());
+        assert_eq!(minio_cluster_len, minio_cluster_multiple_disk_mediums_ok.len());
         assert_eq!(minio_cluster_len, minio_cluster_instance_memory_mb.len());
         assert_eq!(minio_cluster_len, minio_cluster_lb_memory_mb.len());
         assert_eq!(minio_cluster_len, minio_cluster_consul_service_name.len());
@@ -5629,6 +5763,7 @@ impl Database {
                 monitoring_cluster: minio_cluster_monitoring_cluster[row].clone(),
                 expected_zfs_recordsize: minio_cluster_expected_zfs_recordsize[row].clone(),
                 distribute_over_dcs: minio_cluster_distribute_over_dcs[row],
+                multiple_disk_mediums_ok: minio_cluster_multiple_disk_mediums_ok[row],
                 instance_memory_mb: minio_cluster_instance_memory_mb[row],
                 lb_memory_mb: minio_cluster_lb_memory_mb[row],
                 consul_service_name: minio_cluster_consul_service_name[row].clone(),
@@ -5800,6 +5935,7 @@ impl Database {
         let nats_cluster_nats_http_mon_port: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let nats_cluster_nats_prometheus_port: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let nats_cluster_instance_memory_mb: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
+        let nats_cluster_max_file_store_bytes: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let nats_cluster_children_nats_jetstream_stream: Vec<Vec<TableRowPointerNatsJetstreamStream>> = ::bincode::deserialize_from(&mut cursor)?;
         let nats_cluster_children_nats_deployment_instance: Vec<Vec<TableRowPointerNatsDeploymentInstance>> = ::bincode::deserialize_from(&mut cursor)?;
 
@@ -5819,6 +5955,7 @@ impl Database {
         assert_eq!(nats_cluster_len, nats_cluster_nats_http_mon_port.len());
         assert_eq!(nats_cluster_len, nats_cluster_nats_prometheus_port.len());
         assert_eq!(nats_cluster_len, nats_cluster_instance_memory_mb.len());
+        assert_eq!(nats_cluster_len, nats_cluster_max_file_store_bytes.len());
         assert_eq!(nats_cluster_len, nats_cluster_children_nats_jetstream_stream.len());
 
         let mut rows_nats_cluster: Vec<TableRowNatsCluster> = Vec::with_capacity(nats_cluster_len);
@@ -5839,6 +5976,7 @@ impl Database {
                 nats_http_mon_port: nats_cluster_nats_http_mon_port[row],
                 nats_prometheus_port: nats_cluster_nats_prometheus_port[row],
                 instance_memory_mb: nats_cluster_instance_memory_mb[row],
+                max_file_store_bytes: nats_cluster_max_file_store_bytes[row],
                 children_nats_jetstream_stream: nats_cluster_children_nats_jetstream_stream[row].clone(),
                 children_nats_deployment_instance: nats_cluster_children_nats_deployment_instance[row].clone(),
             });
@@ -5868,6 +6006,8 @@ impl Database {
         let nats_jetstream_stream_max_bytes: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let nats_jetstream_stream_max_msg_size: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let nats_jetstream_stream_enable_subjects: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
+        let nats_jetstream_stream_enable_message_id: Vec<bool> = ::bincode::deserialize_from(&mut cursor)?;
+        let nats_jetstream_stream_duplicate_window_ns: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let nats_jetstream_stream_parent: Vec<TableRowPointerNatsCluster> = ::bincode::deserialize_from(&mut cursor)?;
         let nats_jetstream_stream_referrers_ch_nats_stream_import__stream: Vec<Vec<TableRowPointerChNatsStreamImport>> = ::bincode::deserialize_from(&mut cursor)?;
 
@@ -5878,6 +6018,8 @@ impl Database {
         assert_eq!(nats_jetstream_stream_len, nats_jetstream_stream_max_bytes.len());
         assert_eq!(nats_jetstream_stream_len, nats_jetstream_stream_max_msg_size.len());
         assert_eq!(nats_jetstream_stream_len, nats_jetstream_stream_enable_subjects.len());
+        assert_eq!(nats_jetstream_stream_len, nats_jetstream_stream_enable_message_id.len());
+        assert_eq!(nats_jetstream_stream_len, nats_jetstream_stream_duplicate_window_ns.len());
         assert_eq!(nats_jetstream_stream_len, nats_jetstream_stream_parent.len());
 
         let mut rows_nats_jetstream_stream: Vec<TableRowNatsJetstreamStream> = Vec::with_capacity(nats_jetstream_stream_len);
@@ -5889,6 +6031,8 @@ impl Database {
                 max_bytes: nats_jetstream_stream_max_bytes[row],
                 max_msg_size: nats_jetstream_stream_max_msg_size[row],
                 enable_subjects: nats_jetstream_stream_enable_subjects[row],
+                enable_message_id: nats_jetstream_stream_enable_message_id[row],
+                duplicate_window_ns: nats_jetstream_stream_duplicate_window_ns[row],
                 parent: nats_jetstream_stream_parent[row],
                 referrers_ch_nats_stream_import__stream: nats_jetstream_stream_referrers_ch_nats_stream_import__stream[row].clone(),
             });
@@ -6040,6 +6184,25 @@ impl Database {
             });
         }
 
+        let pg_channel_channel_name: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let pg_channel_payload_type: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
+        let pg_channel_parent: Vec<TableRowPointerPgSchema> = ::bincode::deserialize_from(&mut cursor)?;
+
+        let pg_channel_len = pg_channel_parent.len();
+
+        assert_eq!(pg_channel_len, pg_channel_channel_name.len());
+        assert_eq!(pg_channel_len, pg_channel_payload_type.len());
+
+        let mut rows_pg_channel: Vec<TableRowPgChannel> = Vec::with_capacity(pg_channel_len);
+        #[allow(clippy::needless_range_loop)]
+        for row in 0..pg_channel_len {
+            rows_pg_channel.push(TableRowPgChannel {
+                channel_name: pg_channel_channel_name[row].clone(),
+                payload_type: pg_channel_payload_type[row].clone(),
+                parent: pg_channel_parent[row],
+            });
+        }
+
         let pg_deployment_deployment_name: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
         let pg_deployment_namespace: Vec<TableRowPointerNomadNamespace> = ::bincode::deserialize_from(&mut cursor)?;
         let pg_deployment_region: Vec<TableRowPointerRegion> = ::bincode::deserialize_from(&mut cursor)?;
@@ -6130,12 +6293,14 @@ impl Database {
 
         let pg_deployment_instance_instance_id: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let pg_deployment_instance_pg_server: Vec<TableRowPointerServerVolume> = ::bincode::deserialize_from(&mut cursor)?;
+        let pg_deployment_instance_failover_priority: Vec<i64> = ::bincode::deserialize_from(&mut cursor)?;
         let pg_deployment_instance_parent: Vec<TableRowPointerPgDeployment> = ::bincode::deserialize_from(&mut cursor)?;
 
         let pg_deployment_instance_len = pg_deployment_instance_parent.len();
 
         assert_eq!(pg_deployment_instance_len, pg_deployment_instance_instance_id.len());
         assert_eq!(pg_deployment_instance_len, pg_deployment_instance_pg_server.len());
+        assert_eq!(pg_deployment_instance_len, pg_deployment_instance_failover_priority.len());
 
         let mut rows_pg_deployment_instance: Vec<TableRowPgDeploymentInstance> = Vec::with_capacity(pg_deployment_instance_len);
         #[allow(clippy::needless_range_loop)]
@@ -6143,6 +6308,7 @@ impl Database {
             rows_pg_deployment_instance.push(TableRowPgDeploymentInstance {
                 instance_id: pg_deployment_instance_instance_id[row],
                 pg_server: pg_deployment_instance_pg_server[row],
+                failover_priority: pg_deployment_instance_failover_priority[row],
                 parent: pg_deployment_instance_parent[row],
             });
         }
@@ -6370,6 +6536,7 @@ impl Database {
         let pg_schema_schema_name: Vec<::std::string::String> = ::bincode::deserialize_from(&mut cursor)?;
         let pg_schema_children_pg_migration: Vec<Vec<TableRowPointerPgMigration>> = ::bincode::deserialize_from(&mut cursor)?;
         let pg_schema_children_pg_query: Vec<Vec<TableRowPointerPgQuery>> = ::bincode::deserialize_from(&mut cursor)?;
+        let pg_schema_children_pg_channel: Vec<Vec<TableRowPointerPgChannel>> = ::bincode::deserialize_from(&mut cursor)?;
         let pg_schema_children_pg_mutator: Vec<Vec<TableRowPointerPgMutator>> = ::bincode::deserialize_from(&mut cursor)?;
         let pg_schema_children_pg_transaction: Vec<Vec<TableRowPointerPgTransaction>> = ::bincode::deserialize_from(&mut cursor)?;
         let pg_schema_children_pg_mat_view: Vec<Vec<TableRowPointerPgMatView>> = ::bincode::deserialize_from(&mut cursor)?;
@@ -6382,6 +6549,7 @@ impl Database {
         assert_eq!(pg_schema_len, pg_schema_schema_name.len());
         assert_eq!(pg_schema_len, pg_schema_children_pg_migration.len());
         assert_eq!(pg_schema_len, pg_schema_children_pg_query.len());
+        assert_eq!(pg_schema_len, pg_schema_children_pg_channel.len());
         assert_eq!(pg_schema_len, pg_schema_children_pg_mutator.len());
         assert_eq!(pg_schema_len, pg_schema_children_pg_transaction.len());
         assert_eq!(pg_schema_len, pg_schema_children_pg_mat_view.len());
@@ -6395,6 +6563,7 @@ impl Database {
                 schema_name: pg_schema_schema_name[row].clone(),
                 children_pg_migration: pg_schema_children_pg_migration[row].clone(),
                 children_pg_query: pg_schema_children_pg_query[row].clone(),
+                children_pg_channel: pg_schema_children_pg_channel[row].clone(),
                 children_pg_mutator: pg_schema_children_pg_mutator[row].clone(),
                 children_pg_transaction: pg_schema_children_pg_transaction[row].clone(),
                 children_pg_mat_view: pg_schema_children_pg_mat_view[row].clone(),
@@ -7188,6 +7357,7 @@ impl Database {
         let tld_referrers_global_settings__admin_tld: Vec<Vec<TableRowPointerGlobalSettings>> = ::bincode::deserialize_from(&mut cursor)?;
         let tld_referrers_backend_application_deployment_ingress__tld: Vec<Vec<TableRowPointerBackendApplicationDeploymentIngress>> = ::bincode::deserialize_from(&mut cursor)?;
         let tld_referrers_frontend_application_deployment_ingress__tld: Vec<Vec<TableRowPointerFrontendApplicationDeploymentIngress>> = ::bincode::deserialize_from(&mut cursor)?;
+        let tld_referrers_minio_bucket_public_ingress__tld: Vec<Vec<TableRowPointerMinioBucketPublicIngress>> = ::bincode::deserialize_from(&mut cursor)?;
         let tld_referrers_blackbox_deployment_ingress__tld: Vec<Vec<TableRowPointerBlackboxDeploymentIngress>> = ::bincode::deserialize_from(&mut cursor)?;
 
         let tld_len = tld_referrers_blackbox_deployment_ingress__tld.len();
@@ -7201,6 +7371,7 @@ impl Database {
         assert_eq!(tld_len, tld_referrers_global_settings__admin_tld.len());
         assert_eq!(tld_len, tld_referrers_backend_application_deployment_ingress__tld.len());
         assert_eq!(tld_len, tld_referrers_frontend_application_deployment_ingress__tld.len());
+        assert_eq!(tld_len, tld_referrers_minio_bucket_public_ingress__tld.len());
 
         let mut rows_tld: Vec<TableRowTld> = Vec::with_capacity(tld_len);
         #[allow(clippy::needless_range_loop)]
@@ -7215,6 +7386,7 @@ impl Database {
                 referrers_global_settings__admin_tld: tld_referrers_global_settings__admin_tld[row].clone(),
                 referrers_backend_application_deployment_ingress__tld: tld_referrers_backend_application_deployment_ingress__tld[row].clone(),
                 referrers_frontend_application_deployment_ingress__tld: tld_referrers_frontend_application_deployment_ingress__tld[row].clone(),
+                referrers_minio_bucket_public_ingress__tld: tld_referrers_minio_bucket_public_ingress__tld[row].clone(),
                 referrers_blackbox_deployment_ingress__tld: tld_referrers_blackbox_deployment_ingress__tld[row].clone(),
             });
         }
@@ -7551,6 +7723,11 @@ impl Database {
                 c_enable_producer: backend_application_nats_stream_enable_producer,
                 c_is_batch_consumer: backend_application_nats_stream_is_batch_consumer,
                 c_enable_subjects: backend_application_nats_stream_enable_subjects,
+                c_enable_message_id: backend_application_nats_stream_enable_message_id,
+                c_batch_consumer_max_batch_size: backend_application_nats_stream_batch_consumer_max_batch_size,
+                c_batch_consumer_flush_deadline_ms: backend_application_nats_stream_batch_consumer_flush_deadline_ms,
+                c_consumer_needs_seq_id: backend_application_nats_stream_consumer_needs_seq_id,
+                c_consumer_needs_stream_name: backend_application_nats_stream_consumer_needs_stream_name,
                 c_parent: backend_application_nats_stream_parent,
             },
             backend_application_pg_shard: TableDefinitionBackendApplicationPgShard {
@@ -7560,6 +7737,8 @@ impl Database {
                 c_used_queries: backend_application_pg_shard_used_queries,
                 c_used_mutators: backend_application_pg_shard_used_mutators,
                 c_used_transactions: backend_application_pg_shard_used_transactions,
+                c_used_consumer_channels: backend_application_pg_shard_used_consumer_channels,
+                c_used_producer_channels: backend_application_pg_shard_used_producer_channels,
                 c_parent: backend_application_pg_shard_parent,
             },
             backend_application_s3_bucket: TableDefinitionBackendApplicationS3Bucket {
@@ -7617,6 +7796,7 @@ impl Database {
                 c_subdomain: blackbox_deployment_ingress_subdomain,
                 c_tld: blackbox_deployment_ingress_tld,
                 c_basic_auth_credentials: blackbox_deployment_ingress_basic_auth_credentials,
+                c_client_max_body_size: blackbox_deployment_ingress_client_max_body_size,
             },
             blackbox_deployment_local_file: TableDefinitionBlackboxDeploymentLocalFile {
                 rows: rows_blackbox_deployment_local_file,
@@ -7673,6 +7853,7 @@ impl Database {
             blackbox_deployment_task_mount: TableDefinitionBlackboxDeploymentTaskMount {
                 rows: rows_blackbox_deployment_task_mount,
                 c_target_path: blackbox_deployment_task_mount_target_path,
+                c_read_only: blackbox_deployment_task_mount_read_only,
                 c_server_volume: blackbox_deployment_task_mount_server_volume,
                 c_parent: blackbox_deployment_task_mount_parent,
             },
@@ -7769,6 +7950,7 @@ impl Database {
                 c_consumer_name: ch_nats_stream_import_consumer_name,
                 c_into_table: ch_nats_stream_import_into_table,
                 c_stream: ch_nats_stream_import_stream,
+                c_ignore_extra_source_fields: ch_nats_stream_import_ignore_extra_source_fields,
                 c_parent: ch_nats_stream_import_parent,
             },
             ch_query: TableDefinitionChQuery {
@@ -8042,8 +8224,15 @@ impl Database {
                 c_locking_enabled: minio_bucket_locking_enabled,
                 c_parent: minio_bucket_parent,
                 c_referrers_docker_registry_instance__minio_bucket: minio_bucket_referrers_docker_registry_instance__minio_bucket,
+                c_referrers_minio_bucket_public_ingress__bucket: minio_bucket_referrers_minio_bucket_public_ingress__bucket,
                 c_referrers_loki_cluster__storage_bucket: minio_bucket_referrers_loki_cluster__storage_bucket,
                 c_referrers_tempo_cluster__storage_bucket: minio_bucket_referrers_tempo_cluster__storage_bucket,
+            },
+            minio_bucket_public_ingress: TableDefinitionMinioBucketPublicIngress {
+                rows: rows_minio_bucket_public_ingress,
+                c_bucket: minio_bucket_public_ingress_bucket,
+                c_subdomain: minio_bucket_public_ingress_subdomain,
+                c_tld: minio_bucket_public_ingress_tld,
             },
             minio_cluster: TableDefinitionMinioCluster {
                 rows: rows_minio_cluster,
@@ -8061,6 +8250,7 @@ impl Database {
                 c_monitoring_cluster: minio_cluster_monitoring_cluster,
                 c_expected_zfs_recordsize: minio_cluster_expected_zfs_recordsize,
                 c_distribute_over_dcs: minio_cluster_distribute_over_dcs,
+                c_multiple_disk_mediums_ok: minio_cluster_multiple_disk_mediums_ok,
                 c_instance_memory_mb: minio_cluster_instance_memory_mb,
                 c_lb_memory_mb: minio_cluster_lb_memory_mb,
                 c_consul_service_name: minio_cluster_consul_service_name,
@@ -8131,6 +8321,7 @@ impl Database {
                 c_nats_http_mon_port: nats_cluster_nats_http_mon_port,
                 c_nats_prometheus_port: nats_cluster_nats_prometheus_port,
                 c_instance_memory_mb: nats_cluster_instance_memory_mb,
+                c_max_file_store_bytes: nats_cluster_max_file_store_bytes,
                 c_children_nats_jetstream_stream: nats_cluster_children_nats_jetstream_stream,
                 c_children_nats_deployment_instance: nats_cluster_children_nats_deployment_instance,
             },
@@ -8147,6 +8338,8 @@ impl Database {
                 c_max_bytes: nats_jetstream_stream_max_bytes,
                 c_max_msg_size: nats_jetstream_stream_max_msg_size,
                 c_enable_subjects: nats_jetstream_stream_enable_subjects,
+                c_enable_message_id: nats_jetstream_stream_enable_message_id,
+                c_duplicate_window_ns: nats_jetstream_stream_duplicate_window_ns,
                 c_parent: nats_jetstream_stream_parent,
                 c_referrers_ch_nats_stream_import__stream: nats_jetstream_stream_referrers_ch_nats_stream_import__stream,
             },
@@ -8197,6 +8390,12 @@ impl Database {
                 c_referrers_tempo_cluster__namespace: nomad_namespace_referrers_tempo_cluster__namespace,
                 c_referrers_blackbox_deployment__namespace: nomad_namespace_referrers_blackbox_deployment__namespace,
             },
+            pg_channel: TableDefinitionPgChannel {
+                rows: rows_pg_channel,
+                c_channel_name: pg_channel_channel_name,
+                c_payload_type: pg_channel_payload_type,
+                c_parent: pg_channel_parent,
+            },
             pg_deployment: TableDefinitionPgDeployment {
                 rows: rows_pg_deployment,
                 c_deployment_name: pg_deployment_deployment_name,
@@ -8230,6 +8429,7 @@ impl Database {
                 rows: rows_pg_deployment_instance,
                 c_instance_id: pg_deployment_instance_instance_id,
                 c_pg_server: pg_deployment_instance_pg_server,
+                c_failover_priority: pg_deployment_instance_failover_priority,
                 c_parent: pg_deployment_instance_parent,
             },
             pg_deployment_schemas: TableDefinitionPgDeploymentSchemas {
@@ -8307,6 +8507,7 @@ impl Database {
                 c_schema_name: pg_schema_schema_name,
                 c_children_pg_migration: pg_schema_children_pg_migration,
                 c_children_pg_query: pg_schema_children_pg_query,
+                c_children_pg_channel: pg_schema_children_pg_channel,
                 c_children_pg_mutator: pg_schema_children_pg_mutator,
                 c_children_pg_transaction: pg_schema_children_pg_transaction,
                 c_children_pg_mat_view: pg_schema_children_pg_mat_view,
@@ -8575,6 +8776,7 @@ impl Database {
                 c_referrers_global_settings__admin_tld: tld_referrers_global_settings__admin_tld,
                 c_referrers_backend_application_deployment_ingress__tld: tld_referrers_backend_application_deployment_ingress__tld,
                 c_referrers_frontend_application_deployment_ingress__tld: tld_referrers_frontend_application_deployment_ingress__tld,
+                c_referrers_minio_bucket_public_ingress__tld: tld_referrers_minio_bucket_public_ingress__tld,
                 c_referrers_blackbox_deployment_ingress__tld: tld_referrers_blackbox_deployment_ingress__tld,
             },
             tld_cname_record: TableDefinitionTldCnameRecord {
@@ -9149,6 +9351,26 @@ impl TableDefinitionBackendApplicationNatsStream {
         self.c_enable_subjects[ptr.0]
     }
 
+    pub fn c_enable_message_id(&self, ptr: TableRowPointerBackendApplicationNatsStream) -> bool {
+        self.c_enable_message_id[ptr.0]
+    }
+
+    pub fn c_batch_consumer_max_batch_size(&self, ptr: TableRowPointerBackendApplicationNatsStream) -> i64 {
+        self.c_batch_consumer_max_batch_size[ptr.0]
+    }
+
+    pub fn c_batch_consumer_flush_deadline_ms(&self, ptr: TableRowPointerBackendApplicationNatsStream) -> i64 {
+        self.c_batch_consumer_flush_deadline_ms[ptr.0]
+    }
+
+    pub fn c_consumer_needs_seq_id(&self, ptr: TableRowPointerBackendApplicationNatsStream) -> bool {
+        self.c_consumer_needs_seq_id[ptr.0]
+    }
+
+    pub fn c_consumer_needs_stream_name(&self, ptr: TableRowPointerBackendApplicationNatsStream) -> bool {
+        self.c_consumer_needs_stream_name[ptr.0]
+    }
+
     pub fn c_parent(&self, ptr: TableRowPointerBackendApplicationNatsStream) -> TableRowPointerBackendApplication {
         self.c_parent[ptr.0]
     }
@@ -9188,6 +9410,14 @@ impl TableDefinitionBackendApplicationPgShard {
 
     pub fn c_used_transactions(&self, ptr: TableRowPointerBackendApplicationPgShard) -> &::std::string::String {
         &self.c_used_transactions[ptr.0]
+    }
+
+    pub fn c_used_consumer_channels(&self, ptr: TableRowPointerBackendApplicationPgShard) -> &::std::string::String {
+        &self.c_used_consumer_channels[ptr.0]
+    }
+
+    pub fn c_used_producer_channels(&self, ptr: TableRowPointerBackendApplicationPgShard) -> &::std::string::String {
+        &self.c_used_producer_channels[ptr.0]
     }
 
     pub fn c_parent(&self, ptr: TableRowPointerBackendApplicationPgShard) -> TableRowPointerBackendApplication {
@@ -9448,6 +9678,10 @@ impl TableDefinitionBlackboxDeploymentIngress {
         &self.c_basic_auth_credentials[ptr.0]
     }
 
+    pub fn c_client_max_body_size(&self, ptr: TableRowPointerBlackboxDeploymentIngress) -> i64 {
+        self.c_client_max_body_size[ptr.0]
+    }
+
 }
 
 impl TableDefinitionBlackboxDeploymentLocalFile {
@@ -9705,6 +9939,10 @@ impl TableDefinitionBlackboxDeploymentTaskMount {
 
     pub fn c_target_path(&self, ptr: TableRowPointerBlackboxDeploymentTaskMount) -> &::std::string::String {
         &self.c_target_path[ptr.0]
+    }
+
+    pub fn c_read_only(&self, ptr: TableRowPointerBlackboxDeploymentTaskMount) -> bool {
+        self.c_read_only[ptr.0]
     }
 
     pub fn c_server_volume(&self, ptr: TableRowPointerBlackboxDeploymentTaskMount) -> TableRowPointerServerVolume {
@@ -10134,6 +10372,10 @@ impl TableDefinitionChNatsStreamImport {
 
     pub fn c_stream(&self, ptr: TableRowPointerChNatsStreamImport) -> TableRowPointerNatsJetstreamStream {
         self.c_stream[ptr.0]
+    }
+
+    pub fn c_ignore_extra_source_fields(&self, ptr: TableRowPointerChNatsStreamImport) -> bool {
+        self.c_ignore_extra_source_fields[ptr.0]
     }
 
     pub fn c_parent(&self, ptr: TableRowPointerChNatsStreamImport) -> TableRowPointerChDeploymentSchemas {
@@ -11358,12 +11600,45 @@ impl TableDefinitionMinioBucket {
         &self.c_referrers_docker_registry_instance__minio_bucket[ptr.0]
     }
 
+    pub fn c_referrers_minio_bucket_public_ingress__bucket(&self, ptr: TableRowPointerMinioBucket) -> &[TableRowPointerMinioBucketPublicIngress] {
+        &self.c_referrers_minio_bucket_public_ingress__bucket[ptr.0]
+    }
+
     pub fn c_referrers_loki_cluster__storage_bucket(&self, ptr: TableRowPointerMinioBucket) -> &[TableRowPointerLokiCluster] {
         &self.c_referrers_loki_cluster__storage_bucket[ptr.0]
     }
 
     pub fn c_referrers_tempo_cluster__storage_bucket(&self, ptr: TableRowPointerMinioBucket) -> &[TableRowPointerTempoCluster] {
         &self.c_referrers_tempo_cluster__storage_bucket[ptr.0]
+    }
+
+}
+
+impl TableDefinitionMinioBucketPublicIngress {
+    pub fn len(&self) -> usize {
+        self.rows.len()
+    }
+
+    pub fn rows_iter(&self) -> impl ::std::iter::Iterator<Item = TableRowPointerMinioBucketPublicIngress> {
+        (0..self.rows.len()).map(|idx| {
+            TableRowPointerMinioBucketPublicIngress(idx)
+        })
+    }
+
+    pub fn row(&self, ptr: TableRowPointerMinioBucketPublicIngress) -> &TableRowMinioBucketPublicIngress {
+        &self.rows[ptr.0]
+    }
+
+    pub fn c_bucket(&self, ptr: TableRowPointerMinioBucketPublicIngress) -> TableRowPointerMinioBucket {
+        self.c_bucket[ptr.0]
+    }
+
+    pub fn c_subdomain(&self, ptr: TableRowPointerMinioBucketPublicIngress) -> &::std::string::String {
+        &self.c_subdomain[ptr.0]
+    }
+
+    pub fn c_tld(&self, ptr: TableRowPointerMinioBucketPublicIngress) -> TableRowPointerTld {
+        self.c_tld[ptr.0]
     }
 
 }
@@ -11437,6 +11712,10 @@ impl TableDefinitionMinioCluster {
 
     pub fn c_distribute_over_dcs(&self, ptr: TableRowPointerMinioCluster) -> bool {
         self.c_distribute_over_dcs[ptr.0]
+    }
+
+    pub fn c_multiple_disk_mediums_ok(&self, ptr: TableRowPointerMinioCluster) -> bool {
+        self.c_multiple_disk_mediums_ok[ptr.0]
     }
 
     pub fn c_instance_memory_mb(&self, ptr: TableRowPointerMinioCluster) -> i64 {
@@ -11749,6 +12028,10 @@ impl TableDefinitionNatsCluster {
         self.c_instance_memory_mb[ptr.0]
     }
 
+    pub fn c_max_file_store_bytes(&self, ptr: TableRowPointerNatsCluster) -> i64 {
+        self.c_max_file_store_bytes[ptr.0]
+    }
+
     pub fn c_children_nats_jetstream_stream(&self, ptr: TableRowPointerNatsCluster) -> &[TableRowPointerNatsJetstreamStream] {
         &self.c_children_nats_jetstream_stream[ptr.0]
     }
@@ -11821,6 +12104,14 @@ impl TableDefinitionNatsJetstreamStream {
 
     pub fn c_enable_subjects(&self, ptr: TableRowPointerNatsJetstreamStream) -> bool {
         self.c_enable_subjects[ptr.0]
+    }
+
+    pub fn c_enable_message_id(&self, ptr: TableRowPointerNatsJetstreamStream) -> bool {
+        self.c_enable_message_id[ptr.0]
+    }
+
+    pub fn c_duplicate_window_ns(&self, ptr: TableRowPointerNatsJetstreamStream) -> i64 {
+        self.c_duplicate_window_ns[ptr.0]
     }
 
     pub fn c_parent(&self, ptr: TableRowPointerNatsJetstreamStream) -> TableRowPointerNatsCluster {
@@ -12046,6 +12337,35 @@ impl TableDefinitionNomadNamespace {
 
 }
 
+impl TableDefinitionPgChannel {
+    pub fn len(&self) -> usize {
+        self.rows.len()
+    }
+
+    pub fn rows_iter(&self) -> impl ::std::iter::Iterator<Item = TableRowPointerPgChannel> {
+        (0..self.rows.len()).map(|idx| {
+            TableRowPointerPgChannel(idx)
+        })
+    }
+
+    pub fn row(&self, ptr: TableRowPointerPgChannel) -> &TableRowPgChannel {
+        &self.rows[ptr.0]
+    }
+
+    pub fn c_channel_name(&self, ptr: TableRowPointerPgChannel) -> &::std::string::String {
+        &self.c_channel_name[ptr.0]
+    }
+
+    pub fn c_payload_type(&self, ptr: TableRowPointerPgChannel) -> &::std::string::String {
+        &self.c_payload_type[ptr.0]
+    }
+
+    pub fn c_parent(&self, ptr: TableRowPointerPgChannel) -> TableRowPointerPgSchema {
+        self.c_parent[ptr.0]
+    }
+
+}
+
 impl TableDefinitionPgDeployment {
     pub fn len(&self) -> usize {
         self.rows.len()
@@ -12188,6 +12508,10 @@ impl TableDefinitionPgDeploymentInstance {
 
     pub fn c_pg_server(&self, ptr: TableRowPointerPgDeploymentInstance) -> TableRowPointerServerVolume {
         self.c_pg_server[ptr.0]
+    }
+
+    pub fn c_failover_priority(&self, ptr: TableRowPointerPgDeploymentInstance) -> i64 {
+        self.c_failover_priority[ptr.0]
     }
 
     pub fn c_parent(&self, ptr: TableRowPointerPgDeploymentInstance) -> TableRowPointerPgDeployment {
@@ -12551,6 +12875,10 @@ impl TableDefinitionPgSchema {
 
     pub fn c_children_pg_query(&self, ptr: TableRowPointerPgSchema) -> &[TableRowPointerPgQuery] {
         &self.c_children_pg_query[ptr.0]
+    }
+
+    pub fn c_children_pg_channel(&self, ptr: TableRowPointerPgSchema) -> &[TableRowPointerPgChannel] {
+        &self.c_children_pg_channel[ptr.0]
     }
 
     pub fn c_children_pg_mutator(&self, ptr: TableRowPointerPgSchema) -> &[TableRowPointerPgMutator] {
@@ -13753,6 +14081,10 @@ impl TableDefinitionTld {
 
     pub fn c_referrers_frontend_application_deployment_ingress__tld(&self, ptr: TableRowPointerTld) -> &[TableRowPointerFrontendApplicationDeploymentIngress] {
         &self.c_referrers_frontend_application_deployment_ingress__tld[ptr.0]
+    }
+
+    pub fn c_referrers_minio_bucket_public_ingress__tld(&self, ptr: TableRowPointerTld) -> &[TableRowPointerMinioBucketPublicIngress] {
+        &self.c_referrers_minio_bucket_public_ingress__tld[ptr.0]
     }
 
     pub fn c_referrers_blackbox_deployment_ingress__tld(&self, ptr: TableRowPointerTld) -> &[TableRowPointerBlackboxDeploymentIngress] {
